@@ -1,11 +1,11 @@
-name: "Build & Test"
+name: "Build & Test & Lint"
 
 on:
   pull_request:
 
 jobs:
   build:
-    name: Build & Test
+    name: Build & Test & Lint
     runs-on: ubuntu-latest
 
     steps:
