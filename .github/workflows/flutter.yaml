@@ -25,7 +25,11 @@ jobs:
           channel: 'stable'
 
       - name: Disable telemetry
-        run: flutter  --disable-telemetry
+        run: flutter --disable-telemetry
+      - name: Disable analytics
+        run: flutter config --no-analytics
+      - name: Disable animations
+        run: flutter config --no-cli-animations
 
       - name: Install Dependencies
         run: flutter pub get
