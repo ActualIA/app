@@ -24,8 +24,6 @@ jobs:
           flutter-version: '3.19.3'
           channel: 'stable'
 
-      - name: Disable telemetry
-        run: flutter --disable-telemetry
       - name: Disable analytics
         run: flutter config --no-analytics
       - name: Disable animations
