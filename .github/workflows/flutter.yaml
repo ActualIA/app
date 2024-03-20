@@ -32,6 +32,9 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
 
+      - name: Check code format
+        run: dart format lib -o none --set-exit-if-changed
+
       - name: Build flutter app
         run: flutter build apk
 
