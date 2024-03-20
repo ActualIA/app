@@ -29,7 +29,7 @@ jobs:
 
         #4 install dependencies
       - name: Install Dependencies
-        run: flutter pub get
+        run: flutter pub get --disable-telemetry
 
         #5 build
       - name: Build flutter app
