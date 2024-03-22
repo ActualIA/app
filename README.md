@@ -24,3 +24,7 @@ pre-commit install --hook-type commit-msg
 ## Keeping a clean code/git
 
 All the commits must follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification. It is checked both locally by the `pre-commit` hook and by the CI on pull requests.
+
+## Figma
+
+To direct the design process, a [Figma Board](https://www.figma.com/files/project/216524201) has been setup for team members. It houses the main design elements.
