@@ -37,7 +37,7 @@ pacman -S python-pre-commit
 Then run:
 
 ```sh
-pre-commit install --hook-type commit-msg
+pre-commit install --hook-type commit-msg --hook-type pre-commit
 ```
 
 ## Keeping a clean code/git
