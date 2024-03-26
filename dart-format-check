@@ -1,0 +1,14 @@
+#!/usr/bin/python
+
+import subprocess
+import sys
+
+if len(sys.argv) == 1:
+    exit(0)
+
+ret = subprocess.run(["dart", "format", "-o", "none", "--set-exit-if-changed", *sys.argv[1:]])
+
+if ret.returncode != 0:
+    print("\033[31mOne or more files are incorrectly formatted !")
+    print("\033[31mUse 'dart format lib' to fix.")
+    exit(1)
