@@ -38,6 +38,7 @@ Then run:
 
 ```sh
 pre-commit install --hook-type commit-msg --hook-type pre-commit
+pre-commit run --all-files
 ```
 
 ## Keeping a clean code/git
