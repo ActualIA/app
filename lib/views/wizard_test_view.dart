@@ -18,54 +18,67 @@ class _WizardTestViewState extends State<WizardTestView> {
 
   @override
   Widget build(BuildContext context) {
-      return Center(
+      return Container(
         child: Scaffold(
-          body: Column(
-            children: <Widget>[
-              Column(
+          body: Container(
+            margin: const EdgeInsets.fromLTRB(8.0, 40.0, 8.0, 8.0),
+            child: Column(
+              children: <Widget>[
                 //each formField is an entry in the wizard
-                children: [
-                  const Text("Enter country"),
-                  TextFormField(
+                const Text(
+                  "Enter country",
+                  textScaler: TextScaler.linear(1.5),
+                ),
+                TextFormField(
                     decoration: const InputDecoration(
-                      icon: Icon(Icons.map),
-                      labelText: "Country"
+                        icon: Icon(Icons.map),
+                        labelText: "Country"
                     ),
                     onChanged: (String? val) {
                       country = val;
                     }
+                ),
+                const Text(
+                  "Enter city",
+                  textScaler: TextScaler.linear(1.5),
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(
+                      icon: Icon(Icons.location_city),
+                      labelText: "city"
                   ),
-                  const Text("Enter city"),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                        icon: Icon(Icons.location_city),
-                        labelText: "city"
-                    ),
-                    onChanged: (String? val) {
-                      city = val;
-                    },
+                  onChanged: (String? val) {
+                    city = val;
+                  },
+                ),
+                const Text(
+                    "Enter center of interest 1",
+                    textScaler: TextScaler.linear(1.5),
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(
+                      icon: Icon(Icons.anchor),
+                      labelText: "interest 1"
                   ),
-                  const Text("Enter center of interest 1"),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                        labelText: "interest 1"
-                    ),
-                    onChanged: (String? val) {
-                      interest1 = val;
-                    },
+                  onChanged: (String? val) {
+                    interest1 = val;
+                  },
+                ),
+                const Text(
+                  "Enter center of interest 2",
+                  textScaler: TextScaler.linear(1.5),
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(
+                      icon: Icon(Icons.anchor),
+                      labelText: "interest 2"
                   ),
-                  const Text("Enter center of interest 2"),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                        labelText: "interest 2"
-                    ),
-                    onChanged: (String? val) {
-                      interest2 = val;
-                    },
-                  )
-                ]
-              ),
-            ],
+                  onChanged: (String? val) {
+                    interest2 = val;
+                  },
+                )
+              ],
+            ),
           ),
           bottomNavigationBar: OutlinedButton(
             onPressed: sendData,
