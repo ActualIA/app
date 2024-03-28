@@ -1,113 +1,77 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'dart:developer';
 
-class WizardTestView extends StatefulWidget {
-  const WizardTestView({super.key});
+import '../widgets/wizard_widgets.dart';
 
+class WizardTestView extends StatefulWidget {
+  final List<String> countries = ["bob1", "bob2", "bob3"];  //TODO get a list of country
+  final List<String> cities = ["mich1", "mich2", "mich3"]; //TODO get a list of cities? Does it make sense (too much possibilities)
+
+  WizardTestView({super.key});
 
   @override
   State<StatefulWidget> createState() => _WizardTestViewState();
 }
 
 class _WizardTestViewState extends State<WizardTestView> {
-  String? country;
-  String? city;
-  String? interest1;
-  String? interest2;
+  String? _city;
+  String? _country;
+  String? _interest1;
+  String? _interest2;
 
   @override
   Widget build(BuildContext context) {
-      return Container(
-        child: Scaffold(
-          body: Container(
-            margin: const EdgeInsets.fromLTRB(8.0, 40.0, 8.0, 8.0),
-            child: Column(
-              children: <Widget>[
-                //each formField is an entry in the wizard
-                const Text(
-                  "Enter country",
-                  textScaler: TextScaler.linear(1.5),
-                ),
-                TextFormField(
-                    decoration: const InputDecoration(
-                        icon: Icon(Icons.map),
-                        labelText: "Country"
-                    ),
-                    onChanged: (String? val) {
-                      country = val;
-                    }
-                ),
-                const Text(
-                  "Enter city",
-                  textScaler: TextScaler.linear(1.5),
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                      icon: Icon(Icons.location_city),
-                      labelText: "city"
-                  ),
-                  onChanged: (String? val) {
-                    city = val;
-                  },
-                ),
-                const Text(
-                    "Enter center of interest 1",
-                    textScaler: TextScaler.linear(1.5),
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                      icon: Icon(Icons.anchor),
-                      labelText: "interest 1"
-                  ),
-                  onChanged: (String? val) {
-                    interest1 = val;
-                  },
-                ),
-                const Text(
-                  "Enter center of interest 2",
-                  textScaler: TextScaler.linear(1.5),
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                      icon: Icon(Icons.anchor),
-                      labelText: "interest 2"
-                  ),
-                  onChanged: (String? val) {
-                    interest2 = val;
-                  },
-                )
-              ],
-            ),
+      return Scaffold(
+        body: Container(
+          margin: const EdgeInsets.fromLTRB(16.0, 40.0, 16.0, 8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              //each formField is an entry in the wizard
+              SelectorWithInstruction(
+                  (value) { setState(() { _country = value; }); },
+                  "Select a country",
+                  widget.countries,
+                  "Country"),
+              SelectorWithInstruction(
+                  (value) { setState(() { _city = value; }); },
+                  "Select a city",
+                  widget.cities,
+                  "City"
+              ),
+              TextFormFieldWithInstruction(
+                  (value) { setState(() { _interest1 = value; }); },
+                  "Enter a center of interest",
+                  "Interest 1"),
+              TextFormFieldWithInstruction(
+                  (value) { setState(() { _interest2 = value; }); },
+                  "Enter a second center of interest",
+                  "Interest 2")
+            ],
           ),
-          bottomNavigationBar: OutlinedButton(
-            onPressed: sendData,
-            child: const Text("Validate"),
+        ),
+        bottomNavigationBar: Container(
+          margin: const EdgeInsets.all(12.0),
+          child: SizedBox(
+            height: 100,
+            child: OutlinedButton(
+              onPressed: sendData,
+              child: const Text(
+                "Validate",
+                textScaler: TextScaler.linear(2.0),
+              ),
+            ),
           ),
         )
       );
   }
 
-  bool isCountry(String? val) {
-    //TODO implement, I think the logic should not be handled in the view
-    return true;
-  }
-
-  bool isCity(String? val) {
-    //TODO implement, I think the logic should not be handled in the view
-    return false;
-  }
-
-  bool isInterestValid(String? val) {
-    //TODO implement, I think the logic should not be handled in the view
-    return true;
-  }
-
   void sendData() {
-    log('country: $country\n'
-        'city: $city\n'
-        'interest1: $interest1\n'
-        'interest2: $interest2\n'
+    log('country: $_country\n'
+        'city: $_city\n'
+        'interest1: $_interest1\n'
+        'interest2: $_interest2\n'
         'data sent successfully');
   }
 }
+
