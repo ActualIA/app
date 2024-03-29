@@ -1,4 +1,7 @@
+import 'package:actualia/models/news_settings.dart';
+import 'package:actualia/viewmodels/news_settings.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:developer';
 
 import '../widgets/wizard_widgets.dart';
@@ -21,57 +24,59 @@ class _WizardTestViewState extends State<WizardTestView> {
 
   @override
   Widget build(BuildContext context) {
-      return Scaffold(
-        body: Container(
-          margin: const EdgeInsets.fromLTRB(16.0, 40.0, 16.0, 8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              //each formField is an entry in the wizard
-              SelectorWithInstruction(
-                  (value) { setState(() { _country = value; }); },
-                  "Select a country",
-                  widget.countries,
-                  "Country"),
-              SelectorWithInstruction(
-                  (value) { setState(() { _city = value; }); },
-                  "Select a city",
-                  widget.cities,
-                  "City"
-              ),
-              TextFormFieldWithInstruction(
-                  (value) { setState(() { _interest1 = value; }); },
-                  "Enter a center of interest",
-                  "Interest 1"),
-              TextFormFieldWithInstruction(
-                  (value) { setState(() { _interest2 = value; }); },
-                  "Enter a second center of interest",
-                  "Interest 2")
-            ],
-          ),
+    NewsSettingsViewModel newsSettingsModel = Provider.of<NewsSettingsViewModel>(context, listen: false);
+    NewsSettings newsSettingsDefault = NewsSettings.defaults();
+
+    return Scaffold(
+      body: Container(
+        margin: const EdgeInsets.fromLTRB(16.0, 40.0, 16.0, 8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            //each formField is an entry in the wizard
+            SelectorWithInstruction(
+                (value) { setState(() { _country = value; }); },
+                "Select a country",
+                newsSettingsDefault.countries,
+                "Country"),
+            SelectorWithInstruction(
+                (value) { setState(() { _city = value; }); },
+                "Select a city",
+                widget.cities,
+                "City"
+            ),
+            TextFormFieldWithInstruction(
+                (value) { setState(() { _interest1 = value; }); },
+                "Enter a center of interest",
+                "Interest 1"),
+            TextFormFieldWithInstruction(
+                (value) { setState(() { _interest2 = value; }); },
+                "Enter a second center of interest",
+                "Interest 2")
+          ],
         ),
-        bottomNavigationBar: Container(
-          margin: const EdgeInsets.all(12.0),
-          child: SizedBox(
-            height: 100,
-            child: OutlinedButton(
-              onPressed: sendData,
-              child: const Text(
-                "Validate",
-                textScaler: TextScaler.linear(2.0),
-              ),
+      ),
+      bottomNavigationBar: Container(
+        margin: const EdgeInsets.all(12.0),
+        child: SizedBox(
+          height: 100,
+          child: OutlinedButton(
+            onPressed: () {
+              log('country: $_country\n'
+                  'city: $_city\n'
+                  'interest1: $_interest1\n'
+                  'interest2: $_interest2\n'
+                  'data sent successfully');
+              newsSettingsModel.pushSettings(newsSettingsDefault);
+            },
+            child: const Text(
+              "Validate",
+              textScaler: TextScaler.linear(2.0),
             ),
           ),
-        )
-      );
-  }
-
-  void sendData() {
-    log('country: $_country\n'
-        'city: $_city\n'
-        'interest1: $_interest1\n'
-        'interest2: $_interest2\n'
-        'data sent successfully');
+        ),
+      )
+    );
   }
 }
 
