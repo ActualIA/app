@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_selector/widget/flutter_single_select.dart';
@@ -10,7 +11,7 @@ import 'package:flutter_custom_selector/widget/flutter_single_select.dart';
  * @selectorTitle: the label to display when no choice is made
  */
 class SelectorWithInstruction extends StatefulWidget {
-  final ValueChanged<String> onSelectionDone;
+  final ValueChanged<List<String>> onSelectionDone;
   final String? instr;
   final List<String>? items;
   final String? selectorTitle;
@@ -28,10 +29,13 @@ class SelectorWithInstruction extends StatefulWidget {
 }
 
 class _SelectorWithInstruction extends State<SelectorWithInstruction> {
-  String? _res;
+  late List<String> _items;
+  final List<String> _selectedItems = [];
 
   @override
   Widget build(BuildContext context) {
+    setState(() { _items = widget.items!; });
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -41,13 +45,16 @@ class _SelectorWithInstruction extends State<SelectorWithInstruction> {
         ),
         const SizedBox(height: 10),
         CustomSingleSelectField(
-            items: widget.items!,
+            items: _items,
             title: widget.selectorTitle!,
             onSelectionDone: (val) {
+              log("val : $val\n ######## _selectedItems : $_selectedItems");
               setState(() {
-                _res = val;
+                _selectedItems.add(val);
+                _items.remove(val);
               });
-              widget.onSelectionDone(_res!);
+              log("_items : $_items | _selectedItems : $_selectedItems");
+              widget.onSelectionDone(_selectedItems);
             }
         )
       ],
