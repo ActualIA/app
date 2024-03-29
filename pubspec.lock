@@ -94,6 +94,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_custom_selector:
+    dependency: "direct main"
+    description:
+      name: flutter_custom_selector
+      sha256: "4c42dcd6cc2de1574454f0fc86b324303d1bd30e4bc236d01071525342d51427"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   flutter_lints:
     dependency: "direct dev"
     description:

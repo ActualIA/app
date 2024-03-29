@@ -2,6 +2,7 @@ import 'package:actualia/models/user_model.dart';
 import 'package:actualia/views/home_view.dart';
 import 'package:actualia/views/login_view.dart';
 import 'package:actualia/views/wizard_test_view.dart';
+import 'package:actualia/viewmodels/news_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -44,7 +45,7 @@ class _AppState extends State<App> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const WizardTestView()
+      home: WizardTestView()
       // Scaffold(
       //   appBar: AppBar(
       //     backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -59,6 +60,7 @@ class _AppState extends State<App> {
       //     ],
       //   )
       // )
+
     );
   }
 }
