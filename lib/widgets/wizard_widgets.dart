@@ -45,22 +45,75 @@ class _SelectorWithInstruction extends State<SelectorWithInstruction> {
         ),
         const SizedBox(height: 10),
         CustomSingleSelectField(
-            items: _items,
-            title: widget.selectorTitle!,
-            onSelectionDone: (val) {
-              log("val : $val\n ######## _selectedItems : $_selectedItems");
-              setState(() {
-                _selectedItems.add(val);
-                _items.remove(val);
-              });
-              log("_items : $_items | _selectedItems : $_selectedItems");
-              widget.onSelectionDone(_selectedItems);
-            }
+          items: _items,
+          title: widget.selectorTitle!,
+          onSelectionDone: (val) {
+            log("val : $val\n ######## _selectedItems : $_selectedItems");
+            setState(() {
+              _selectedItems.add(val);
+              _items.remove(val);
+            });
+            log("_items : $_items | _selectedItems : $_selectedItems");
+            widget.onSelectionDone(_selectedItems);
+          }
+        ),
+        DisplayList(
+          _selectedItems,
+          (val) { setState(() {
+            _selectedItems.remove(val);
+            _items.add(val);
+          }); },
         )
       ],
     );
   }
 }
+
+/*
+ * Displays a list of strings as a row of bordered text widgets
+ * @items: the list to display
+ */
+class DisplayList extends StatelessWidget {
+  final ValueChanged<String> onClick;
+  final List<String> items;
+  
+  const DisplayList(this.items, this.onClick, {super.key});
+  
+  @override
+  Widget build(BuildContext context) {
+    
+    return Wrap(
+      children: items.map((it) =>
+        InkWell(
+          onTap: () { onClick(it); },
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 3.0),
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.deepOrangeAccent, width: 1.5),
+                borderRadius: const BorderRadius.all(Radius.circular(20.0))
+            ),
+            child: Text(
+              it,
+              textScaler: const TextScaler.linear(0.75),
+            ),
+          ),
+        )
+      ).toList(),
+    );
+  }
+  
+}
+
+// class DisplayList extends StatefulWidget {
+//  
+//   @override
+//   State<DisplayList> createState() => _DisplayList();
+// }
+//
+// class _DisplayList extends State<DisplayList> {
+//  
+// }
 
 /*
  * Create a text field where user can input some value, and provide instruction on what the user
