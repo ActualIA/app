@@ -1,4 +1,4 @@
-package com.example.actualia
+package ch.epfl.swent.actualia
 
 import io.flutter.embedding.android.FlutterActivity
 
