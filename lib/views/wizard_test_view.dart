@@ -85,6 +85,7 @@ class _WizardTestViewState extends State<WizardTestView> {
                   wantsCountries: true,
                   wantsInterests: true
               );
+              log('settings : $toSend');
               newsSettingsModel.pushSettings(toSend);
             },
             style: OutlinedButton.styleFrom(

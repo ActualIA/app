@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:actualia/models/news_settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -43,7 +45,7 @@ class NewsSettingsViewModel extends ChangeNotifier {
     });
 
     if (res.error != null) {
-      print("Error inserting settings: ${res.error!.message}");
+      log("Error inserting settings: ${res.error!.message}");
       return false;
     }
     return true;
