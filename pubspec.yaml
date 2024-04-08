@@ -101,3 +101,6 @@ flutter:
     - family: EB Garamond
       fonts:
         - asset: assets/fonts/EBGaramond-VariableFont_wght.ttf
+    - family: Fira Code
+      fonts:
+        - asset: assets/font/FiraCode-VariableFont_wght.ttf
