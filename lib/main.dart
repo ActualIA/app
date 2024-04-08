@@ -60,7 +60,7 @@ class _AppState extends State<App> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: home
+      home: WizardTestView()
     );
   }
 }

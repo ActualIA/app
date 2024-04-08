@@ -2,7 +2,9 @@ import 'dart:ui';
 
 import 'package:actualia/models/news_settings.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:provider/provider.dart';
 import 'dart:developer';
 
@@ -36,6 +38,11 @@ class _WizardTestViewState extends State<WizardTestView> {
           child: const Text(
             "Tell us more about your interests",
             textScaler: TextScaler.linear(2.0),
+            style: TextStyle(
+              fontFamily: 'EB Garamond',
+              fontWeight: FontWeight.w700,
+              color: Colors.black
+            ),
             maxLines: 2,
           ),
         )
@@ -68,15 +75,15 @@ class _WizardTestViewState extends State<WizardTestView> {
         ),
       ),
       bottomNavigationBar: Container(
-        margin: const EdgeInsets.fromLTRB(225.0, 8.0, 16.0, 24.0),
+        margin: const EdgeInsets.fromLTRB(205.0, 8.0, 16.0, 24.0),
         child: SizedBox(
           height: 60.0,
           child: OutlinedButton(
             onPressed: () {
-              log('countries: $_countries\n'
-                  'cities: $_cities\n'
-                  'interests: $_interests\n'
-                  'data sent successfully');
+              // log('countries: $_countries\n'
+              //     'cities: $_cities\n'
+              //     'interests: $_interests\n'
+              //     'data sent successfully');
               NewsSettings toSend = NewsSettings(
                   cities: _cities,
                   countries: _countries,
@@ -85,7 +92,7 @@ class _WizardTestViewState extends State<WizardTestView> {
                   wantsCountries: true,
                   wantsInterests: true
               );
-              log('settings : $toSend');
+              // log('settings : $toSend');
               newsSettingsModel.pushSettings(toSend);
             },
             style: OutlinedButton.styleFrom(
@@ -97,8 +104,12 @@ class _WizardTestViewState extends State<WizardTestView> {
             ),
             child: const Text(
               "Validate",
-              textScaler: TextScaler.linear(2.0),
-              style: TextStyle(color: Colors.lightBlueAccent),
+              textScaler: TextScaler.linear(1.75),
+              style: TextStyle(
+                color: Colors.black,
+                fontFamily: 'Fira Code',
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ),

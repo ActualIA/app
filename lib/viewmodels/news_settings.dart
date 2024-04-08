@@ -18,7 +18,7 @@ class NewsSettingsViewModel extends ChangeNotifier {
         .single();
 
     if (res['error'] != null) {
-      print("Error fetching settings: ${res['error'].message}");
+      log("Error fetching settings: ${res['error'].message}");
       return;
     }
 

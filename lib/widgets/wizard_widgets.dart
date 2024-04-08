@@ -41,6 +41,11 @@ class _SelectorWithInstruction extends State<SelectorWithInstruction> {
       children: [
         Text(
           widget.instr!,
+          style: const TextStyle(
+            fontFamily: 'EB Garamond',
+            fontWeight: FontWeight.w500,
+            color: Colors.black
+          ),
           textScaler: const TextScaler.linear(1.5),
         ),
         const SizedBox(height: 10),
@@ -48,12 +53,10 @@ class _SelectorWithInstruction extends State<SelectorWithInstruction> {
           items: _items,
           title: widget.selectorTitle!,
           onSelectionDone: (val) {
-            log("val : $val\n ######## _selectedItems : $_selectedItems");
             setState(() {
               _selectedItems.add(val);
               _items.remove(val);
             });
-            log("_items : $_items | _selectedItems : $_selectedItems");
             widget.onSelectionDone(_selectedItems);
           }
         ),
@@ -110,6 +113,9 @@ class DisplayList extends StatelessWidget {
                   child: Center(
                     child: Text(
                       items[index],
+                      style: const TextStyle(
+                        fontFamily: 'Fira Code'
+                      ),
                       textScaler: const TextScaler.linear(1.0),
                     )
                   )
