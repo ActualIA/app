@@ -42,6 +42,7 @@ dependencies:
   google_sign_in_android: ^6.1.22
   google_sign_in_web: ^0.12.4
   flutter_custom_selector: ^0.0.3
+  country_list: ^0.0.5
 
 dev_dependencies:
   flutter_test:

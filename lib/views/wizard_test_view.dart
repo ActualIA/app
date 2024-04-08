@@ -91,14 +91,14 @@ class _WizardTestViewState extends State<WizardTestView> {
             style: OutlinedButton.styleFrom(
               side: const BorderSide(
                 width: 3.5,
-                color: Colors.deepOrangeAccent
+                color: Colors.lightBlueAccent
               ),
-              foregroundColor: Colors.deepOrangeAccent,
+              foregroundColor: Colors.lightBlueAccent,
             ),
             child: const Text(
               "Validate",
               textScaler: TextScaler.linear(2.0),
-              style: TextStyle(color: Colors.deepOrangeAccent),
+              style: TextStyle(color: Colors.lightBlueAccent),
             ),
           ),
         ),

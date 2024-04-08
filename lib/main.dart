@@ -55,12 +55,6 @@ class _AppState extends State<App> {
     }
 
     return MaterialApp(
-      // title: 'ActualIA',
-      // theme: ThemeData(
-      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      //   useMaterial3: true,
-      // ),
-      // home: WizardTestView()
       title: 'ActualIA',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

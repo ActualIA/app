@@ -62,6 +62,7 @@ class _SelectorWithInstruction extends State<SelectorWithInstruction> {
           (val) { setState(() {
             _selectedItems.remove(val);
             _items.add(val);
+            _items.sort();
           }); },
         )
       ],
@@ -70,7 +71,7 @@ class _SelectorWithInstruction extends State<SelectorWithInstruction> {
 }
 
 /*
- * Displays a list of strings as a row of bordered text widgets
+ * Displays a scrollable list of strings as a row of bordered text widgets with a delete option
  * @items: the list to display
  */
 class DisplayList extends StatelessWidget {
@@ -82,27 +83,65 @@ class DisplayList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     
-    return Wrap(
-      children: items.map((it) =>
-        InkWell(
-          onTap: () { onClick(it); },
-          child: Container(
+    return SizedBox(
+      height: 45.0,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: items.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Container(
             margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 3.0),
-            padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-                border: Border.all(color: Colors.deepOrangeAccent, width: 1.5),
+                border: Border.all(color: Colors.lightBlueAccent, width: 1.5),
                 borderRadius: const BorderRadius.all(Radius.circular(20.0))
             ),
-            child: Text(
-              it,
-              textScaler: const TextScaler.linear(0.75),
-            ),
-          ),
-        )
-      ).toList(),
+            child: Row(
+              children: [
+                Container(
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      right: BorderSide(
+                        width: 0.75,
+                        color: Colors.lightBlueAccent
+                      )
+                    )
+                  ),
+                  padding: const EdgeInsets.fromLTRB(4.0, 1.0, 3.0, 1.0),
+                  child: Center(
+                    child: Text(
+                      items[index],
+                      textScaler: const TextScaler.linear(1.0),
+                    )
+                  )
+                ),
+                Container(
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        color: Colors.lightBlueAccent,
+                        width: 0.75,
+                      )
+                    )
+                  ),
+                  child: Center(
+                    child: InkWell(
+                      borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                      highlightColor: Colors.lightBlueAccent,
+                      onTap: () { onClick(items[index]); },
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(1.0, 1.0, 3.0, 1.0),
+                        child: const Icon(Icons.delete, color: Colors.lightBlueAccent),
+                      )
+                    ),
+                  )
+                )
+              ],
+            )
+          );
+        },
+      )
     );
   }
-  
 }
 
 // class DisplayList extends StatefulWidget {
