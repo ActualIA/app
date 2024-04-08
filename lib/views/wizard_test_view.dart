@@ -87,7 +87,7 @@ class _WizardTestViewState extends State<WizardTestView> {
               NewsSettings toSend = NewsSettings(
                   cities: _cities,
                   countries: _countries,
-                  interests: _cities,
+                  interests: _interests,
                   wantsCities: true,
                   wantsCountries: true,
                   wantsInterests: true
