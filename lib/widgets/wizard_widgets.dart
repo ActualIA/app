@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:ffi';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_custom_selector/widget/flutter_single_select.dart';
 
 /*
@@ -69,6 +70,48 @@ class _SelectorWithInstruction extends State<SelectorWithInstruction> {
           }); },
         )
       ],
+    );
+  }
+}
+
+class WizardNavigationButton extends StatelessWidget {
+  final String text;
+  final void Function() onPressed;
+
+  const WizardNavigationButton(this.text, this.onPressed, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+          child: SizedBox(
+            height: 60.0,
+            child: OutlinedButton(
+              onPressed: onPressed,
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(
+                    width: 3.5,
+                    color: Colors.lightBlueAccent
+                ),
+                foregroundColor: Colors.lightBlueAccent,
+              ),
+              child: Text(
+                text,
+                textScaler: const TextScaler.linear(1.75),
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Fira Code',
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        )
+      ]
     );
   }
 }
@@ -149,16 +192,6 @@ class DisplayList extends StatelessWidget {
     );
   }
 }
-
-// class DisplayList extends StatefulWidget {
-//  
-//   @override
-//   State<DisplayList> createState() => _DisplayList();
-// }
-//
-// class _DisplayList extends State<DisplayList> {
-//  
-// }
 
 /*
  * Create a text field where user can input some value, and provide instruction on what the user

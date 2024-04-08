@@ -74,47 +74,62 @@ class _WizardTestViewState extends State<WizardTestView> {
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        margin: const EdgeInsets.fromLTRB(205.0, 8.0, 16.0, 24.0),
-        child: SizedBox(
-          height: 60.0,
-          child: OutlinedButton(
-            onPressed: () {
-              // log('countries: $_countries\n'
-              //     'cities: $_cities\n'
-              //     'interests: $_interests\n'
-              //     'data sent successfully');
-              NewsSettings toSend = NewsSettings(
-                  cities: _cities,
-                  countries: _countries,
-                  interests: _interests,
-                  wantsCities: true,
-                  wantsCountries: true,
-                  wantsInterests: true
-              );
-              // log('settings : $toSend');
-              newsSettingsModel.pushSettings(toSend);
-            },
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(
-                width: 3.5,
-                color: Colors.lightBlueAccent
-              ),
-              foregroundColor: Colors.lightBlueAccent,
-            ),
-            child: const Text(
-              "Validate",
-              textScaler: TextScaler.linear(1.75),
-              style: TextStyle(
-                color: Colors.black,
-                fontFamily: 'Fira Code',
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ),
-      )
+      bottomNavigationBar: WizardNavigationButton(
+        'Validate',
+        () {
+          NewsSettings toSend = NewsSettings(
+              cities: _cities,
+              countries: _countries,
+              interests: _interests,
+              wantsCities: true,
+              wantsCountries: true,
+              wantsInterests: true
+          );
+          newsSettingsModel.pushSettings(toSend);
+        }
+      ),
     );
+
+      // Container(
+      //   margin: const EdgeInsets.fromLTRB(205.0, 8.0, 16.0, 24.0),
+      //   child: SizedBox(
+      //     height: 60.0,
+      //     child: OutlinedButton(
+      //       onPressed: () {
+      //         // log('countries: $_countries\n'
+      //         //     'cities: $_cities\n'
+      //         //     'interests: $_interests\n'
+      //         //     'data sent successfully');
+      //         NewsSettings toSend = NewsSettings(
+      //             cities: _cities,
+      //             countries: _countries,
+      //             interests: _interests,
+      //             wantsCities: true,
+      //             wantsCountries: true,
+      //             wantsInterests: true
+      //         );
+      //         // log('settings : $toSend');
+      //         newsSettingsModel.pushSettings(toSend);
+      //       },
+      //       style: OutlinedButton.styleFrom(
+      //         side: const BorderSide(
+      //           width: 3.5,
+      //           color: Colors.lightBlueAccent
+      //         ),
+      //         foregroundColor: Colors.lightBlueAccent,
+      //       ),
+      //       child: const Text(
+      //         "Validate",
+      //         textScaler: TextScaler.linear(1.75),
+      //         style: TextStyle(
+      //           color: Colors.black,
+      //           fontFamily: 'Fira Code',
+      //           fontWeight: FontWeight.w500,
+      //         ),
+      //       ),
+      //     ),
+      //   ),
+      // )
   }
 }
 
