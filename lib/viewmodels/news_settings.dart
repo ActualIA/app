@@ -34,20 +34,20 @@ class NewsSettingsViewModel extends ChangeNotifier {
   }
 
   Future<bool> pushSettings(NewsSettings settings) async {
-    final res = await supabase.from("news_settings").upsert({
-      'created_by': supabase.auth.currentUser!.id,
-      'cities': settings.cities,
-      'countries': settings.countries,
-      'interests': settings.interests,
-      'wants_cities': settings.wantsCities,
-      'wants_countries': settings.wantsCountries,
-      'wants_interests': settings.wantsInterests,
-    });
-
-    if (res.error != null) {
-      log("Error inserting settings: ${res.error!.message}");
+    try {
+      final res = await supabase.from("news_settings").upsert({
+        'created_by': supabase.auth.currentUser!.id,
+        'cities': settings.cities,
+        'countries': settings.countries,
+        'interests': settings.interests,
+        'wants_cities': settings.wantsCities,
+        'wants_countries': settings.wantsCountries,
+        'wants_interests': settings.wantsInterests,
+      });
+      return true;
+    } catch (e) {
+      log("Error pushing settings: $e");
       return false;
     }
-    return true;
   }
 }
