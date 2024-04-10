@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!python
 
 import subprocess
 import sys
@@ -6,7 +6,7 @@ import sys
 if len(sys.argv) == 1:
     exit(0)
 
-ret = subprocess.run(["dart", "format", "-o", "none", "--set-exit-if-changed", *sys.argv[1:]])
+ret = subprocess.run(["dart", "format", "-o", "none", "--set-exit-if-changed", *sys.argv[1:]], shell=True)
 
 if ret.returncode != 0:
     print("\033[31mOne or more files are incorrectly formatted !")
