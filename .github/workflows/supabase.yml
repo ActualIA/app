@@ -1,0 +1,52 @@
+name: Edge functions tests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # Setup Supabase and Deno (for testing)
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x # Run with latest stable Deno.
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: "Create env file"
+        working-directory: supabase/functions
+        run: |
+          touch .env
+          echo GNEWS_API_KEY=${{ secrets.GNEWS_API_KEY }} >> .env
+
+      # Start Supabase and store the keys/urls in a .env file
+      - run: supabase start
+      - run: supabase status -o env --override-name api.url=SUPABASE_URL --override-name auth.anon_key=SUPABASE_ANON_KEY --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY > supabase/.env
+
+      # Run the tests
+      - run: deno test --allow-all functions/tests/*.ts --env .env
+        working-directory: supabase
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - run: supabase functions deploy --project-ref $PROJECT_ID get-news
+        if: github.event_name == "push"

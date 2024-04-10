@@ -1,5 +1,3 @@
 {
-    "recommendations": [
-        "dart-code.flutter"
-    ]
+  "recommendations": ["dart-code.flutter", "denoland.vscode-deno"]
 }
