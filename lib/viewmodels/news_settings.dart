@@ -11,26 +11,26 @@ class NewsSettingsViewModel extends ChangeNotifier {
   NewsSettings get settings => _settings;
 
   Future<void> fetchSettings() async {
-    final res = await supabase
+
+    try {
+      final res = await supabase
         .from("news_settings")
         .select()
         .eq('created_by', supabase.auth.currentUser!.id)
         .single();
-
-    if (res['error'] != null) {
-      log("Error fetching settings: ${res['error'].message}");
+      _settings = NewsSettings(
+        cities: List<String>.from(res['cities']),
+        countries: List<String>.from(res['countries']),
+        interests: List<String>.from(res['interests']),
+        wantsCities: res['wants_cities'],
+        wantsCountries: res['wants_countries'],
+        wantsInterests: res['wants_interests'],
+      );
+      notifyListeners();
+    } catch (e) {
+      log("Error fetching settings: $e");
       return;
     }
-
-    _settings = NewsSettings(
-      cities: List<String>.from(res['cities']),
-      countries: List<String>.from(res['countries']),
-      interests: List<String>.from(res['interests']),
-      wantsCities: res['wants_cities'],
-      wantsCountries: res['wants_countries'],
-      wantsInterests: res['wants_interests'],
-    );
-    notifyListeners();
   }
 
   Future<bool> pushSettings(NewsSettings settings) async {

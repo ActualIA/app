@@ -15,10 +15,12 @@ class SelectorWithInstruction extends StatefulWidget {
   final String? instr;
   final List<String>? items;
   final String? selectorTitle;
+  final List<String>? selectedItems;
 
   const SelectorWithInstruction(
       this.onSelectionDone, this.instr, this.items, this.selectorTitle,
-      {super.key});
+      {this.selectedItems = const [], super.key}
+      );
 
   @override
   State<StatefulWidget> createState() => _SelectorWithInstruction();
@@ -26,12 +28,17 @@ class SelectorWithInstruction extends StatefulWidget {
 
 class _SelectorWithInstruction extends State<SelectorWithInstruction> {
   late List<String> _items;
-  final List<String> _selectedItems = [];
+  late List<String> _selectedItems = [];
 
   @override
   Widget build(BuildContext context) {
     setState(() {
       _items = widget.items!;
+      _selectedItems = widget.selectedItems!;
+      for (var e in _selectedItems) {
+        if (_items.contains(e)) { _items.remove(e); }
+        else { log("error, element $e should not exist"); }
+      }
     });
 
     return Column(
