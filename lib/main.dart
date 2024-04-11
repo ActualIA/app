@@ -1,4 +1,5 @@
 import 'package:actualia/models/auth_model.dart';
+import 'package:actualia/views/home_view.dart';
 import 'package:actualia/views/login_view.dart';
 import 'package:actualia/views/wizard_test_view.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
@@ -35,10 +36,18 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     AuthModel authModel = Provider.of(context);
+    NewsSettingsViewModel newsSettingsModel =
+        Provider.of<NewsSettingsViewModel>(context);
 
     Widget home;
     if (authModel.isSignedIn) {
-      home = WizardTestView();
+      home = Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: const Text('ActualIA'),
+        ),
+        body: const HomeView(),
+      );
     } else {
       home = Scaffold(
         appBar: AppBar(
@@ -55,7 +64,6 @@ class _AppState extends State<App> {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: home
-    );
+        home: home);
   }
 }

@@ -31,16 +31,19 @@ class _SelectorWithInstruction extends State<SelectorWithInstruction> {
   late List<String> _selectedItems = [];
 
   @override
-  Widget build(BuildContext context) {
-    setState(() {
-      _items = widget.items!;
-      _selectedItems = widget.selectedItems!;
-      for (var e in _selectedItems) {
-        if (_items.contains(e)) { _items.remove(e); }
-        else { log("error, element $e should not exist"); }
-      }
-    });
+  void initState() {
+    _items = widget.items!;
+    _selectedItems = widget.selectedItems!;
+    for (var e in _selectedItems) {
+      if (_items.contains(e)) { _items.remove(e); }
+      else { print("error, element $e should not exist"); }
+    }
+    
+    super.initState();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

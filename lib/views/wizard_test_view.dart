@@ -11,8 +11,16 @@ import 'dart:developer';
 import '../widgets/wizard_widgets.dart';
 
 class WizardTestView extends StatefulWidget {
-  final List<String> countries = ["bob1", "bob2", "bob3"];  //TODO get a list of country
-  final List<String> cities = ["mich1", "mich2", "mich3"]; //TODO get a list of cities? Does it make sense (too much possibilities)
+  final List<String> countries = [
+    "bob1",
+    "bob2",
+    "bob3"
+  ]; //TODO get a list of country
+  final List<String> cities = [
+    "mich1",
+    "mich2",
+    "mich3"
+  ]; //TODO get a list of cities? Does it make sense (too much possibilities)
 
   WizardTestView({super.key});
 
@@ -27,109 +35,109 @@ class _WizardTestViewState extends State<WizardTestView> {
 
   @override
   Widget build(BuildContext context) {
-    NewsSettingsViewModel newsSettingsModel = Provider.of<NewsSettingsViewModel>(context, listen: false);
+    NewsSettingsViewModel newsSettingsModel =
+        Provider.of<NewsSettingsViewModel>(context);
     NewsSettings newsSettingsDefault = NewsSettings.defaults();
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(120.0),
-        child: Container(
-          margin: const EdgeInsets.fromLTRB(16, 50, 16, 8.0),
-          child: const Text(
-            "Tell us more about your interests",
-            textScaler: TextScaler.linear(2.0),
-            style: TextStyle(
-              fontFamily: 'EB Garamond',
-              fontWeight: FontWeight.w700,
-              color: Colors.black
+          preferredSize: const Size.fromHeight(120.0),
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(16, 50, 16, 8.0),
+            child: const Text(
+              "Tell us more about your interests",
+              textScaler: TextScaler.linear(2.0),
+              style: TextStyle(
+                  fontFamily: 'EB Garamond',
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black),
+              maxLines: 2,
             ),
-            maxLines: 2,
-          ),
-        )
-      ),
+          )),
       body: Container(
         margin: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             //each formField is an entry in the wizard
-            SelectorWithInstruction(
-                (value) { setState(() { _countries = value; }); },
-                "Select some countries",
-                newsSettingsDefault.countries,
-                "Country"
-            ),
-            SelectorWithInstruction(
-                (value) { setState(() { _cities = value; }); },
-                "Select some cities",
-                newsSettingsDefault.cities,
-                "City"
-            ),
-            SelectorWithInstruction(
-                (value) { setState(() { _interests = value; }); },
-                "Select some interests",
-                newsSettingsDefault.interests,
-                "Interests"
-            )
+            SelectorWithInstruction((value) {
+              setState(() {
+                _countries = value;
+              });
+            }, "Select some countries", newsSettingsDefault.countries,
+                "Country"),
+            SelectorWithInstruction((value) {
+              setState(() {
+                _cities = value;
+              });
+            }, "Select some cities", newsSettingsDefault.cities, "City"),
+            SelectorWithInstruction((value) {
+              setState(() {
+                _interests = value;
+              });
+            }, "Select some interests", newsSettingsDefault.interests,
+                "Interests")
           ],
         ),
       ),
-      bottomNavigationBar: WizardNavigationButton(
-        'Validate',
-        () {
-          NewsSettings toSend = NewsSettings(
-              cities: _cities,
-              countries: _countries,
-              interests: _interests,
-              wantsCities: true,
-              wantsCountries: true,
-              wantsInterests: true
-          );
-          newsSettingsModel.pushSettings(toSend);
-        }
-      ),
+      bottomNavigationBar: WizardNavigationButton('Validate', () {
+        NewsSettings toSend = NewsSettings(
+            cities: _cities,
+            countries: _countries,
+            interests: _interests,
+            wantsCities: true,
+            wantsCountries: true,
+            wantsInterests: true,
+            onboardingNeeded: false);
+        newsSettingsModel.pushSettings(toSend).then((success) => {
+          if (success) {
+            Navigator.pop(context)
+          } else {
+            print("Unable to validate onboarding")
+          }
+        });
+      }),
     );
 
-      // Container(
-      //   margin: const EdgeInsets.fromLTRB(205.0, 8.0, 16.0, 24.0),
-      //   child: SizedBox(
-      //     height: 60.0,
-      //     child: OutlinedButton(
-      //       onPressed: () {
-      //         // log('countries: $_countries\n'
-      //         //     'cities: $_cities\n'
-      //         //     'interests: $_interests\n'
-      //         //     'data sent successfully');
-      //         NewsSettings toSend = NewsSettings(
-      //             cities: _cities,
-      //             countries: _countries,
-      //             interests: _interests,
-      //             wantsCities: true,
-      //             wantsCountries: true,
-      //             wantsInterests: true
-      //         );
-      //         // log('settings : $toSend');
-      //         newsSettingsModel.pushSettings(toSend);
-      //       },
-      //       style: OutlinedButton.styleFrom(
-      //         side: const BorderSide(
-      //           width: 3.5,
-      //           color: Colors.lightBlueAccent
-      //         ),
-      //         foregroundColor: Colors.lightBlueAccent,
-      //       ),
-      //       child: const Text(
-      //         "Validate",
-      //         textScaler: TextScaler.linear(1.75),
-      //         style: TextStyle(
-      //           color: Colors.black,
-      //           fontFamily: 'Fira Code',
-      //           fontWeight: FontWeight.w500,
-      //         ),
-      //       ),
-      //     ),
-      //   ),
-      // )
+    // Container(
+    //   margin: const EdgeInsets.fromLTRB(205.0, 8.0, 16.0, 24.0),
+    //   child: SizedBox(
+    //     height: 60.0,
+    //     child: OutlinedButton(
+    //       onPressed: () {
+    //         // print('countries: $_countries\n'
+    //         //     'cities: $_cities\n'
+    //         //     'interests: $_interests\n'
+    //         //     'data sent successfully');
+    //         NewsSettings toSend = NewsSettings(
+    //             cities: _cities,
+    //             countries: _countries,
+    //             interests: _interests,
+    //             wantsCities: true,
+    //             wantsCountries: true,
+    //             wantsInterests: true
+    //         );
+    //         // print('settings : $toSend');
+    //         newsSettingsModel.pushSettings(toSend);
+    //       },
+    //       style: OutlinedButton.styleFrom(
+    //         side: const BorderSide(
+    //           width: 3.5,
+    //           color: Colors.lightBlueAccent
+    //         ),
+    //         foregroundColor: Colors.lightBlueAccent,
+    //       ),
+    //       child: const Text(
+    //         "Validate",
+    //         textScaler: TextScaler.linear(1.75),
+    //         style: TextStyle(
+    //           color: Colors.black,
+    //           fontFamily: 'Fira Code',
+    //           fontWeight: FontWeight.w500,
+    //         ),
+    //       ),
+    //     ),
+    //   ),
+    // )
   }
 }
-

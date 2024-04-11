@@ -8,9 +8,12 @@ class NewsSettings {
   bool wantsCountries;
   bool wantsInterests;
 
+  bool onboardingNeeded;
+
   // Predefined lists
   static List<String> predefinedCities = ['City 1', 'City 2', 'City 3'];
-  static List<String> predefinedCountries = Countries.list.map((c) => c.name).toList();
+  static List<String> predefinedCountries =
+      Countries.list.map((c) => c.name).toList();
   static List<String> predefinedInterests = [
     'Sports',
     'Music',
@@ -32,6 +35,7 @@ class NewsSettings {
     required this.wantsCities,
     required this.wantsCountries,
     required this.wantsInterests,
+    required this.onboardingNeeded,
   });
 
   factory NewsSettings.defaults() {
@@ -42,6 +46,7 @@ class NewsSettings {
       wantsCities: false,
       wantsCountries: false,
       wantsInterests: false,
+      onboardingNeeded: false, // wait before setting this to true
     );
   }
 }
