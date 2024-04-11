@@ -1,7 +1,7 @@
 # app
 
 ![Build](https://github.com/actualia/app/actions/workflows/flutter.yml/badge.svg?branch=main)
-![Sonarcloud](https://github.com/actualia/app/actions/workflows/build.yml/badge.svg?branch=main)
+![Sonarcloud](https://github.com/actualia/app/actions/workflows/sonarcloud.yml/badge.svg?branch=main)
 ![Supabase](https://github.com/actualia/app/actions/workflows/supabase.yml/badge.svg?branch=main)
 
 ActualIA Android app
