@@ -1,3 +1,4 @@
+import 'package:actualia/views/loading_view.dart';
 import 'package:flutter/material.dart';
 import 'package:actualia/widgets/news_text.dart';
 import 'package:actualia/widgets/top_app_bar.dart';
@@ -16,16 +17,16 @@ class _NewsViewState extends State<NewsView> {
   void initState() {
     super.initState();
     Future.microtask(() => Provider.of<NewsViewModel>(context, listen: false)
-        .fetchNews(DateTime.now()));
+        .getNews(DateTime.now()));
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget loading =
+        const LoadingView(text: "Please wait while we fetch the news for you.");
     final newsViewModel = Provider.of<NewsViewModel>(context);
     final _news = newsViewModel.news;
-    Widget body = _news == null
-        ? const Center(child: CircularProgressIndicator())
-        : NewsText(news: _news);
+    Widget body = _news == null ? loading : NewsText(news: _news);
 
     return Scaffold(
       appBar: const TopAppBar(),

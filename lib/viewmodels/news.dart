@@ -2,56 +2,95 @@ import 'dart:developer';
 import 'package:actualia/models/news.dart';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dart:convert';
 
+/// View model for managing news data.
 class NewsViewModel extends ChangeNotifier {
   final supabase = Supabase.instance.client;
   News? _news;
   News? get news => _news;
 
+  /// Retrieves news for the specified date.
+  ///
+  /// If no news is found for the given date, it checks if the date is today.
+  /// If it is today, it invokes a cloud function to generate news and fetches it again.
+  /// If the news is still not found, it sets an error message.
+  Future<void> getNews(DateTime date) async {
+    await fetchNews(date);
+
+    if (_news == null || _news!.paragraphs.isEmpty) {
+      DateTime today = DateTime.now();
+      if (date.year == today.year &&
+          date.month == today.month &&
+          date.day == today.day) {
+        await invokeTranscriptFunction();
+        await fetchNews(date);
+        if (_news == null || _news!.paragraphs.isEmpty) {
+          setNewsError(date, 'News generation failed and no news found.',
+              'Something went wrong while generating news. Please try again later.');
+        }
+      } else {
+        setNewsError(date, 'No news found for this date.',
+            'There are no news for you on this date.');
+      }
+    }
+    notifyListeners();
+  }
+
+  /// Fetches news for the specified date from the database.
   Future<void> fetchNews(DateTime date) async {
     var dateString = date.toString().substring(0, 10);
     try {
-      final res = await supabase
+      final response = await supabase
           .from('news')
           .select()
           .eq('user', supabase.auth.currentUser!.id)
           .eq('date', dateString)
           .single();
 
-      // If there is no news for this day AND date == today, call the transcript function
-      // If it's the right day but before the time, tell them to come back. If it's the right day after the time, say there is a problem.
-
-      List<String> texts = List<String>.from(jsonDecode(res['texts']));
-      List<String> sources = List<String>.from(jsonDecode(res['sources']));
-      List<Paragraph> paragraphs = [];
-      for (var i = 0; i < texts.length; i++) {
-        paragraphs.add(Paragraph(text: texts[i], source: sources[i]));
+      if (response['error'] != null || response.isEmpty) {
+        _news = null;
+        return;
       }
-      //TODO : Implement the edge function call
-      /*
-      final get_news = await supabase.functions
-          .invoke("get_news", method: HttpMethod.post);*/
+
+      List<dynamic> newsItems = response['transcript']['news'];
+      List<Paragraph> paragraphs = newsItems.map((item) {
+        return Paragraph(text: item['transcript'], source: item['titre']);
+      }).toList();
 
       _news = News(
-        title: res['title'],
-        date: res['date'],
+        title: response['title'],
+        date: response['date'],
         paragraphs: paragraphs,
       );
       notifyListeners();
     } catch (e) {
-      log("Error fetching settings: $e");
-      _news = News(
-          date: date.toString().substring(0, 10),
-          title: 'No news found for this date',
-          paragraphs: [
-            Paragraph(
-                text:
-                    'There has been an error fetching news from the database. (click me to print the error message)',
-                source: e.toString())
-          ]);
-      notifyListeners();
-      return;
+      log("Error fetching news: $e");
+      print('Error fetching news: $e');
+      _news = null;
     }
+  }
+
+  /// Invokes a cloud function to generate news transcripts.
+  ///
+  /// This is a simulated function call and should be replaced with an actual cloud function call.
+  Future<void> invokeTranscriptFunction() async {
+    try {
+      // Placeholder for invoking a cloud function
+      //TODO: Replace this with actual cloud function call
+      await Future.delayed(const Duration(seconds: 5));
+      log("Cloud function 'transcript' invoked successfully.");
+    } catch (e) {
+      log("Error invoking cloud function: $e");
+      throw Exception("Failed to invoke transcript function");
+    }
+  }
+
+  /// Sets an error message for the news.
+  void setNewsError(DateTime date, String title, String message) {
+    _news = News(
+      date: date.toString().substring(0, 10),
+      title: title,
+      paragraphs: [Paragraph(text: message, source: 'System')],
+    );
   }
 }

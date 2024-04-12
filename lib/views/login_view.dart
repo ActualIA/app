@@ -1,7 +1,5 @@
-import 'package:actualia/models/auth_model.dart';
 import 'package:actualia/widgets/signin_controls.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});

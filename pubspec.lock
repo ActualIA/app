@@ -57,6 +57,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
+  country_list:
+    dependency: "direct main"
+    description:
+      name: country_list
+      sha256: "82c4cde6793c9498ebada8ded990bd36121b31c03342eec7845f5265d2828c59"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.5"
   crypto:
     dependency: transitive
     description:
@@ -102,6 +110,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_custom_selector:
+    dependency: "direct main"
+    description:
+      name: flutter_custom_selector
+      sha256: "4c42dcd6cc2de1574454f0fc86b324303d1bd30e4bc236d01071525342d51427"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -177,7 +193,7 @@ packages:
     source: hosted
     version: "2.4.5"
   google_sign_in_web:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: google_sign_in_web
       sha256: fc0f14ed45ea616a6cfb4d1c7534c2221b7092cc4f29a709f0c3053cc3e821bd
