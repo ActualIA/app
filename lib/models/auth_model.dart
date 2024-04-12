@@ -11,7 +11,7 @@ class AuthModel extends ChangeNotifier {
     serverClientId: _webClientId,
   );
 
-  late final _supabase; 
+  late final _supabase;
 
   User? user;
   StreamSubscription? authStateSub;
@@ -19,7 +19,7 @@ class AuthModel extends ChangeNotifier {
   bool get isSignedIn => user != null;
 
   AuthModel(SupabaseClient supabaseClient) {
-    _supabase = supabaseClient; 
+    _supabase = supabaseClient;
     authStateSub = _supabase.auth.onAuthStateChange.listen((authState) {
       print('Supabase onAuthStateChange new authState : ${authState.event}');
 
