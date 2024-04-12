@@ -44,6 +44,7 @@ class FakeGotrue extends Fake implements GoTrueClient {
       user: _user,
     );
   }
+
   @override
   Stream<AuthState> get onAuthStateChange => const Stream.empty();
 }
@@ -51,7 +52,9 @@ class FakeGotrue extends Fake implements GoTrueClient {
 // END;
 
 class MockAuthModel extends AuthModel {
-  MockAuthModel(super.key) { print("instantiated mockauth"); }
+  MockAuthModel(super.key) {
+    print("instantiated mockauth");
+  }
 }
 
 void main() {
