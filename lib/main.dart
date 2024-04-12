@@ -22,7 +22,8 @@ Future<void> main() async {
       ChangeNotifierProvider(
           create: (context) => AuthModel(Supabase.instance.client)),
       ChangeNotifierProvider(create: (context) => NewsViewModel()),
-      ChangeNotifierProvider(create: (context) => NewsSettingsViewModel()),
+      ChangeNotifierProvider(
+          create: (context) => NewsSettingsViewModel(Supabase.instance.client)),
     ],
     child: const App(),
   ));

@@ -46,7 +46,7 @@ jobs:
           get-deps: true
 
       - name: Test flutter app
-        run: flutter test
+        run: flutter test test/**/*.dart
 
   lint:
     name: Lint

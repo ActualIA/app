@@ -52,8 +52,8 @@ class _WizardViewState extends State<WizardView> {
           )),
       body: Container(
         margin: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+        child: ListView(
+          /// temp mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             //each formField is an entry in the wizard
             SelectorWithInstruction(
@@ -66,6 +66,7 @@ class _WizardViewState extends State<WizardView> {
               newsSettingsDefault.predefinedCountries,
               "Country",
               selectedItems: _countries,
+              key: const Key("country-selector"),
             ),
             SelectorWithInstruction(
               (value) {
@@ -77,6 +78,7 @@ class _WizardViewState extends State<WizardView> {
               newsSettingsDefault.predefinedCities,
               "City",
               selectedItems: _cities,
+              key: const Key("city-selector"),
             ),
             SelectorWithInstruction(
               (value) {
@@ -88,6 +90,7 @@ class _WizardViewState extends State<WizardView> {
               newsSettingsDefault.predefinedInterests,
               "Interests",
               selectedItems: _interests,
+              key: const Key("interest-selector"),
             )
           ],
         ),

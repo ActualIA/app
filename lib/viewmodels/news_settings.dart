@@ -4,8 +4,16 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NewsSettingsViewModel extends ChangeNotifier {
-  final supabase = Supabase.instance.client;
+  late final supabase;
+
+  NewsSettingsViewModel(SupabaseClient supabaseClient) {
+    supabase = supabaseClient;
+  }
+
   NewsSettings? _settings;
+
+  @protected
+  void setSettings(NewsSettings value) => {_settings = value};
 
   NewsSettings? get settings => _settings;
 
