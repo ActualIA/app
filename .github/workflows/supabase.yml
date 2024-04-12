@@ -50,3 +50,4 @@ jobs:
           version: latest
 
       - run: supabase functions deploy --project-ref $PROJECT_ID get-news
+      - run: supabase functions deploy --project-ref $PROJECT_ID get-transcript
