@@ -284,13 +284,14 @@ void main() {
   });
 
   test("Google signin failure is handled", () async {
-    AuthModel vm = AuthModel(FakeSupabaseClient(FakeGoTrueClient()), FakeFailingGoogleSignin());
+    AuthModel vm = AuthModel(
+        FakeSupabaseClient(FakeGoTrueClient()), FakeFailingGoogleSignin());
     expect(await vm.signInWithGoogle(), isFalse);
   });
 
-
   test("Google signout failure is handled", () async {
-    AuthModel vm = AuthModel(FakeSupabaseClient(Signout()), FakeFailingGoogleSignin());
+    AuthModel vm =
+        AuthModel(FakeSupabaseClient(Signout()), FakeFailingGoogleSignin());
     expect(await vm.signOut(), isFalse);
   });
 }
