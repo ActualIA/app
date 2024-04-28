@@ -202,4 +202,12 @@ void main() {
 
     expect(vm.wasTriggered, isTrue);
   });
+
+  testWidgets("Cancel present", (WidgetTester tester) async {
+    final vm = ValidateVM(null, null);
+    await tester.pumpWidget(
+        WizardWrapper(const WizardView(isInitialOnboarding: false), vm));
+
+    expect(find.text("Cancel"), findsOne);
+  });
 }

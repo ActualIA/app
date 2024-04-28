@@ -1,16 +1,24 @@
 import 'dart:developer';
 import 'package:actualia/models/news.dart';
 import 'package:flutter/foundation.dart';
+import 'package:logging/logging.dart';
 
 /// View model for managing news data.
 class NewsViewModel extends ChangeNotifier {
   late final supabase;
   News? _news;
   News? get news => _news;
+  List<News> _newsList = [];
+  List<News> get newsList => _newsList;
 
   @protected
   void setNews(News? news) {
     _news = news;
+  }
+
+  @protected
+  void setNewsList(List<News> newsList) {
+    _newsList = newsList;
   }
 
   NewsViewModel(this.supabase);
@@ -28,12 +36,7 @@ class NewsViewModel extends ChangeNotifier {
       if (date.year == today.year &&
           date.month == today.month &&
           date.day == today.day) {
-        await invokeTranscriptFunction();
-        await fetchNews(date);
-        if (_news == null || _news!.paragraphs.isEmpty) {
-          setNewsError(date, 'News generation failed and no news found.',
-              'Something went wrong while generating news. Please try again later.');
-        }
+        await generateAndGetNews();
       } else {
         setNewsError(date, 'No news found for this date.',
             'There are no news for you on this date.');
@@ -56,6 +59,7 @@ class NewsViewModel extends ChangeNotifier {
           .gte('date', dayStart)
           .lt('date', nextDayStart)
           .order('date', ascending: false);
+
       final response = supabaseResponse.isEmpty ? {} : supabaseResponse.first;
 
       if (response['error'] != null || response.isEmpty) {
@@ -63,37 +67,87 @@ class NewsViewModel extends ChangeNotifier {
         return;
       }
 
-      List<dynamic> newsItems = response['transcript']['articles'];
-      List<Paragraph> paragraphs = newsItems.map((item) {
-        return Paragraph(
-            transcript: item['transcript'],
-            source: item['source']['name'],
-            title: item['title'],
-            date: item['publishedAt'],
-            content: item['content']);
-      }).toList();
-
-      _news = News(
-        title: response['title'],
-        date: response['date'],
-        transcriptID: response['id'],
-        audio: response['audio'],
-        paragraphs: paragraphs,
-      );
+      _news = parseNews(response);
       notifyListeners();
     } catch (e) {
-      log("Error fetching news: $e");
+      log("Error fetching news: $e", level: Level.WARNING.value);
       _news = null;
     }
+  }
+
+  Future<void> getNewsList() async {
+    try {
+      var response = await fetchNewsList();
+
+      if (response.isEmpty) {
+        await generateAndGetNews();
+        _newsList.insert(0, _news!);
+      } else {
+        _newsList = response.map<News>((news) => parseNews(news)).toList();
+
+        //If the date of the first news is not today, call the cloud function
+        if (_newsList[0].date.substring(0, 10) !=
+            DateTime.now().toString().substring(0, 10)) {
+          await generateAndGetNews();
+          _newsList.insert(0, _news!);
+        }
+      }
+    } catch (e) {
+      log("Error fetching news list: $e", level: Level.WARNING.value);
+      _newsList = [];
+    }
+    notifyListeners();
+  }
+
+  @protected
+  Future<void> generateAndGetNews() async {
+    await invokeTranscriptFunction();
+    await fetchNews(DateTime
+        .now()); //We only fetch one news since we already fetched the list and it was either empty or needed a single entry to be added
+
+    if (_news == null || _news!.paragraphs.isEmpty) {
+      setNewsError(DateTime.now(), 'News generation failed and no news found.',
+          'Something went wrong while generating news. Please try again later.');
+    }
+  }
+
+  Future<List<dynamic>> fetchNewsList() async {
+    return await supabase
+        .from('news')
+        .select()
+        .eq('user', supabase.auth.currentUser!.id)
+        .order('date', ascending: false) // Sorting by date descending
+        .limit(10); // Limiting to 10 news items;
+  }
+
+  News parseNews(dynamic response) {
+    List<dynamic> newsItems = response['transcript']['articles'];
+    List<Paragraph> paragraphs = newsItems.map((item) {
+      return Paragraph(
+          transcript: item['transcript'],
+          source: item['source']['name'],
+          title: item['title'],
+          date: item['publishedAt'],
+          content: item['content']);
+    }).toList();
+
+    return News(
+      title: response['title'],
+      date: response['date'],
+      transcriptID: response['id'],
+      audio: response['audio'],
+      paragraphs: paragraphs,
+    );
   }
 
   /// Invokes a cloud function to generate news transcripts.
   Future<void> invokeTranscriptFunction() async {
     try {
       await supabase.functions.invoke('get-transcript');
-      log("Cloud function 'transcript' invoked successfully.");
+      log("Cloud function 'transcript' invoked successfully.",
+          level: Level.INFO.value);
     } catch (e) {
-      print("Error invoking cloud function: $e");
+      log("Error invoking cloud function: $e", level: Level.WARNING.value);
       throw Exception("Failed to invoke transcript function");
     }
   }

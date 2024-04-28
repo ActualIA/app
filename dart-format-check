@@ -1,14 +1,14 @@
 #!python
 
-import subprocess
 import sys
+import os
 
 if len(sys.argv) == 1:
     exit(0)
 
-ret = subprocess.run(["dart", "format", "-o", "none", "--set-exit-if-changed", *sys.argv[1:]], shell=True)
+ret = os.system("dart format --set-exit-if-changed -o none " + " ".join(sys.argv[1:]))
 
-if ret.returncode != 0:
-    print("\033[31mOne or more files are incorrectly formatted !")
-    print("\033[31mUse 'dart format lib' to fix.")
+if ret != 0:
+    print("\033[31mOne or more files are incorrectly formatted !\033[0m")
+    print("\033[31mUse 'dart format lib' to fix.\033[0m")
     exit(1)

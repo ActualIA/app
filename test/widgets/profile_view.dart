@@ -2,6 +2,8 @@ import 'package:actualia/models/auth_model.dart';
 import 'package:actualia/models/news_settings.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
 import 'package:actualia/views/profile_view.dart';
+import 'package:actualia/views/wizard_view.dart';
+import 'package:actualia/widgets/wizard_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -73,19 +75,19 @@ class ProfilePageWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: "ActualIA",
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        home: MultiProvider(
-          providers: [
-            ChangeNotifierProvider<NewsSettingsViewModel>(
-                create: (context) => _newsSettingsModel),
-            ChangeNotifierProvider<AuthModel>(create: (context) => _authModel)
-          ],
-          child: _child,
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider<NewsSettingsViewModel>(
+              create: (context) => _newsSettingsModel),
+          ChangeNotifierProvider<AuthModel>(create: (context) => _authModel)
+        ],
+        child: MaterialApp(
+          title: "ActualIA",
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            useMaterial3: true,
+          ),
+          home: _child,
         ));
   }
 }
@@ -107,7 +109,11 @@ void main() {
       await tester.pump();
     }
 
-    await testButton('Interests');
+    testInterestButton() async {
+      expect(find.text("Interests"), findsOne);
+    }
+
+    await testInterestButton();
     await testButton('Sources');
     await testButton('Alarm');
     await testButton('Manage Storage');
@@ -123,5 +129,30 @@ void main() {
         MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin())));
 
     expect(find.text("Hey, test.test@epfl.ch !"), findsOne);
+  });
+
+  testWidgets("Interests button work as intended", (tester) async {
+    await tester.pumpWidget(ProfilePageWrapper(
+        const ProfilePageView(),
+        MockNewsSettingsViewModel(),
+        MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin())));
+
+    expect(find.text("Interests"), findsOne);
+    await tester.tap(find.text("Interests"));
+    await tester.pumpAndSettle();
+
+    //check wizard is on screen
+    expect(find.byType(WizardView), findsOneWidget);
+    expect(find.byType(WizardNavigationButton), findsExactly(2));
+    Finder finder = find.text("Cancel");
+    expect(finder, findsOne);
+
+    //click on cancel button
+    await tester.tap(finder);
+    await tester.pumpAndSettle();
+
+    //check wizard not on screen anymore
+    expect(find.byType(WizardView), findsNothing);
+    expect(find.text("Interests"), findsOne);
   });
 }

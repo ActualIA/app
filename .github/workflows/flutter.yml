@@ -30,8 +30,8 @@ jobs:
 
       - uses: actions/upload-artifact@master
         with:
-          name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
 
   test:
     name: Run tests
@@ -90,7 +90,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@master
         with:
-          name: release-apk
+          name: debug-apk
           path: apk
 
       - name: Release

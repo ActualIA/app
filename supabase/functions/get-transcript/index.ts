@@ -2,38 +2,22 @@ import { assertHasEnv } from "../util.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.40.0";
 import OpenAI from "https://deno.land/x/openai@v4.33.0/mod.ts";
 import { corsHeaders } from "../_shared/cors.ts";
+import { fetchNews } from "../providers.ts";
+import { News } from "../model.ts";
 
-interface News {
+interface Result {
   transcript: string;
 }
 
-interface NewsJSONLLM {
+interface NewsJsonLLM {
   totalNewsByLLM: string;
-  news: News[];
+  news: Result[];
 }
 
-interface Article {
-  title: string;
-  description: string;
-  content: string;
-  url: string;
-  image: string;
-  publishedAt: string;
-  source: {
-    name: string;
-    url: string;
-  };
-}
-
-interface ArticlesResponse {
-  totalArticles: number;
-  articles: Article[];
-}
-
-interface MergedJSON {
+interface Transcript {
   totalArticles: number;
   totalNewsByLLM: string;
-  articles: (Article & News)[];
+  articles: (News & Result)[];
 }
 
 Deno.serve(async (request) => {
@@ -57,52 +41,75 @@ Deno.serve(async (request) => {
   }
   const userId = user.data.user.id;
 
-  // const userId = "9d9d8c92-90d3-4702-9e38-0e821a2111a2";
-
   console.log("We start the process for the user with ID:", userId);
 
   // Get the user's interests.
-  const interests = await supabaseClient.from("news_settings").select(
+  console.log("Fetching user settings");
+  const interestsDB = await supabaseClient.from("news_settings").select(
     "*",
   )
     .filter("created_by", "eq", userId)
     .filter("wants_interests", "eq", true);
-  if (interests.error) {
-    console.error("We can't get the user's interests");
-    console.log(interests);
-    console.log(interests.error);
-    return new Response("Internal Server Error", { status: 500 });
-  }
-  console.log(interests);
 
-  // Get the news from GNews.
-  const gNews = await getGNews(interests);
+  let interests = null;
+  if (interestsDB.error) {
+    console.error("We can't get the user's interests");
+    console.error(interestsDB.error);
+    return new Response("Internal Server Error", { status: 500 });
+  } else {
+    interests = interestsDB.data[0];
+  }
+
+  console.log("Fetching provider from the database");
+  const providersDB = await supabaseClient.from("news_providers").select("*")
+    .in(
+      "id",
+      interests["providers_id"] || [],
+    );
+  let providers = null;
+  if (providersDB.error) {
+    console.error("We can't get the user's providers");
+    console.error(providersDB.error);
+    return new Response("Internal Server Error", { status: 500 });
+  } else {
+    providers = providersDB.data.map((p) => p.type);
+  }
+
+  // Get the news.
+  console.log(`Fetching news from ${providers.length} providers`);
+  const news = await fetchNews(providers || [], interests);
 
   // Generate a transcript from the news.
-  const articlesPrompt = generateArticlesPrompt(gNews);
-  const transcript = await generateTranscript(articlesPrompt);
-  console.log(transcript);
-
-  // Merge the GNews and the transcript.
-  const response = mergeJSON(transcript, gNews);
-  console.log(response);
+  console.log("Generating transcript from news");
+  const transcript = news.length > 0 ? await generateTranscript(news) : {
+    totalArticles: 0,
+    totalNewsByLLM: 0,
+    articles: [],
+  };
 
   // Insert the transcript into the database.
+  console.log(
+    "Inserting transcript in the database: ",
+    JSON.stringify(transcript),
+  );
   const { error } = await supabaseClient.from("news").insert({
     user: userId,
     title: "Hello! This is your daily news",
-    transcript: response,
+    transcript: transcript,
   });
+  if (error) {
+    console.error(error);
+  }
 
   // return transcript
-  return new Response(JSON.stringify(response), {
+  return new Response(JSON.stringify(transcript), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
     status: 200,
   });
 });
 
 // Call OpenAI API for json generation
-async function generateTranscript(articlesPrompt: any) {
+async function generateTranscript(news: News[]): Promise<Transcript> {
   const openai = new OpenAI();
   const completion = await openai.chat.completions.create({
     "model": "gpt-3.5-turbo",
@@ -113,89 +120,32 @@ async function generateTranscript(articlesPrompt: any) {
       {
         "role": "system",
         "content":
-          'You are a journalist who provide a transcript from a selection of article headlines that we give you. It\'s up to you to compose your own text according to these, and to make interesting transitions between transcript items (IMPORTANT). For exemple, you can use Also, On the other hand, etc. to do the transition between news. Create a valid JSON array from this news-cut transcript, as in the example here {"totalNewsByLLM":"The number of news you proceed (ex. 3 here)","news":[{"transcript":"The summary of the news 1"},{"transcript":"The summary of the news 2"},{"transcript":"etc."}]}',
+          'You are a journalist who provide a transcript from a selection of article headlines that we give you. It\'s up \
+          to you to compose your own text according to these, and to make interesting transitions between transcript items \
+          (IMPORTANT). For example, you can use Also, On the other hand, etc. to do the transition between news. Create a \
+          valid JSON array from this news-cut transcript, as in the example here {"totalNewsByLLM":"The number of news you \
+          proceed (ex. 3 here)","news":[{"transcript":"The summary of the news 1"},{"transcript":"The summary of the news 2"},{"transcript":"etc."}]}',
       },
       {
         "role": "user",
-        "content": articlesPrompt,
+        "content": news.reduce(
+          (s, n) => `${s}${n.title}\n${n.description}\n\n`,
+          "",
+        ),
       },
     ],
   });
 
-  const transcriptJSON = JSON.parse(
+  const transcriptJSON: NewsJsonLLM = JSON.parse(
     completion.choices[0].message.content || "",
   );
-  return transcriptJSON;
-}
 
-// Fetch GNews based on user's interests
-async function getGNews(interests: any) {
-  // Computes the GNews query by ORing all the categories.
-  // The categories must be "escaped" by putting them in quotes.
-  // See https://gnews.io/docs/v4#search-endpoint-query-parameters for more details.
-  let gNewsQuery = interests.data.length > 0
-    ? ((JSON.parse(interests.data[0].interests)) as string[]).map((s) =>
-      `"${s}"`
-    ).join(
-      " OR ",
-    )
-    : "";
-
-  if (!gNewsQuery) {
-    console.error("No user's interests, we will use default ones.");
-    gNewsQuery = "Microsoft OR OpenAI";
-  }
-  // Constructs the query URL.
-  const url = `https://gnews.io/api/v4/search?q=${
-    encodeURIComponent(gNewsQuery)
-  }&lang=en&sortby=relevance&max=4&apikey=${
-    encodeURIComponent(Deno.env.get("GNEWS_API_KEY") || "")
-  }`;
-
-  // Send the query and parse its result.
-  const result = await fetch(url);
-  const json = await result.json();
-  console.log(json);
-
-  return json;
-}
-
-// Concatenate the articles into a single string to pass them to LLM
-function generateArticlesPrompt(json: ArticlesResponse): string {
-  let result: string = "";
-  json.articles.forEach((article: Article) => {
-    result += `${article.title}\n${article.description}\n\n`;
-  });
-  return result;
-}
-
-function mergeJSON(json1: any, json2: any): MergedJSON {
-  const mergedData: MergedJSON = {
-    totalArticles: json2.totalArticles,
-    totalNewsByLLM: json1.totalNewsByLLM,
-    articles: [],
+  return {
+    totalArticles: news.length,
+    totalNewsByLLM: transcriptJSON.totalNewsByLLM,
+    articles: news.map((n, i) => ({
+      ...transcriptJSON.news[i],
+      ...n,
+    })),
   };
-
-  for (let i = 0; i < json2.articles.length; i++) {
-    const article = json2.articles[i];
-    const news = json1.news[i];
-    const mergedItem = { ...article, ...news };
-    mergedData.articles.push(mergedItem);
-  }
-
-  return mergedData;
-}
-
-// Verify the JSON structure of the OpenAI response
-function verifyJSONStructure(jsonData: any): jsonData is NewsJSONLLM {
-  if (
-    typeof jsonData === "object" &&
-    jsonData !== null &&
-    typeof jsonData.totalNewsByLLM === "string" &&
-    Array.isArray(jsonData.news) &&
-    jsonData.news.every((item: any) => typeof item.transcript === "string")
-  ) {
-    return true;
-  }
-  return false;
 }

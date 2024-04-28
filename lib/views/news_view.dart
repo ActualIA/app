@@ -16,8 +16,8 @@ class _NewsViewState extends State<NewsView> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => Provider.of<NewsViewModel>(context, listen: false)
-        .getNews(DateTime.now()));
+    Future.microtask(
+        () => Provider.of<NewsViewModel>(context, listen: false).getNewsList());
   }
 
   @override
@@ -25,9 +25,14 @@ class _NewsViewState extends State<NewsView> {
     Widget loading =
         const LoadingView(text: "Please wait while we fetch the news for you.");
     final newsViewModel = Provider.of<NewsViewModel>(context);
-    final _news = newsViewModel.news;
-    Widget body = _news == null ? loading : NewsText(news: _news);
-
+    final _newsList = newsViewModel.newsList;
+    Widget body = _newsList.isEmpty
+        ? loading
+        : ListView.builder(
+            itemCount: _newsList.length,
+            itemBuilder: (context, index) {
+              return NewsText(news: _newsList[index]);
+            });
     return Scaffold(
       appBar: const TopAppBar(),
       body: body,

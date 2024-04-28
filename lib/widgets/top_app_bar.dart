@@ -2,7 +2,12 @@ import 'package:actualia/views/profile_view.dart';
 import 'package:flutter/material.dart';
 
 class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final bool enableReturnButton;
+  final void Function()? onPressed;
+
   const TopAppBar({
+    this.enableReturnButton = false,
+    this.onPressed,
     super.key,
   });
 
@@ -10,9 +15,10 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       title: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           //Invisible box to center the title
-          const SizedBox(width: 40),
+          const SizedBox(width: 10),
           // Central button acting as the application title
           Expanded(
             child: TextButton(

@@ -1,6 +1,3 @@
-import 'dart:math';
-
-import 'package:actualia/models/news_settings.dart';
 import 'package:actualia/views/wizard_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -90,13 +87,12 @@ class _ProfilePageState extends State<ProfilePageView> {
                   onPressed: () {
                     // TODO 1 : Implement showig interests directly on this page
                     //isInterestUnfold.value = !isInterestUnfold.value;
-                    /*
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (builder) => const WizardView()));
-                            */
-
+                            builder: (context) => const WizardView(
+                                  isInitialOnboarding: false,
+                                )));
                     print("Click on Interests");
                   },
                   child: const Text('Interests'))),

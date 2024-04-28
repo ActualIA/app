@@ -45,7 +45,97 @@ class MockNewsViewModel extends NewsViewModel {
           ]);
 
   @override
+  List<News> get newsList => [
+        News(
+            title: "Title1",
+            date: "1970-01-01",
+            transcriptID: -1,
+            audio: null,
+            paragraphs: [
+              Paragraph(
+                  transcript: "text1",
+                  source: "source1",
+                  title: "title1",
+                  date: "1970-01-01",
+                  content: "content1"),
+              Paragraph(
+                  transcript: "text2",
+                  source: "source2",
+                  title: "title2",
+                  date: "1970-01-01",
+                  content: "content2"),
+              Paragraph(
+                  transcript: "text3",
+                  source: "source3",
+                  title: "title3",
+                  date: "1970-01-01",
+                  content: "content3"),
+              Paragraph(
+                  transcript: "text4",
+                  source: "source4",
+                  title: "title4",
+                  date: "1970-01-01",
+                  content: "content4")
+            ]),
+        News(
+            title: "Title2",
+            date: "1970-01-01",
+            transcriptID: -1,
+            audio: null,
+            paragraphs: [
+              Paragraph(
+                  transcript: "text1",
+                  source: "source1",
+                  title: "title1",
+                  date: "1970-01-01",
+                  content: "content1"),
+              Paragraph(
+                  transcript: "text2",
+                  source: "source2",
+                  title: "title2",
+                  date: "1970-01-01",
+                  content: "content2"),
+              Paragraph(
+                  transcript: "text3",
+                  source: "source3",
+                  title: "title3",
+                  date: "1970-01-01",
+                  content: "content3"),
+              Paragraph(
+                  transcript: "text4",
+                  source: "source4",
+                  title: "title4",
+                  date: "1970-01-01",
+                  content: "content4")
+            ]),
+        News(
+            title: "Title3",
+            date: "1970-01-01",
+            transcriptID: -1,
+            audio: null,
+            paragraphs: [
+              Paragraph(
+                  transcript: "text1",
+                  source: "source1",
+                  title: "title1",
+                  date: "1970-01-01",
+                  content: "content1"),
+              Paragraph(
+                  transcript: "text2",
+                  source: "source2",
+                  title: "title2",
+                  date: "1970-01-01",
+                  content: "content2"),
+            ]),
+      ];
+
+  @override
   Future<void> getNews(DateTime date) {
+    return Future.value();
+  }
+
+  @override
+  Future<void> getNewsList() {
     return Future.value();
   }
 }
@@ -82,6 +172,6 @@ void main() {
     await tester.pumpWidget(NewsWrapper(const NewsView(), MockNewsViewModel()));
     await tester.pumpAndSettle();
 
-    expect(find.text("Title"), findsOne);
+    expect(find.text("Title1"), findsOne);
   });
 }

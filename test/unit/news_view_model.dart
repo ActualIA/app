@@ -150,6 +150,124 @@ class NeverExistingNewsVM extends NewsViewModel {
   Future<void> invokeTranscriptFunction() async {}
 }
 
+class NewsListVM extends NewsViewModel {
+  NewsListVM(SupabaseClient super.supabase);
+
+  @override
+  Future<void> fetchNews(DateTime date) {
+    setNews(News(
+        date: DateTime.now().toIso8601String(),
+        title: "News",
+        transcriptID: -1,
+        audio: null,
+        paragraphs: [
+          Paragraph(
+              transcript: "text",
+              source: "source",
+              title: "title",
+              date: "12-04-2024",
+              content: "content")
+        ]));
+    return Future.value();
+  }
+
+  @override
+  Future<List<dynamic>> fetchNewsList() async {
+    return Future.value([
+      {
+        "date": DateTime.now().toIso8601String(),
+        "title": "News",
+        "id": -1,
+        "audio": null,
+        "transcript": {
+          "articles": [
+            {
+              "transcript": "text",
+              "source": {"name": "source"},
+              "title": "title",
+              "publishedAt": "12-04-2024",
+              "content": "content"
+            }
+          ]
+        }
+      }
+    ]);
+  }
+
+  @override
+  Future<void> invokeTranscriptFunction() {
+    fail("invokeTranscriptFunction should not be called");
+  }
+}
+
+class NewsList2VM extends NewsViewModel {
+  NewsList2VM(SupabaseClient super.supabase);
+  bool invokedTranscriptFunction = false;
+  bool fetchNewsCalled = false;
+
+  @override
+  Future<void> fetchNews(DateTime date) {
+    setNews(null);
+    fetchNewsCalled = true;
+    return Future.value();
+  }
+
+  @override
+  Future<void> invokeTranscriptFunction() {
+    invokedTranscriptFunction = true;
+    return Future.value();
+  }
+}
+
+class EmptyNewsListVM extends NewsViewModel {
+  EmptyNewsListVM(SupabaseClient super.supabase);
+  bool generateNewsCalled = false;
+
+  @override
+  Future<List<dynamic>> fetchNewsList() async {
+    return Future.value([]);
+  }
+
+  @override
+  Future<void> generateAndGetNews() {
+    generateNewsCalled = true;
+    return Future.value();
+  }
+}
+
+class ExceptionNewsListVM extends NewsViewModel {
+  ExceptionNewsListVM(SupabaseClient super.supabase);
+
+  @override
+  Future<List<dynamic>> fetchNewsList() async {
+    throw Exception();
+  }
+}
+
+class NotTodayNewsListVM extends NewsViewModel {
+  NotTodayNewsListVM(SupabaseClient super.supabase);
+  bool generateNewsCalled = false;
+
+  @override
+  Future<void> generateAndGetNews() {
+    generateNewsCalled = true;
+    return Future.value();
+  }
+
+  @override
+  Future<List<dynamic>> fetchNewsList() async {
+    return Future.value([
+      {
+        "date": "2022-04-12T00:00:00.000Z",
+        "title": "News",
+        "id": -1,
+        "audio": null,
+        "transcript": {"articles": []}
+      }
+    ]);
+  }
+}
+
 void main() {
   test("get-transcript failure is reported", () async {
     NewsViewModel vm = NewsViewModel(FakeFailingSupabaseClient());
@@ -188,13 +306,6 @@ void main() {
     expect(vm.invokedTranscriptFunction, isTrue);
   });
 
-  test('non existing news are correctly generated', () async {
-    NonExistingNewsVM vm = NonExistingNewsVM();
-    await vm.getNews(DateTime.now());
-    expect(vm.news?.title, equals("News"));
-    expect(vm.invokedTranscriptFunction, isTrue);
-  });
-
   test('getNews with invalid date reports error', () async {
     NewsViewModel vm = NewsViewModel(FakeSupabaseClient());
     await vm.getNews(DateTime.fromMicrosecondsSinceEpoch(0));
@@ -204,6 +315,55 @@ void main() {
   test('getNews with non working EF reports error', () async {
     NewsViewModel vm = NeverExistingNewsVM();
     await vm.getNews(DateTime.now());
+    expect(vm.news?.title, equals("News generation failed and no news found."));
+  });
+
+  test('getNewsList with non working EF reports error', () async {
+    NewsViewModel vm = NeverExistingNewsVM();
+    await vm.getNewsList();
+    expect(vm.newsList, isEmpty);
+  });
+
+  test('getNewsList with working EF returns correct list', () async {
+    NewsListVM vm = NewsListVM(FakeSupabaseClient());
+    await vm.getNewsList();
+    expect(vm.newsList.length, equals(1));
+    expect(vm.newsList[0].title, equals("News"));
+    expect(vm.newsList[0].paragraphs[0].source, equals("source"));
+    expect(vm.newsList[0].paragraphs[0].title, equals("title"));
+    expect(vm.newsList[0].paragraphs[0].content, equals("content"));
+  });
+
+  test('getNewsList with Empty list generates news', () async {
+    EmptyNewsListVM vm = EmptyNewsListVM(FakeSupabaseClient());
+    await vm.getNewsList();
+    expect(vm.generateNewsCalled, isTrue);
+  });
+
+  test('getNewsList with Exception reports error', () async {
+    ExceptionNewsListVM vm = ExceptionNewsListVM(FakeSupabaseClient());
+    await vm.getNewsList();
+    expect(vm.newsList, isEmpty);
+  });
+
+  test('getNewsList with non-today news generates news', () async {
+    NotTodayNewsListVM vm = NotTodayNewsListVM(FakeSupabaseClient());
+    await vm.getNewsList();
+    expect(vm.generateNewsCalled, isTrue);
+  });
+
+  test('generateAndGetNews calls invoke and fetchNews', () async {
+    NewsList2VM vm = NewsList2VM(FakeSupabaseClient());
+    // ignore: invalid_use_of_protected_member
+    await vm.generateAndGetNews();
+    expect(vm.invokedTranscriptFunction, isTrue);
+    expect(vm.fetchNewsCalled, isTrue);
+  });
+
+  test('setNewsError is called when news is null', () async {
+    NewsList2VM vm = NewsList2VM(FakeSupabaseClient());
+    // ignore: invalid_use_of_protected_member
+    await vm.generateAndGetNews();
     expect(vm.news?.title, equals("News generation failed and no news found."));
   });
 }

@@ -60,7 +60,7 @@ class _AppState extends State<App> {
     if (authModel.isSignedIn) {
       if (newsSettingsVM.settings != null) {
         if (newsSettingsVM.settings!.onboardingNeeded) {
-          home = const WizardView();
+          home = const WizardView(isInitialOnboarding: true);
         } else {
           home = const NewsView();
         }

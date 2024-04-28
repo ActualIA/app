@@ -98,38 +98,76 @@ class _SelectorWithInstruction extends State<SelectorWithInstruction> {
   }
 }
 
-class WizardNavigationButton extends StatelessWidget {
-  final String text;
-  final void Function() onPressed;
+class WizardNavigationBottomBar extends StatelessWidget {
+  final bool showLeft;
+  final bool showRight;
+  final String rText;
+  final String lText;
+  final void Function()? rOnPressed;
+  final void Function()? lOnPressed;
 
-  const WizardNavigationButton(this.text, this.onPressed, {super.key});
+  const WizardNavigationBottomBar(
+      {this.showLeft = true,
+      this.showRight = true,
+      this.rText = "right button",
+      this.lText = "left button",
+      this.rOnPressed,
+      this.lOnPressed,
+      super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-      Container(
-        margin: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-        child: SizedBox(
-          height: 60.0,
-          child: OutlinedButton(
-            onPressed: onPressed,
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(width: 3.5, color: Colors.lightBlueAccent),
-              foregroundColor: Colors.lightBlueAccent,
-            ),
-            child: Text(
-              text,
-              textScaler: const TextScaler.linear(1.75),
-              style: const TextStyle(
-                color: Colors.black,
-                fontFamily: 'Fira Code',
-                fontWeight: FontWeight.w500,
-              ),
+    Widget right = const SizedBox();
+    Widget left = const SizedBox();
+    if (showRight) {
+      right = WizardNavigationButton(
+        text: rText,
+        onPressed: rOnPressed,
+      );
+    }
+    if (showLeft) {
+      left = WizardNavigationButton(
+        text: lText,
+        onPressed: lOnPressed,
+      );
+    }
+
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [left, right]);
+  }
+}
+
+class WizardNavigationButton extends StatelessWidget {
+  final String text;
+  final void Function()? onPressed;
+
+  const WizardNavigationButton({this.text = "", this.onPressed, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+      child: SizedBox(
+        height: 60.0,
+        child: OutlinedButton(
+          onPressed: onPressed,
+          style: OutlinedButton.styleFrom(
+            side: const BorderSide(width: 3.5, color: Colors.lightBlueAccent),
+            foregroundColor: Colors.lightBlueAccent,
+          ),
+          child: Text(
+            text,
+            textScaler: const TextScaler.linear(1.75),
+            style: const TextStyle(
+              color: Colors.black,
+              fontFamily: 'Fira Code',
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
-      )
-    ]);
+      ),
+    );
   }
 }
 

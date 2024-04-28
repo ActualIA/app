@@ -28,3 +28,30 @@ export interface NewsSettings {
     user_prompt: string,
     providers_id: any
 }
+
+export interface News {
+  title: string;
+  description: string;
+  content: string;
+  publishedAt: Date;
+  url: string;
+  source: {
+    name: string;
+    url: string;
+  };
+}
+
+interface GNewsProvider {
+  type: "gnews";
+}
+
+interface RSSProvider {
+  type: "rss";
+  url: string;
+}
+
+/**
+ * Describe a provider where news can be fetched.
+ * They can be distinguished by their `type` property.
+ */
+export type Provider = GNewsProvider | RSSProvider;
