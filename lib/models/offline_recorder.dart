@@ -8,7 +8,7 @@ import 'package:actualia/viewmodels/news.dart';
  * Records news locally to retrieve them offline. Must be created through OfflineRecorder.create(newsProvider)
  */
 class OfflineRecorder {
-  static const ROOT_OFFLINE_FOLDER = "offlineNews";
+  static const ROOT_OFFLINE_FOLDER = "storage";
 
   late final _newsProvider;
   late final _appOfflineNewsPath;
@@ -32,45 +32,5 @@ class OfflineRecorder {
     }
 
     return OfflineRecorder._create(newsProvider, appOfflineNewsPath);
-  }
-
-  static Map<String, dynamic> serializeNews(News news) {
-    List<Map<String, String>> paragraphs = [];
-    for (Paragraph p in news.paragraphs) {
-      paragraphs.add({
-        "title": p.title,
-        "date": p.date,
-        "content": p.content,
-        "source": p.source
-      });
-    }
-
-    Map<String, String> serializedNews = {
-      "title": news.title.toString(),
-      "date": news.date.toString(),
-      "transcriptID": news.transcriptID.toString(),
-      "paragraphs": paragraphs.toString(),
-    };
-
-    return serializedNews;
-  }
-
-  static News deserializeNews(Map<String, dynamic> storedNews) {
-    List<Paragraph> paragraphs = List.empty();
-    for (Map<String, String> p in storedNews["paragraphs"]) {
-      paragraphs.add(Paragraph(
-          transcript: storedNews["transcriptID"],
-          source: p["source"]!,
-          title: p["title"]!,
-          date: p["date"]!,
-          content: p["content"]!));
-    }
-
-    return News(
-        audio: "",
-        title: storedNews["title"],
-        date: storedNews["date"],
-        transcriptID: int.parse(storedNews["transcriptID"]),
-        paragraphs: paragraphs);
   }
 }

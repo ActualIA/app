@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:actualia/models/news.dart';
 import 'package:actualia/models/offline_recorder.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -30,9 +32,6 @@ News testNews = News(
 
 void main() {
   test("Correct Serialisation and Deserialization", () {
-    expect(
-        OfflineRecorder.deserializeNews(
-            OfflineRecorder.serializeNews(testNews)),
-        equals(testNews));
+    expect(News.fromJson(testNews.toJson()), equals(testNews));
   });
 }
