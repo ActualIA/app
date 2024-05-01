@@ -1,12 +1,24 @@
+import "package:actualia/models/auth_model.dart";
 import "package:actualia/models/news_settings.dart";
 import "package:actualia/viewmodels/news_settings.dart";
 import "package:actualia/views/wizard_view.dart";
 import "package:flutter/material.dart";
 import "package:flutter_test/flutter_test.dart";
+import "package:google_sign_in/google_sign_in.dart";
 import "package:provider/provider.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 
-class FakeSupabaseClient extends Fake implements SupabaseClient {}
+class FakeSupabaseClient extends Fake implements SupabaseClient {
+  final GoTrueClient client = FakeGoTrueClient();
+
+  @override
+  GoTrueClient get auth => client;
+}
+
+class FakeGoTrueClient extends Fake implements GoTrueClient {
+  @override
+  Stream<AuthState> get onAuthStateChange => const Stream.empty();
+}
 
 class MockNewsSettingsViewModel extends NewsSettingsViewModel {
   MockNewsSettingsViewModel() : super(FakeSupabaseClient()) {
@@ -52,8 +64,9 @@ class ValidateVM extends MockNewsSettingsViewModel {
 class WizardWrapper extends StatelessWidget {
   late final Widget _child;
   late final NewsSettingsViewModel _model;
+  late final AuthModel _auth;
 
-  WizardWrapper(this._child, this._model, {super.key});
+  WizardWrapper(this._child, this._model, this._auth, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -66,12 +79,24 @@ class WizardWrapper extends StatelessWidget {
         home: MultiProvider(
           providers: [
             ChangeNotifierProvider<NewsSettingsViewModel>(
-                create: (context) => _model)
+                create: (context) => _model),
+            ChangeNotifierProvider<AuthModel>(create: (context) => _auth)
           ],
           child: _child,
         ));
   }
 }
+
+class MockAuthModel extends AuthModel {
+  MockAuthModel(super.supabaseClient, super.googleSignIn);
+
+  @override
+  Future<bool> setOnboardingIsDone() async {
+    return true;
+  }
+}
+
+class FakeGoogleSignin extends Fake implements GoogleSignIn {}
 
 void main() {
   // The `BuildContext` does not include the provider
@@ -79,8 +104,10 @@ void main() {
   testWidgets("Has all correct inputs", (WidgetTester tester) async {
     // Build our app and trigger a frame.
 
-    await tester.pumpWidget(
-        WizardWrapper(const WizardView(), MockNewsSettingsViewModel()));
+    await tester.pumpWidget(WizardWrapper(
+        const WizardView(),
+        MockNewsSettingsViewModel(),
+        MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin())));
 
     expect(find.text("Select some interests"), findsOne);
     expect(find.text("Interests"), findsOne);
@@ -100,10 +127,10 @@ void main() {
           wantsCities: false,
           wantsCountries: false,
           wantsInterests: false,
-          onboardingNeeded: false,
         ),
         null);
-    await tester.pumpWidget(WizardWrapper(const WizardView(), vm));
+    await tester.pumpWidget(WizardWrapper(const WizardView(), vm,
+        MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin())));
 
     await tester.tap(find.byKey(const Key("interest-selector")));
     await tester.pumpAndSettle();
@@ -120,15 +147,16 @@ void main() {
   testWidgets("Can select city", (WidgetTester tester) async {
     final vm = ValidateVM(
         NewsSettings(
-            interests: [],
-            cities: ["Basel"],
-            countries: [],
-            wantsCities: false,
-            wantsCountries: false,
-            wantsInterests: false,
-            onboardingNeeded: false),
+          interests: [],
+          cities: ["Basel"],
+          countries: [],
+          wantsCities: false,
+          wantsCountries: false,
+          wantsInterests: false,
+        ),
         null);
-    await tester.pumpWidget(WizardWrapper(const WizardView(), vm));
+    await tester.pumpWidget(WizardWrapper(const WizardView(), vm,
+        MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin())));
 
     await tester.tap(find.byKey(const Key("city-selector")));
     await tester.pumpAndSettle();
@@ -145,15 +173,16 @@ void main() {
   testWidgets("Can select country", (WidgetTester tester) async {
     final vm = ValidateVM(
         NewsSettings(
-            interests: [],
-            cities: [],
-            countries: ["Albania"],
-            wantsCities: false,
-            wantsCountries: false,
-            wantsInterests: false,
-            onboardingNeeded: false),
+          interests: [],
+          cities: [],
+          countries: ["Albania"],
+          wantsCities: false,
+          wantsCountries: false,
+          wantsInterests: false,
+        ),
         null);
-    await tester.pumpWidget(WizardWrapper(const WizardView(), vm));
+    await tester.pumpWidget(WizardWrapper(const WizardView(), vm,
+        MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin())));
 
     await tester.tap(find.byKey(const Key("country-selector")));
     await tester.pumpAndSettle();
@@ -169,16 +198,17 @@ void main() {
 
   testWidgets("Keep initial values", (WidgetTester tester) async {
     NewsSettings ns = NewsSettings(
-        interests: ["Gaming"],
-        cities: ["Basel"],
-        countries: ["Switzerland"],
-        wantsCities: false,
-        wantsCountries: false,
-        wantsInterests: false,
-        onboardingNeeded: false);
+      interests: ["Gaming"],
+      cities: ["Basel"],
+      countries: ["Switzerland"],
+      wantsCities: false,
+      wantsCountries: false,
+      wantsInterests: false,
+    );
     final vm = ValidateVM(ns, ns);
 
-    await tester.pumpWidget(WizardWrapper(const WizardView(), vm));
+    await tester.pumpWidget(WizardWrapper(const WizardView(), vm,
+        MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin())));
 
     final validateFinder = find.text("Validate");
     expect(validateFinder, findsOne);
@@ -192,7 +222,8 @@ void main() {
   testWidgets("Can validate", (WidgetTester tester) async {
     final vm = ValidateVM(null, null);
 
-    await tester.pumpWidget(WizardWrapper(const WizardView(), vm));
+    await tester.pumpWidget(WizardWrapper(const WizardView(), vm,
+        MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin())));
 
     final validateFinder = find.text("Validate");
     expect(validateFinder, findsOne);
@@ -205,8 +236,10 @@ void main() {
 
   testWidgets("Cancel present", (WidgetTester tester) async {
     final vm = ValidateVM(null, null);
-    await tester.pumpWidget(
-        WizardWrapper(const WizardView(isInitialOnboarding: false), vm));
+    await tester.pumpWidget(WizardWrapper(
+        const WizardView(isInitialOnboarding: false),
+        vm,
+        MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin())));
 
     expect(find.text("Cancel"), findsOne);
   });

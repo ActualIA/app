@@ -28,18 +28,19 @@ class NewsSettingsViewModel extends ChangeNotifier {
           .single();
 
       _settings = NewsSettings(
-          cities: List<String>.from(jsonDecode(res['cities'])),
-          countries: List<String>.from(jsonDecode(res['countries'])),
-          interests: List<String>.from(jsonDecode(res['interests'])),
-          wantsCities: res['wants_cities'],
-          wantsCountries: res['wants_countries'],
-          wantsInterests: res['wants_interests'],
-          onboardingNeeded: false);
+        cities: List<String>.from(jsonDecode(res['cities'])),
+        countries: List<String>.from(jsonDecode(res['countries'])),
+        interests: List<String>.from(jsonDecode(res['interests'])),
+        wantsCities: res['wants_cities'],
+        wantsCountries: res['wants_countries'],
+        wantsInterests: res['wants_interests'],
+      );
       print("Settings updated");
       notifyListeners();
     } catch (e) {
       print("Error fetching settings: $e");
       _settings = NewsSettings.defaults();
+      notifyListeners();
       return;
     }
   }

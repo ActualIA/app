@@ -49,6 +49,5 @@ jobs:
         with:
           version: latest
 
-      - run: supabase functions deploy --project-ref $PROJECT_ID get-news
-      - run: supabase functions deploy --project-ref $PROJECT_ID get-transcript
+      - run: supabase functions deploy --project-ref $PROJECT_ID generate-transcript
       - run: supabase functions deploy --project-ref $PROJECT_ID generate-audio

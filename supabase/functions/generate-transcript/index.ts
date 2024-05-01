@@ -11,13 +11,18 @@ interface Result {
 
 interface NewsJsonLLM {
   totalNewsByLLM: string;
+  intro: string;
+  outro: string;
   news: Result[];
 }
 
 interface Transcript {
-  totalArticles: number;
+  totalNews: number;
   totalNewsByLLM: string;
-  articles: (News & Result)[];
+  intro: string;
+  outro: string;
+  fullTranscript: string;
+  news: (News & Result)[];
 }
 
 Deno.serve(async (request) => {
@@ -25,21 +30,34 @@ Deno.serve(async (request) => {
   assertHasEnv("GNEWS_API_KEY");
   assertHasEnv("OPENAI_API_KEY");
 
-  // Create a Supabase client with the user's token.
-  const authHeader = request.headers.get("Authorization")!;
-  const supabaseClient = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-    { global: { headers: { Authorization: authHeader } } },
-  );
+  const url = new URL(request.url);
+  const userIdProvided = url.searchParams.get("userId");
+  let supabaseClient;
+  let userId;
 
-  // Get the user from the token.
-  const user = await supabaseClient.auth.getUser();
-  if (user.error !== null) {
-    console.error(user.error);
-    return new Response("Authentication error", { status: 401 });
+  if (userIdProvided) {
+    supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    );
+    userId = userIdProvided;
+  } else {
+    // Create a Supabase client with the user's token.
+    const authHeader = request.headers.get("Authorization")!;
+    supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } },
+    );
+
+    // Get the user from the token.
+    const user = await supabaseClient.auth.getUser();
+    if (user.error !== null) {
+      console.error(user.error);
+      return new Response("Authentication error", { status: 401 });
+    }
+    userId = user.data.user.id;
   }
-  const userId = user.data.user.id;
 
   console.log("We start the process for the user with ID:", userId);
 
@@ -82,9 +100,9 @@ Deno.serve(async (request) => {
   // Generate a transcript from the news.
   console.log("Generating transcript from news");
   const transcript = news.length > 0 ? await generateTranscript(news) : {
-    totalArticles: 0,
+    totalNews: 0,
     totalNewsByLLM: 0,
-    articles: [],
+    news: [],
   };
 
   // Insert the transcript into the database.
@@ -110,8 +128,29 @@ Deno.serve(async (request) => {
 
 // Call OpenAI API for json generation
 async function generateTranscript(news: News[]): Promise<Transcript> {
+  const newsToGenerate = news.reduce(
+    (s, n) => `${s}${n.title}\n${n.description}\n\n`,
+    "",
+  );
+
   const openai = new OpenAI();
-  const completion = await openai.chat.completions.create({
+  const completion1 = await openai.chat.completions.create({
+    "model": "gpt-3.5-turbo",
+    "messages": [
+      {
+        "role": "system",
+        "content":
+          "You're a radio journalist writing a script to announce the day's news. The user gives you the news to announce. Your radio broadcast should only last 2-3 minutes, so try to find interesting transitions between the news items. Write the script.",
+      },
+      {
+        "role": "user",
+        "content": newsToGenerate,
+      },
+    ],
+  });
+  const fullTranscript = completion1.choices[0].message.content;
+
+  const completion2 = await openai.chat.completions.create({
     "model": "gpt-3.5-turbo",
     "response_format": {
       "type": "json_object",
@@ -120,30 +159,28 @@ async function generateTranscript(news: News[]): Promise<Transcript> {
       {
         "role": "system",
         "content":
-          'You are a journalist who provide a transcript from a selection of article headlines that we give you. It\'s up \
-          to you to compose your own text according to these, and to make interesting transitions between transcript items \
-          (IMPORTANT). For example, you can use Also, On the other hand, etc. to do the transition between news. Create a \
-          valid JSON array from this news-cut transcript, as in the example here {"totalNewsByLLM":"The number of news you \
-          proceed (ex. 3 here)","news":[{"transcript":"The summary of the news 1"},{"transcript":"The summary of the news 2"},{"transcript":"etc."}]}',
+          'You\'re an assistant trained to create JSON. You\'re given a text which is a radio chronicle about the news of the day. You\'re asked to recognize each news item and classify it in the JSON below. You should also be able to recognize the intro and conclusion. Don\'t leave out any words from the text. {"totalNewsByLLM":"Number of news you have recognized ","intro":"intro you have recognized","outro":"outro you have recognized","news":[{"transcript":"Content of the first news"},{"transcript":"Content of the second news"},{"transcript":"etc."}]}',
       },
       {
         "role": "user",
-        "content": news.reduce(
-          (s, n) => `${s}${n.title}\n${n.description}\n\n`,
-          "",
-        ),
+        "content": fullTranscript || "",
       },
     ],
   });
 
   const transcriptJSON: NewsJsonLLM = JSON.parse(
-    completion.choices[0].message.content || "",
+    completion2.choices[0].message.content || "",
   );
 
+  console.log("Transcript JSON: ", transcriptJSON);
+
   return {
-    totalArticles: news.length,
+    totalNews: news.length,
     totalNewsByLLM: transcriptJSON.totalNewsByLLM,
-    articles: news.map((n, i) => ({
+    intro: transcriptJSON.intro,
+    outro: transcriptJSON.outro,
+    fullTranscript: fullTranscript || "",
+    news: news.map((n, i) => ({
       ...transcriptJSON.news[i],
       ...n,
     })),

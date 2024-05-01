@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:gotrue/src/fetch.dart';
+import 'package:gotrue/src/types/fetch_options.dart';
 
 class PasswordSignin extends FakeGoTrueClient {
   @override
@@ -123,6 +125,30 @@ class StateChangeSignOutEmitter extends FakeGoTrueClient {
 }
 
 class FakeGoTrueClient extends Fake implements GoTrueClient {
+  late final FakeGotrueFetch _mockFetch = FakeGotrueFetch();
+  final Map<String, String> _headers = {};
+
+  FakeGotrueFetch get mockFetch => _mockFetch;
+
+  @override
+  Session? get currentSession => Session(
+      accessToken: "",
+      tokenType: "",
+      user: const User(
+          id: "1234",
+          appMetadata: {},
+          userMetadata: {},
+          aud: "",
+          createdAt: ""));
+
+  @override
+  User? get currentUser => const User(
+      id: "1234",
+      appMetadata: <String, dynamic>{},
+      userMetadata: <String, dynamic>{},
+      aud: "aud",
+      createdAt: "createdAt");
+
   @override
   Stream<AuthState> get onAuthStateChange => const Stream.empty();
 
@@ -153,9 +179,39 @@ class FakeGoTrueClient extends Fake implements GoTrueClient {
             aud: "",
             createdAt: "")));
   }
+
+  @override
+  Future<UserResponse> updateUser(UserAttributes attributes,
+      {String? emailRedirectTo}) async {
+    Map<String, dynamic>? userJson = currentUser?.toJson();
+    userJson?["user_metadata"] = attributes.toJson();
+    GotrueRequestOptions options =
+        GotrueRequestOptions(headers: _headers, body: userJson);
+    mockFetch.request("", RequestMethodType.post, options: options);
+    return UserResponse.fromJson(attributes.toJson());
+  }
 }
 
+class FakeGotrueFetch extends Fake implements GotrueFetch {
+  late User? _userdb;
+
+  User? get userdb => _userdb;
+
+  @override
+  Future<dynamic> request(
+    String url,
+    RequestMethodType method, {
+    GotrueRequestOptions? options,
+  }) async {
+    _userdb = User.fromJson(options!.body!);
+    return userdb?.toJson();
+  }
+}
+
+class FakeGotrueRequestOption extends Fake implements GotrueRequestOptions {}
+
 class FakeSupabaseClient extends Fake implements SupabaseClient {
+  late User? userdb;
   GoTrueClient client;
   FakeSupabaseClient(this.client);
 
@@ -293,5 +349,16 @@ void main() {
     AuthModel vm =
         AuthModel(FakeSupabaseClient(Signout()), FakeFailingGoogleSignin());
     expect(await vm.signOut(), isFalse);
+  });
+
+  test("SetOnboardingIsDone work as intended", () async {
+    FakeGoTrueClient fakeClient = FakeGoTrueClient();
+    FakeSupabaseClient fakedb = FakeSupabaseClient(fakeClient);
+    AuthModel auth = AuthModel(fakedb, FakeGoogleSignin());
+    auth.setOnboardingIsDone();
+
+    expect(fakeClient.mockFetch._userdb?.userMetadata, {
+      "data": {"onboardingDone": true}
+    });
   });
 }

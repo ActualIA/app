@@ -1,6 +1,23 @@
 {
-	"image": "mcr.microsoft.com/devcontainers/universal:2",
-	"features": {
-		"ghcr.io/devcontainers-community/features/deno:1": {}
-	}
+  "name": "Flutter Codespace",
+  "image": "ghcr.io/nouvist/codespace.flutter:latest",
+  "remoteUser": "vscode",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": true,
+      "installOhMyZsh": true,
+      "username": "vscode",
+      "upgradePackages": false
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["Dart-Code.dart-code", "Dart-Code.flutter"]
+    }
+  },
+
+  "runArgs": ["--device=/dev/net/tun"],
+  "capAdd": ["NET_ADMIN", "NET_RAW"]
 }

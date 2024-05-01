@@ -1,3 +1,4 @@
+import 'package:actualia/models/auth_model.dart';
 import 'package:actualia/models/news_settings.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class _WizardViewState extends State<WizardView> {
 
   @override
   Widget build(BuildContext context) {
+    AuthModel authModel = Provider.of<AuthModel>(context);
     NewsSettingsViewModel? newsSettingsModel;
     NewsSettings newsSettingsDefault = NewsSettings.defaults();
     NewsSettings? fromDB;
@@ -106,7 +108,7 @@ class _WizardViewState extends State<WizardView> {
         },
         showRight: true,
         rText: 'Validate',
-        rOnPressed: () {
+        rOnPressed: () async {
           NewsSettings toSend = NewsSettings(
             cities: _cities,
             countries: _countries,
@@ -114,9 +116,9 @@ class _WizardViewState extends State<WizardView> {
             wantsCities: true,
             wantsCountries: true,
             wantsInterests: true,
-            onboardingNeeded: false,
           );
           newsSettingsModel?.pushSettings(toSend);
+          await authModel.setOnboardingIsDone();
           //todo nav to main screen
           if (!widget.isInitialOnboarding) {
             Navigator.pop(context);
