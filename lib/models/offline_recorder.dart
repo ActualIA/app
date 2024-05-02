@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:actualia/models/news.dart';
 import 'package:path_provider/path_provider.dart';
@@ -12,9 +13,10 @@ class OfflineRecorder {
 
   late final _newsProvider;
   late final _appOfflineNewsPath;
+  var _maxStorageSize = 17e+6; // One minute mp3 file ~ 1MB
 
   OfflineRecorder._create(
-      NewsViewModel newsProvider, Directory appOfflineNewsPath) {
+      NewsViewModel newsProvider, String appOfflineNewsPath) {
     // Getting the news provider
     late final _newsProvider = newsProvider;
 
@@ -24,13 +26,80 @@ class OfflineRecorder {
 
   static Future<OfflineRecorder> create(NewsViewModel newsProvider) async {
     final Directory appDir = await getApplicationDocumentsDirectory();
-    Directory appOfflineNewsPath =
-        Directory("${appDir.path}/${ROOT_OFFLINE_FOLDER}/");
+    String appOfflineNewsPath = "${appDir.path}/${ROOT_OFFLINE_FOLDER}/";
+    Directory appOfflineNewsFolder = Directory(appOfflineNewsPath);
 
-    if (!(await appOfflineNewsPath.exists())) {
-      appOfflineNewsPath = await appOfflineNewsPath.create(recursive: true);
+    if (!(await appOfflineNewsFolder.exists())) {
+      appOfflineNewsPath =
+          (await appOfflineNewsFolder.create(recursive: true)).path;
     }
 
     return OfflineRecorder._create(newsProvider, appOfflineNewsPath);
+  }
+
+  Future<int> setMaxStorage(int newStorageSize) async {
+    Directory appOfflineNewsFolder = Directory(_appOfflineNewsPath);
+
+    if (!(await appOfflineNewsFolder.exists())) {
+      await appOfflineNewsFolder.create(recursive: true);
+    }
+
+    if (await _dirSize(Directory(_appOfflineNewsPath)) >= newStorageSize) {
+      _cleanStorage();
+    }
+
+    _maxStorageSize = newStorageSize as double;
+
+    return newStorageSize;
+  }
+
+  /**
+   * TODO : Only delete some files
+   */
+  void _cleanStorage() async {
+    Directory appOfflineNewsFolder = Directory(_appOfflineNewsPath);
+
+    if (await appOfflineNewsFolder.exists()) {
+      appOfflineNewsFolder.delete(recursive: true);
+    }
+
+    await Directory(_appOfflineNewsPath).create(recursive: true);
+  }
+
+  /**
+   * Provides the size, in bytes, of a directory
+   */
+  Future<int> _dirSize(Directory dir) async {
+    var files = await dir.list(recursive: true).toList();
+    var dirSize = files.fold(0, (int sum, file) => sum + file.statSync().size);
+    return dirSize;
+  }
+
+  void downloadNews(News news) async {
+    Directory appOfflineNewsFolder = Directory(_appOfflineNewsPath);
+
+    // Missing folder -> creates it, even if it should be created the first time the offline recorder is created
+    if (!(await appOfflineNewsFolder.exists())) {
+      await appOfflineNewsFolder.create(recursive: true);
+    }
+
+    String filePath =
+        _appOfflineNewsPath + "${news.date.substring(0, 10)}_transcript.json";
+    String json = jsonEncode(news);
+
+    // Cannot have to transcripts for the same day
+    if (await File(filePath).exists()) {
+      await File(filePath).delete();
+    }
+
+    // Creates the file
+    final file = File(filePath);
+
+    await file.writeAsString(json);
+
+    // TODO : Only delete oldest files when overflowing
+    if (await _dirSize(Directory(_appOfflineNewsPath)) >= _maxStorageSize) {
+      _cleanStorage();
+    }
   }
 }
