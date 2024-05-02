@@ -102,4 +102,23 @@ class OfflineRecorder {
       _cleanStorage();
     }
   }
+
+  /**
+   * Load data from local storage. Date must be formated in the following way : <year>-<month>-<day>
+   */
+  Future<News> loadNews(String date) async {
+    RegExp regex = RegExp(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$");
+    if (regex.allMatches(date).isEmpty) {
+      throw UnimplementedError("Date String not well formated");
+    }
+
+    String filePath = _appOfflineNewsPath + "${date}_transcript.json";
+    if (await File(filePath).exists()) {
+      throw FileSystemException("$filePath doesn't exist");
+    }
+
+    String json = await File(filePath).readAsString();
+
+    return jsonDecode(json) as News;
+  }
 }
