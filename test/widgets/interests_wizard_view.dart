@@ -1,7 +1,7 @@
 import "package:actualia/models/auth_model.dart";
 import "package:actualia/models/news_settings.dart";
 import "package:actualia/viewmodels/news_settings.dart";
-import "package:actualia/views/wizard_view.dart";
+import "package:actualia/views/interests_wizard_view.dart";
 import "package:flutter/material.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:google_sign_in/google_sign_in.dart";
@@ -49,11 +49,10 @@ class ValidateVM extends MockNewsSettingsViewModel {
 
   @override
   Future<bool> pushSettings(NewsSettings settings) {
-    final expected = this.expected;
     if (expected != null) {
-      expect(settings.cities, equals(expected.cities));
-      expect(settings.countries, equals(expected.countries));
-      expect(settings.interests, equals(expected.interests));
+      expect(settings.cities, equals(expected!.cities));
+      expect(settings.countries, equals(expected!.countries));
+      expect(settings.interests, equals(expected!.interests));
     }
 
     wasTriggered = true;
@@ -88,7 +87,10 @@ class WizardWrapper extends StatelessWidget {
 }
 
 class MockAuthModel extends AuthModel {
-  MockAuthModel(super.supabaseClient, super.googleSignIn);
+  final bool isOnboardingRequired;
+
+  MockAuthModel(super.supabaseClient, super.googleSignIn,
+      {this.isOnboardingRequired = false});
 
   @override
   Future<bool> setOnboardingIsDone() async {
@@ -101,97 +103,54 @@ class FakeGoogleSignin extends Fake implements GoogleSignIn {}
 void main() {
   // The `BuildContext` does not include the provider
   // needed by Provider<AuthModel>, UI will test more specific parts
-  testWidgets("Has all correct inputs", (WidgetTester tester) async {
+  testWidgets("Correctly display each selector", (WidgetTester tester) async {
     // Build our app and trigger a frame.
 
     await tester.pumpWidget(WizardWrapper(
-        const WizardView(),
+        const InterestWizardView(),
         MockNewsSettingsViewModel(),
-        MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin())));
+        MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin(),
+            isOnboardingRequired: true)));
 
-    expect(find.text("Select some interests"), findsOne);
-    expect(find.text("Interests"), findsOne);
-    expect(find.text("Select some countries"), findsOne);
-    expect(find.text("Country"), findsOne);
-    expect(find.text("Select some cities"), findsOne);
-    expect(find.text("City"), findsOne);
-    expect(find.text("Validate"), findsOne);
+    testSelector(Key selectorKey, String scrollUntil, String buttonText) async {
+      expect(find.byKey(selectorKey), findsOneWidget);
+      // await tester.dragUntilVisible(find.text("Chad"), find.byType(SingleChildScrollView), Offset(200, 50)); TODO find a way to test the scroll of a singleChildScrollView
+      expect(find.text(buttonText), findsOne);
+      await tester.tap(find.text(buttonText));
+      await tester.pumpAndSettle();
+    }
+
+    await testSelector(const Key("countries-selector"), "Chad", "Next");
+    await testSelector(const Key("cities-selector"), "Basel", "Next");
+    await testSelector(const Key("interests-selector"), "Gaming", "Finish");
   });
 
-  testWidgets("Can select interest", (WidgetTester tester) async {
+  testWidgets("Can select countries, cities and interests and push them",
+      (WidgetTester tester) async {
     final vm = ValidateVM(
         NewsSettings(
           interests: ["Biology"],
-          cities: [],
-          countries: [],
-          wantsCities: false,
-          wantsCountries: false,
-          wantsInterests: false,
-        ),
-        null);
-    await tester.pumpWidget(WizardWrapper(const WizardView(), vm,
-        MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin())));
-
-    await tester.tap(find.byKey(const Key("interest-selector")));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text("Biology"));
-    await tester.pump();
-
-    await tester.tap(find.text("Validate"));
-    await tester.pump();
-
-    expect(vm.wasTriggered, isTrue);
-  });
-
-  testWidgets("Can select city", (WidgetTester tester) async {
-    final vm = ValidateVM(
-        NewsSettings(
-          interests: [],
           cities: ["Basel"],
-          countries: [],
+          countries: ["Antarctica"],
           wantsCities: false,
           wantsCountries: false,
           wantsInterests: false,
         ),
         null);
-    await tester.pumpWidget(WizardWrapper(const WizardView(), vm,
+    await tester.pumpWidget(WizardWrapper(const InterestWizardView(), vm,
         MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin())));
 
-    await tester.tap(find.byKey(const Key("city-selector")));
-    await tester.pumpAndSettle();
+    select(Key selectorKey, String toSelect, String button) async {
+      expect(find.byKey(selectorKey), findsOneWidget);
+      expect(find.text(toSelect), findsOne);
+      await tester.tap(find.text(toSelect));
+      await tester.tap(find.text(button));
+      await tester.pumpAndSettle();
+    }
 
-    await tester.tap(find.text("Basel"));
-    await tester.pump();
-
-    await tester.tap(find.text("Validate"));
-    await tester.pump();
-
-    expect(vm.wasTriggered, isTrue);
-  });
-
-  testWidgets("Can select country", (WidgetTester tester) async {
-    final vm = ValidateVM(
-        NewsSettings(
-          interests: [],
-          cities: [],
-          countries: ["Albania"],
-          wantsCities: false,
-          wantsCountries: false,
-          wantsInterests: false,
-        ),
-        null);
-    await tester.pumpWidget(WizardWrapper(const WizardView(), vm,
-        MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin())));
-
-    await tester.tap(find.byKey(const Key("country-selector")));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text("Albania"));
-    await tester.pump();
-
-    await tester.tap(find.text("Validate"));
-    await tester.pump();
+    await select(const Key("countries-selector"), "Antarctica", "Next");
+    await select(const Key("cities-selector"), "Basel", "Next");
+    await select(const Key("interests-selector"), "Biology", "Finish");
 
     expect(vm.wasTriggered, isTrue);
   });
@@ -200,47 +159,44 @@ void main() {
     NewsSettings ns = NewsSettings(
       interests: ["Gaming"],
       cities: ["Basel"],
-      countries: ["Switzerland"],
+      countries: ["Antarctica"],
       wantsCities: false,
       wantsCountries: false,
       wantsInterests: false,
     );
     final vm = ValidateVM(ns, ns);
 
-    await tester.pumpWidget(WizardWrapper(const WizardView(), vm,
+    await tester.pumpWidget(WizardWrapper(const InterestWizardView(), vm,
         MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin())));
 
-    final validateFinder = find.text("Validate");
-    expect(validateFinder, findsOne);
+    nextScreen(String button) async {
+      await tester.tap(find.text(button));
+      await tester.pumpAndSettle();
+    }
 
-    await tester.tap(validateFinder);
-    await tester.pump();
+    await nextScreen("Next");
+    await nextScreen("Next");
+    await nextScreen("Finish");
 
     expect(vm.wasTriggered, isTrue);
   });
 
-  testWidgets("Can validate", (WidgetTester tester) async {
-    final vm = ValidateVM(null, null);
-
-    await tester.pumpWidget(WizardWrapper(const WizardView(), vm,
-        MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin())));
-
-    final validateFinder = find.text("Validate");
-    expect(validateFinder, findsOne);
-
-    await tester.tap(validateFinder);
-    await tester.pump();
-
-    expect(vm.wasTriggered, isTrue);
-  });
-
-  testWidgets("Cancel present", (WidgetTester tester) async {
+  testWidgets("Cancel present and send to previous screen on tap",
+      (WidgetTester tester) async {
     final vm = ValidateVM(null, null);
     await tester.pumpWidget(WizardWrapper(
-        const WizardView(isInitialOnboarding: false),
+        const InterestWizardView(),
         vm,
-        MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin())));
+        MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin(),
+            isOnboardingRequired: false)));
 
     expect(find.text("Cancel"), findsOne);
+    await tester.tap(find.text("Next"));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text("Basel"));
+    expect(find.text("Cancel"), findsOne);
+    await tester.tap(find.text("Cancel"));
+    await tester.pumpAndSettle();
+    expect(find.text("Select countries"), findsOne);
   });
 }

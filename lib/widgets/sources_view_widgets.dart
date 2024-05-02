@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:actualia/utils/themes.dart';
 import 'package:flutter/material.dart';
 
 class ScrollableText extends StatelessWidget {
@@ -8,80 +8,36 @@ class ScrollableText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-        child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-            child: SingleChildScrollView(
-              child: Text(
-                text,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 12,
-                  fontFamily: 'Fira Code',
-                  fontWeight: FontWeight.w300,
-                  decoration: TextDecoration.none,
-                ),
-                textAlign: TextAlign.left,
-              ),
-            )));
+    return SingleChildScrollView(
+      child: Text(style: Theme.of(context).textTheme.displaySmall, text),
+    );
   }
 }
 
-class DisplayOrigin extends StatelessWidget {
+class SourceOrigin extends StatelessWidget {
   final String origin;
   final String date;
 
-  const DisplayOrigin({this.origin = "", this.date = "", super.key});
+  const SourceOrigin({this.origin = "", this.date = "", super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-        child: Wrap(
-          children: [
-            Text(
-              "Article from $origin,",
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 22,
-                fontFamily: 'EB Garamond',
-                fontWeight: FontWeight.w400,
-                height: 1.2,
-              ),
-            ),
-            Text(
-              "published the $date",
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 22,
-                fontFamily: 'EB Garamond',
-                fontWeight: FontWeight.w400,
-                height: 1.2,
-              ),
-            )
-          ],
-        ));
+    return Text(
+        style: Theme.of(context)
+            .textTheme
+            .displaySmall
+            ?.copyWith(color: THEME_GREY),
+        "$origin, $date");
   }
 }
 
-class DisplayTitle extends StatelessWidget {
+class SourceTitle extends StatelessWidget {
   final String title;
 
-  const DisplayTitle({this.title = "", super.key});
+  const SourceTitle({this.title = "", super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.all(16),
-        child: Text(
-          "Title of the article : $title",
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 22,
-            fontFamily: 'EB Garamond',
-            fontWeight: FontWeight.w400,
-            height: 1.2,
-          ),
-        ));
+    return Text(style: Theme.of(context).textTheme.titleMedium, title);
   }
 }

@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:actualia/models/news_settings.dart';
 import 'package:flutter/foundation.dart';
+import 'package:logging/logging.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NewsSettingsViewModel extends ChangeNotifier {
-  late final supabase;
+  late final SupabaseClient supabase;
 
   NewsSettingsViewModel(SupabaseClient supabaseClient) {
     supabase = supabaseClient;
@@ -35,10 +36,9 @@ class NewsSettingsViewModel extends ChangeNotifier {
         wantsCountries: res['wants_countries'],
         wantsInterests: res['wants_interests'],
       );
-      print("Settings updated");
       notifyListeners();
     } catch (e) {
-      print("Error fetching settings: $e");
+      log("Error fetching settings: $e", level: Level.WARNING.value);
       _settings = NewsSettings.defaults();
       notifyListeners();
       return;
@@ -59,7 +59,7 @@ class NewsSettingsViewModel extends ChangeNotifier {
       fetchSettings();
       return true;
     } catch (e) {
-      print("Error pushing settings: $e");
+      log("Error pushing settings: $e", level: Level.WARNING.value);
       return false;
     }
   }

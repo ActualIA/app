@@ -1,11 +1,12 @@
 //coverage:ignore-file
 
 import 'package:actualia/models/auth_model.dart';
+import 'package:actualia/utils/themes.dart';
 import 'package:actualia/views/loading_view.dart';
 import 'package:actualia/views/news_view.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
 import 'package:actualia/views/login_view.dart';
-import 'package:actualia/views/wizard_view.dart';
+import 'package:actualia/views/interests_wizard_view.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
@@ -62,7 +63,7 @@ class _AppState extends State<App> {
         if (newsSettings.settings == null) {
           home = const LoadingView(text: 'Fetching your settings...');
         } else {
-          home = const WizardView(isInitialOnboarding: true);
+          home = const InterestWizardView();
         }
       } else {
         home = const NewsView();
@@ -73,12 +74,6 @@ class _AppState extends State<App> {
       );
     }
 
-    return MaterialApp(
-        title: 'ActualIA',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF5EDCE4)),
-          useMaterial3: true,
-        ),
-        home: home);
+    return MaterialApp(title: 'ActualIA', theme: ACTUALIA_THEME, home: home);
   }
 }

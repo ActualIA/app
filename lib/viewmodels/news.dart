@@ -3,10 +3,11 @@ import 'package:actualia/models/news.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:actualia/models/offline_recorder.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// View model for managing news data.
 class NewsViewModel extends ChangeNotifier {
-  late final supabase;
+  late final SupabaseClient supabase;
   News? _news;
   News? get news => _news;
   List<News> _newsList = [];
@@ -50,10 +51,14 @@ class NewsViewModel extends ChangeNotifier {
 
   /// Fetches news for the specified date from the database.
   Future<void> fetchNews(DateTime date) async {
+    // Converts time to UTC to match Supabase's instances.
+    date = date.toUtc();
+
     String dayStart =
         DateTime(date.year, date.month, date.day).toIso8601String();
     String nextDayStart =
         DateTime(date.year, date.month, date.day + 1).toIso8601String();
+
     try {
       var supabaseResponse = await supabase
           .from('news')
@@ -90,7 +95,7 @@ class NewsViewModel extends ChangeNotifier {
 
         //If the date of the first news is not today, call the cloud function
         if (_newsList[0].date.substring(0, 10) !=
-            DateTime.now().toString().substring(0, 10)) {
+            DateTime.now().toUtc().toString().substring(0, 10)) {
           await generateAndGetNews();
           _newsList.insert(0, _news!);
         }
@@ -105,8 +110,9 @@ class NewsViewModel extends ChangeNotifier {
   @protected
   Future<void> generateAndGetNews() async {
     await invokeTranscriptFunction();
-    await fetchNews(DateTime
-        .now()); //We only fetch one news since we already fetched the list and it was either empty or needed a single entry to be added
+
+    // We only fetch one news since we already fetched the list and it was either empty or needed a single entry to be added
+    await fetchNews(DateTime.now());
 
     if (_news == null || _news!.paragraphs.isEmpty) {
       setNewsError(DateTime.now(), 'News generation failed and no news found.',
@@ -138,7 +144,8 @@ class NewsViewModel extends ChangeNotifier {
 
     return News(
       title: response['title'],
-      date: response['date'],
+      // Dates are stored in UTC timezone in the database.
+      date: DateTime.parse(response['date']).toLocal().toIso8601String(),
       transcriptID: response['id'],
       audio: response['audio'],
       paragraphs: paragraphs,

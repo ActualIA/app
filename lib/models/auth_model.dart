@@ -1,12 +1,13 @@
 import 'dart:async';
-
+import 'dart:developer';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:logging/logging.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthModel extends ChangeNotifier {
   late final GoogleSignIn _googleSignIn;
-  late final _supabase;
+  late final SupabaseClient _supabase;
 
   User? user;
   StreamSubscription? authStateSub;
@@ -17,13 +18,11 @@ class AuthModel extends ChangeNotifier {
   AuthModel(SupabaseClient supabaseClient, this._googleSignIn) {
     _supabase = supabaseClient;
     authStateSub = _supabase.auth.onAuthStateChange.listen((authState) {
-      print('Supabase onAuthStateChange new authState : ${authState.event}');
-
       if (authState.event == AuthChangeEvent.signedOut ||
           authState.event == AuthChangeEvent.userDeleted) {
         user = null;
       } else {
-        user = _supabase.auth?.currentSession?.user;
+        user = _supabase.auth.currentSession?.user;
       }
 
       if (user != null) {
@@ -34,7 +33,7 @@ class AuthModel extends ChangeNotifier {
 
       notifyListeners();
     }, onError: (e) {
-      print('Supabase onAuthStateChange error : $e');
+      log('Supabase onAuthStateChange error : $e', level: Level.WARNING.value);
     });
   }
 
@@ -55,7 +54,8 @@ class AuthModel extends ChangeNotifier {
       final idToken = googleAuth.idToken;
 
       if (idToken == null || accessToken == null) {
-        print('Missing ID Token or access token from Google OAuth.');
+        log('Missing ID Token or access token from Google OAuth.',
+            level: Level.WARNING.value);
       }
 
       final res = await _supabase.auth.signInWithIdToken(
@@ -65,8 +65,8 @@ class AuthModel extends ChangeNotifier {
       );
 
       return res.user != null;
-    } catch (error) {
-      print(error);
+    } catch (e) {
+      log("Google Sign-In failed: $e", level: Level.WARNING.value);
       return false;
     }
   }
@@ -79,7 +79,7 @@ class AuthModel extends ChangeNotifier {
       }
       return true;
     } catch (e) {
-      print(e);
+      log("Sign-Out failed: $e", level: Level.WARNING.value);
       return false;
     }
   }

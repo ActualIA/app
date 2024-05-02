@@ -22,7 +22,6 @@ class _LoginViewState extends State<LoginView> {
       shrinkWrap: true,
       children: <Widget>[
         UnconstrainedBox(child: monogram),
-        const SizedBox(height: 32),
         const SignInControls(),
       ],
     ));

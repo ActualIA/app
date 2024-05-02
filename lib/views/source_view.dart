@@ -1,3 +1,4 @@
+import 'package:actualia/utils/themes.dart';
 import 'package:actualia/widgets/sources_view_widgets.dart';
 import 'package:actualia/widgets/top_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,7 @@ class _SourceViewState extends State<SourceView> {
   @override
   void initState() {
     super.initState();
-    //init _article, _title, _date and _newsPaper using widget.source
+    // init _article, _title, _date and _newsPaper using widget.source
     _article = widget.article;
     _title = widget.title;
     _date = widget.date;
@@ -38,22 +39,28 @@ class _SourceViewState extends State<SourceView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: TopAppBar(
-          enableReturnButton: true,
-          onPressed: () => {Navigator.pop(context)},
-        ),
-        body: Container(
-          padding: const EdgeInsets.all(16),
-          child: Center(
-              child: Column(
-            children: [
-              DisplayOrigin(origin: _newsPaper, date: _date),
-              const SizedBox(height: 20),
-              DisplayTitle(title: _title),
-              const SizedBox(height: 20),
+      appBar: TopAppBar(
+        enableReturnButton: true,
+        onPressed: () => {Navigator.pop(context)},
+      ),
+      body: Container(
+          padding: const EdgeInsets.all(UNIT_PADDING * 3),
+          child: ListView(
+            children: <Widget>[
+              ListView(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: UNIT_PADDING, vertical: UNIT_PADDING * 2),
+                  children: <Widget>[
+                    SourceOrigin(origin: _newsPaper, date: _date),
+                    Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: UNIT_PADDING / 2),
+                        child: SourceTitle(title: _title)),
+                  ]),
               ScrollableText(text: _article)
             ],
           )),
-        ));
+    );
   }
 }

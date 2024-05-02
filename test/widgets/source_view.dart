@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:actualia/views/source_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -46,13 +44,13 @@ void main() {
     expect(find.text("ActualIA"), findsOne);
 
     //check article origin
-    expect(find.text("Article from $newsPaper,"), findsOne);
-    expect(find.text("published the $date"), findsOne);
+    expect(find.text("$newsPaper, $date"), findsOne);
 
     //check title
-    expect(find.text("Title of the article : $title"), findsOne);
+    expect(find.text(title), findsOne);
 
     //check article is present and scrollable
-    await tester.scrollUntilVisible(find.text(article), 5, scrollable: null);
+    await tester.dragUntilVisible(
+        find.text(article), find.byType(ListView), Offset.fromDirection(90.0));
   });
 }

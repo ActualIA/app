@@ -141,10 +141,10 @@ class MockNewsViewModel extends NewsViewModel {
 }
 
 class NewsWrapper extends StatelessWidget {
-  late final Widget _child;
-  late final NewsViewModel _model;
+  final Widget _child;
+  final NewsViewModel _model;
 
-  NewsWrapper(this._child, this._model, {super.key});
+  const NewsWrapper(this._child, this._model, {super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -5,10 +5,8 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-// import 'package:flutter/material.dart';
-import 'package:actualia/main.dart';
-import 'package:actualia/models/auth_model.dart';
 import 'package:flutter/material.dart';
+import 'package:actualia/models/auth_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:actualia/views/login_view.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -55,9 +53,7 @@ class FakeGoogleSignin extends Fake implements GoogleSignIn {}
 // END;
 
 class MockAuthModel extends AuthModel {
-  MockAuthModel(super.key, super._googleSignIn) {
-    print("instantiated mockauth");
-  }
+  MockAuthModel(super.key, super._googleSignIn);
 }
 
 void main() {

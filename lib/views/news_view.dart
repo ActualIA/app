@@ -24,8 +24,10 @@ class _NewsViewState extends State<NewsView> {
   Widget build(BuildContext context) {
     Widget loading =
         const LoadingView(text: "Please wait while we fetch the news for you.");
+
     final newsViewModel = Provider.of<NewsViewModel>(context);
     final _newsList = newsViewModel.newsList;
+
     Widget body = _newsList.isEmpty
         ? loading
         : ListView.builder(

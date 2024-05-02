@@ -2,8 +2,7 @@ import 'package:actualia/models/auth_model.dart';
 import 'package:actualia/models/news_settings.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
 import 'package:actualia/views/profile_view.dart';
-import 'package:actualia/views/wizard_view.dart';
-import 'package:actualia/widgets/wizard_widgets.dart';
+import 'package:actualia/views/interests_wizard_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -18,16 +17,18 @@ class FakeSupabaseClient extends Fake implements SupabaseClient {
 
 class FakeGotrue extends Fake implements GoTrueClient {
   @override
-  Stream<AuthState> get onAuthStateChange => Stream.empty();
+  Stream<AuthState> get onAuthStateChange => const Stream.empty();
 }
 
 class FakeGoogleSignin extends Fake implements GoogleSignIn {}
 
 // END
 class MockAuthModel extends AuthModel {
-  MockAuthModel(super.key, super._googleSignIn) {
-    print("instantiated mockauth");
-  }
+  @override
+  final bool isOnboardingRequired;
+
+  MockAuthModel(super.key, super._googleSignIn,
+      {this.isOnboardingRequired = false});
 
   @override
   User? get user => User(
@@ -39,6 +40,7 @@ class MockAuthModel extends AuthModel {
         createdAt: DateTime.now().toIso8601String(),
       );
 
+  @override
   Future<bool> signInWithGoogle() async {
     return Future.value(true);
   }
@@ -104,8 +106,9 @@ void main() {
     expect(find.text('Logout'), findsOne);
 
     testButton(String text) async {
-      await tester.scrollUntilVisible(find.text(text), 1);
-      await tester.tap(find.text(text));
+      await tester.dragUntilVisible(
+          find.text(text), find.byType(ListView), Offset.fromDirection(90.0));
+      await tester.tap(find.text(findRichText: true, text));
       await tester.pump();
     }
 
@@ -116,8 +119,8 @@ void main() {
     await testInterestButton();
     await testButton('Sources');
     await testButton('Alarm');
-    await testButton('Manage Storage');
-    await testButton('Narrator Settings');
+    await testButton('Storage');
+    await testButton('Narrator');
     await testButton('Accessibility');
     await testButton('Done');
   });
@@ -128,7 +131,7 @@ void main() {
         MockNewsSettingsViewModel(),
         MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin())));
 
-    expect(find.text("Hey, test.test@epfl.ch !"), findsOne);
+    expect(find.text("test.test@epfl.ch"), findsOne);
   });
 
   testWidgets("Interests button work as intended", (tester) async {
@@ -142,8 +145,8 @@ void main() {
     await tester.pumpAndSettle();
 
     //check wizard is on screen
-    expect(find.byType(WizardView), findsOneWidget);
-    expect(find.byType(WizardNavigationButton), findsExactly(2));
+    expect(find.byType(InterestWizardView), findsOneWidget);
+    expect(find.byType(FilledButton), findsExactly(2));
     Finder finder = find.text("Cancel");
     expect(finder, findsOne);
 
@@ -152,7 +155,7 @@ void main() {
     await tester.pumpAndSettle();
 
     //check wizard not on screen anymore
-    expect(find.byType(WizardView), findsNothing);
+    expect(find.byType(InterestWizardView), findsNothing);
     expect(find.text("Interests"), findsOne);
   });
 }

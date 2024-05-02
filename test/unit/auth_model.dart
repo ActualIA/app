@@ -242,10 +242,12 @@ class FakeGoogleSignInAccount extends Fake implements GoogleSignInAccount {
 
 class FakeGoogleSignInAuthentication extends Fake
     implements GoogleSignInAuthentication {
-  /// An OpenID Connect ID token that identifies the user.
+  /// An OpenID Connect ID token that identifies the user.ù
+  @override
   String? get idToken => "idToken";
 
   /// The OAuth2 access token to access Google services.
+  @override
   String? get accessToken => "accessToken";
 }
 
