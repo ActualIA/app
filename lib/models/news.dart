@@ -23,7 +23,7 @@ class News {
         title: json['title'] as String,
         date: json['date'] as String,
         transcriptID: json['transcriptID'] as int,
-        audio: json['audio'] as String,
+        audio: json['audio'] as String?,
         paragraphs: (json['paragraphs'] != null)
             ? (json["paragraphs"]) as List<Paragraph>
             : List.empty());
