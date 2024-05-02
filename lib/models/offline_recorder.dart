@@ -11,20 +11,15 @@ import 'package:actualia/viewmodels/news.dart';
 class OfflineRecorder {
   static const ROOT_OFFLINE_FOLDER = "storage";
 
-  late final _newsProvider;
   late final _appOfflineNewsPath;
-  var _maxStorageSize = 17e+6; // One minute mp3 file ~ 1MB
+  var _maxStorageSize = 17e+6 as int; // One minute mp3 file ~ 1MB
 
-  OfflineRecorder._create(
-      NewsViewModel newsProvider, String appOfflineNewsPath) {
-    // Getting the news provider
-    late final _newsProvider = newsProvider;
-
+  OfflineRecorder._create(String appOfflineNewsPath) {
     // Creating the root file to store the news
     _appOfflineNewsPath = appOfflineNewsPath;
   }
 
-  static Future<OfflineRecorder> create(NewsViewModel newsProvider) async {
+  static Future<OfflineRecorder> create() async {
     final Directory appDir = await getApplicationDocumentsDirectory();
     String appOfflineNewsPath = "${appDir.path}/${ROOT_OFFLINE_FOLDER}/";
     Directory appOfflineNewsFolder = Directory(appOfflineNewsPath);
@@ -34,10 +29,10 @@ class OfflineRecorder {
           (await appOfflineNewsFolder.create(recursive: true)).path;
     }
 
-    return OfflineRecorder._create(newsProvider, appOfflineNewsPath);
+    return OfflineRecorder._create(appOfflineNewsPath);
   }
 
-  Future<int> setMaxStorage(int newStorageSize) async {
+  Future<int> setMaxStorageSize(int newStorageSize) async {
     Directory appOfflineNewsFolder = Directory(_appOfflineNewsPath);
 
     if (!(await appOfflineNewsFolder.exists())) {
@@ -48,9 +43,13 @@ class OfflineRecorder {
       _cleanStorage();
     }
 
-    _maxStorageSize = newStorageSize as double;
+    _maxStorageSize = newStorageSize;
 
     return newStorageSize;
+  }
+
+  int getCurrentMaxStorageSize() {
+    return _maxStorageSize;
   }
 
   /**

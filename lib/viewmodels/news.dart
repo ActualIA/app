@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:actualia/models/news.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
+import 'package:actualia/models/offline_recorder.dart';
 
 /// View model for managing news data.
 class NewsViewModel extends ChangeNotifier {
@@ -10,6 +11,8 @@ class NewsViewModel extends ChangeNotifier {
   News? get news => _news;
   List<News> _newsList = [];
   List<News> get newsList => _newsList;
+
+  late final _offlineRecorder = OfflineRecorder.create();
 
   @protected
   void setNews(News? news) {
