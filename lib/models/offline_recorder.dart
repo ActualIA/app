@@ -21,7 +21,7 @@ class OfflineRecorder {
 
   static Future<OfflineRecorder> create() async {
     final Directory appDir = await getApplicationDocumentsDirectory();
-    String appOfflineNewsPath = "${appDir.path}/${ROOT_OFFLINE_FOLDER}/";
+    String appOfflineNewsPath = "${appDir.path}/$ROOT_OFFLINE_FOLDER/";
     Directory appOfflineNewsFolder = Directory(appOfflineNewsPath);
 
     if (!(await appOfflineNewsFolder.exists())) {

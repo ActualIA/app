@@ -37,9 +37,10 @@ class FakeFailingQueryBuilder extends Fake implements SupabaseQueryBuilder {
 class FakeFailingFunctionsClient extends Fake implements FunctionsClient {
   @override
   Future<FunctionResponse> invoke(String functionName,
-      {Map<String, String>? headers,
-      Map<String, dynamic>? body,
-      HttpMethod method = HttpMethod.post}) {
+      {Map<String, dynamic>? body,
+      Map<String, String>? headers,
+      HttpMethod method = HttpMethod.post,
+      Map<String, dynamic>? queryParameters}) {
     throw UnimplementedError();
   }
 }
@@ -63,7 +64,8 @@ class FakeFunctionsClient extends Fake implements FunctionsClient {
   Future<FunctionResponse> invoke(String functionName,
       {Map<String, String>? headers,
       Map<String, dynamic>? body,
-      HttpMethod method = HttpMethod.post}) {
+      HttpMethod method = HttpMethod.post,
+      Map<String, dynamic>? queryParameters}) {
     expect(functionName, equals('generate-transcript'));
     expect(body, isNull);
     expect(method, equals(HttpMethod.post));

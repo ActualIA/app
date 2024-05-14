@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -8,6 +9,7 @@ import 'package:actualia/models/offline_recorder.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider_android/path_provider_android.dart';
 import 'package:path_provider_ios/path_provider_ios.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 
 News testNews = News(
     title: "Test title",
@@ -36,11 +38,149 @@ News testNews = News(
               "This news comes from \"The Mindful Worker,\" a leading publication dedicated to exploring the intersection of mindfulness and professional success."),
     ]);
 
+class MockPathProviderPlateform extends PathProviderPlatform {
+  @override
+  Future<String?> getApplicationDocumentsPath() async {
+    debugPrint("[DEBUG] mock path provider platform called");
+    return "/mockRoot";
+  }
+}
+
+class MockIOOverrides extends IOOverrides {
+  @override
+  Directory createDirectory(String path) => MockDir();
+}
+
+class MockDir implements Directory {
+  @override
+  // TODO: implement absolute
+  Directory get absolute => throw UnimplementedError();
+
+  @override
+  Future<Directory> create({bool recursive = false}) {
+    // TODO: implement create
+    throw UnimplementedError();
+  }
+
+  @override
+  void createSync({bool recursive = false}) {
+    // TODO: implement createSync
+  }
+
+  @override
+  Future<Directory> createTemp([String? prefix]) {
+    // TODO: implement createTemp
+    throw UnimplementedError();
+  }
+
+  @override
+  Directory createTempSync([String? prefix]) {
+    // TODO: implement createTempSync
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<FileSystemEntity> delete({bool recursive = false}) {
+    // TODO: implement delete
+    throw UnimplementedError();
+  }
+
+  @override
+  void deleteSync({bool recursive = false}) {
+    // TODO: implement deleteSync
+  }
+
+  @override
+  Future<bool> exists() {
+    // TODO: implement exists
+    throw UnimplementedError();
+  }
+
+  @override
+  bool existsSync() {
+    // TODO: implement existsSync
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement isAbsolute
+  bool get isAbsolute => throw UnimplementedError();
+
+  @override
+  Stream<FileSystemEntity> list(
+      {bool recursive = false, bool followLinks = true}) {
+    // TODO: implement list
+    throw UnimplementedError();
+  }
+
+  @override
+  List<FileSystemEntity> listSync(
+      {bool recursive = false, bool followLinks = true}) {
+    // TODO: implement listSync
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement parent
+  Directory get parent => throw UnimplementedError();
+
+  @override
+  // TODO: implement path
+  String get path => throw UnimplementedError();
+
+  @override
+  Future<Directory> rename(String newPath) {
+    // TODO: implement rename
+    throw UnimplementedError();
+  }
+
+  @override
+  Directory renameSync(String newPath) {
+    // TODO: implement renameSync
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> resolveSymbolicLinks() {
+    // TODO: implement resolveSymbolicLinks
+    throw UnimplementedError();
+  }
+
+  @override
+  String resolveSymbolicLinksSync() {
+    // TODO: implement resolveSymbolicLinksSync
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<FileStat> stat() {
+    // TODO: implement stat
+    throw UnimplementedError();
+  }
+
+  @override
+  FileStat statSync() {
+    // TODO: implement statSync
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement uri
+  Uri get uri => throw UnimplementedError();
+
+  @override
+  Stream<FileSystemEvent> watch(
+      {int events = FileSystemEvent.all, bool recursive = false}) {
+    // TODO: implement watch
+    throw UnimplementedError();
+  }
+}
+
 void main() {
   // Allows async functions in main
   WidgetsFlutterBinding.ensureInitialized();
-  if (Platform.isAndroid) PathProviderAndroid.registerWith();
-  if (Platform.isIOS) PathProviderIOS.registerWith();
+  // if (Platform.isAndroid) PathProviderAndroid.registerWith();
+  // if (Platform.isIOS) PathProviderIOS.registerWith();
 
   test("Correct Serialisation and Deserialization", () {
     expect(News.fromJson(testNews.toJson()), equals(testNews));
@@ -49,7 +189,9 @@ void main() {
   test(
       "Creating an offline recorder creates the folder where transcripts will be stored",
       () async {
-    OfflineRecorder.create();
+    PathProviderPlatform.instance = MockPathProviderPlateform();
+    IOOverrides.global = MockIOOverrides();
+    await OfflineRecorder.create();
     Directory appDir = await getApplicationDocumentsDirectory();
 
     expect(Directory("${appDir.path}/storage/").exists(), isTrue);
