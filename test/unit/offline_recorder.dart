@@ -1,14 +1,10 @@
-import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:actualia/models/news.dart';
 import 'package:actualia/models/offline_recorder.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:path_provider_android/path_provider_android.dart';
-import 'package:path_provider_ios/path_provider_ios.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 
 News testNews = News(
@@ -38,30 +34,62 @@ News testNews = News(
               "This news comes from \"The Mindful Worker,\" a leading publication dedicated to exploring the intersection of mindfulness and professional success."),
     ]);
 
-const file ROOT = "/mockRoot";
+const file ROOT = "mockRoot";
 typedef Dir = Map<String, dynamic>;
 typedef file = String;
 
 class MockFileSys {
-  Dir FILES = {ROOT: <String, dynamic>{}};
+  Dir FILES = {};
 
   void add(MockDir dir) {
+    Dir createSubDir(List<String> consumer) {
+      // debugPrint("[CSD] consumer: $consumer");
+      if (consumer.isEmpty) {
+        return {};
+      } else {
+        consumer.removeAt(0);
+        return createSubDir(consumer);
+      }
+    }
+
     List<String> path = dir.path.split('/');
-    path.removeAt(path.length - 1);
-    path.removeAt(0);
-    Dir temp =
-        path.reversed.fold(<String, dynamic>{}, (previousValue, element) {
-      Map<String, dynamic> res = {element: previousValue};
-      return res;
-    });
-    debugPrint("[DEBUG] temp: $temp");
+    // debugPrint("[ADD] path: $path");
+    bool exist = true;
+    int depth = 0;
+    Dir subFiles = FILES;
+    while (exist && depth < path.length) {
+      if (subFiles.containsKey(path[depth])) {
+        subFiles = subFiles[path[depth]];
+        depth++;
+      } else {
+        exist = false;
+        subFiles[path[depth]] = createSubDir(path.sublist(depth));
+      }
+    }
+    debugPrint("[ADD] files: $FILES");
+  }
+
+  bool exist(MockDir dir) {
+    List<String> path = dir.path.split("/");
+    bool exist = true;
+    int i = 0;
+    Dir subFiles = FILES;
+    while (exist && i < path.length) {
+      if (subFiles.containsKey(path[i])) {
+        subFiles = subFiles[path[i]];
+        i++;
+      } else {
+        exist = false;
+      }
+    }
+    return exist;
   }
 }
 
 class MockPathProviderPlateform extends PathProviderPlatform {
   @override
   Future<String?> getApplicationDocumentsPath() async {
-    debugPrint("[DEBUG] mock path provider platform called");
+    // debugPrint("[DEBUG] mock path provider platform called");
     return ROOT;
   }
 }
@@ -72,13 +100,17 @@ class MockIOOverrides extends IOOverrides {
   MockIOOverrides(this.files);
 
   @override
-  Directory createDirectory(String path) => MockDir(path, files);
+  Directory createDirectory(String path) {
+    debugPrint("[CREATEDIR] path: $path");
+    return MockDir(path, files);
+  }
 }
 
 class MockDir implements Directory {
   late final String _path;
+  late MockFileSys files;
 
-  MockDir(String path, MockFileSys files) {
+  MockDir(String path, this.files) {
     _path = path;
     files.add(this);
   }
@@ -88,9 +120,8 @@ class MockDir implements Directory {
   Directory get absolute => throw UnimplementedError();
 
   @override
-  Future<Directory> create({bool recursive = false}) {
-    // TODO: implement create
-    throw UnimplementedError();
+  Future<Directory> create({bool recursive = false}) async {
+    return this;
   }
 
   @override
@@ -122,9 +153,8 @@ class MockDir implements Directory {
   }
 
   @override
-  Future<bool> exists() {
-    // TODO: implement exists
-    throw UnimplementedError();
+  Future<bool> exists() async {
+    return files.exist(this);
   }
 
   @override
@@ -156,7 +186,6 @@ class MockDir implements Directory {
   Directory get parent => throw UnimplementedError();
 
   @override
-  // TODO: implement path
   String get path => _path;
 
   @override
@@ -223,6 +252,8 @@ void main() {
     PathProviderPlatform.instance = MockPathProviderPlateform();
     IOOverrides.global = MockIOOverrides(MockFileSys());
     await OfflineRecorder.create();
+    Directory("$ROOT/test");
+    Directory("$ROOT/test/test");
     Directory appDir = await getApplicationDocumentsDirectory();
 
     expect(Directory("${appDir.path}/storage/").exists(), isTrue);
