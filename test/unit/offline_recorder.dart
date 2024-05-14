@@ -38,20 +38,51 @@ News testNews = News(
               "This news comes from \"The Mindful Worker,\" a leading publication dedicated to exploring the intersection of mindfulness and professional success."),
     ]);
 
+const file ROOT = "/mockRoot";
+typedef Dir = Map<String, dynamic>;
+typedef file = String;
+
+class MockFileSys {
+  Dir FILES = {ROOT: <String, dynamic>{}};
+
+  void add(MockDir dir) {
+    List<String> path = dir.path.split('/');
+    path.removeAt(path.length - 1);
+    path.removeAt(0);
+    Dir temp =
+        path.reversed.fold(<String, dynamic>{}, (previousValue, element) {
+      Map<String, dynamic> res = {element: previousValue};
+      return res;
+    });
+    debugPrint("[DEBUG] temp: $temp");
+  }
+}
+
 class MockPathProviderPlateform extends PathProviderPlatform {
   @override
   Future<String?> getApplicationDocumentsPath() async {
     debugPrint("[DEBUG] mock path provider platform called");
-    return "/mockRoot";
+    return ROOT;
   }
 }
 
 class MockIOOverrides extends IOOverrides {
+  MockFileSys files;
+
+  MockIOOverrides(this.files);
+
   @override
-  Directory createDirectory(String path) => MockDir();
+  Directory createDirectory(String path) => MockDir(path, files);
 }
 
 class MockDir implements Directory {
+  late final String _path;
+
+  MockDir(String path, MockFileSys files) {
+    _path = path;
+    files.add(this);
+  }
+
   @override
   // TODO: implement absolute
   Directory get absolute => throw UnimplementedError();
@@ -126,7 +157,7 @@ class MockDir implements Directory {
 
   @override
   // TODO: implement path
-  String get path => throw UnimplementedError();
+  String get path => _path;
 
   @override
   Future<Directory> rename(String newPath) {
@@ -190,7 +221,7 @@ void main() {
       "Creating an offline recorder creates the folder where transcripts will be stored",
       () async {
     PathProviderPlatform.instance = MockPathProviderPlateform();
-    IOOverrides.global = MockIOOverrides();
+    IOOverrides.global = MockIOOverrides(MockFileSys());
     await OfflineRecorder.create();
     Directory appDir = await getApplicationDocumentsDirectory();
 
