@@ -17,7 +17,7 @@ class NewsViewModel extends ChangeNotifier {
   List<News> get newsList => _newsList;
   bool hasNews = true;
 
-  late final _offlineRecorder = OfflineRecorder.create();
+  late final OfflineRecorder _offlineRecorder;
 
   @protected
   void setNews(News? news) {
@@ -29,7 +29,9 @@ class NewsViewModel extends ChangeNotifier {
     _newsList = newsList;
   }
 
-  NewsViewModel(this.supabase);
+  NewsViewModel(this.supabase) {
+    OfflineRecorder.create().then((offRec) => _offlineRecorder = offRec);
+  }
 
   /// Retrieves news for the specified date.
   ///
@@ -82,8 +84,14 @@ class NewsViewModel extends ChangeNotifier {
       _news = parseNews(response);
       notifyListeners();
     } catch (e) {
-      log("Error fetching news: $e", level: Level.WARNING.value);
-      _news = null;
+      try {
+        _offlineRecorder
+            .loadNews("${date.year}-${date.month}-${date.day}")
+            .then((loadedNews) => _news = loadedNews);
+      } catch (e) {
+        log("Error fetching news: $e", level: Level.WARNING.value);
+        _news = null;
+      }
     }
   }
 
