@@ -59,6 +59,36 @@ class OfflineRecorder {
   void _cleanStorage() async {
     Directory appOfflineNewsFolder = Directory(_appOfflineNewsPath);
 
+    try {
+      var transcriptList = List<String>.empty();
+      appOfflineNewsFolder
+          .list(recursive: false, followLinks: false)
+          .listen((FileSystemEntity file) {
+        if (file.path
+            .substring(file.path.length - "XXXX-XX-XX_transcript.json".length)
+            .startsWith(RegExp(r"[0-9]{4}-[0-9]{2}-[0-9]{2}"))) {
+          transcriptList.add(file.path);
+        }
+      });
+      transcriptList.sort();
+      // Most recent at the end
+      transcriptList = transcriptList.reversed.toList();
+
+      while (await _dirSize(appOfflineNewsFolder) >= (0.75 * _maxStorageSize)) {
+        if (File(transcriptList.last).existsSync()) {
+          await File(transcriptList.last).delete();
+        }
+        transcriptList.removeLast();
+      }
+    } catch (e) {
+      // If an error happen, recreate the whole folder
+      if (await appOfflineNewsFolder.exists()) {
+        appOfflineNewsFolder.delete(recursive: true);
+      }
+
+      await Directory(_appOfflineNewsPath).create(recursive: true);
+    }
+
     if (await appOfflineNewsFolder.exists()) {
       appOfflineNewsFolder.delete(recursive: true);
     }

@@ -139,6 +139,7 @@ class NewsViewModel extends ChangeNotifier {
       hasNews = true;
       _newsList.insert(0, _news!);
       getAudioFile(_news!).whenComplete(() => notifyListeners());
+      _offlineRecorder.downloadNews(_news!);
     }
     notifyListeners();
   }
