@@ -18,8 +18,7 @@ void main() {
         ),
         home: MultiProvider(providers: [
           ChangeNotifierProvider<AlarmsViewModel>(
-              create: (context) =>
-                  MockAlarmsViewModelViewModel(FakeSupabaseClient())),
+              create: (context) => MockAlarmsViewModel(FakeSupabaseClient())),
           ChangeNotifierProvider<NewsViewModel>(
               create: (context) => pb.MockNewsViewModel()),
         ], child: const NewsAlertView())));

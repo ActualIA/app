@@ -7,13 +7,11 @@ import 'package:actualia/widgets/wizard_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import '../models/auth_model.dart';
+import 'alarm_wizard.dart';
 
 class ProvidersWizardView extends StatefulWidget {
-  final bool cancelable;
-  final bool hasNext;
-
-  const ProvidersWizardView(
-      {this.cancelable = false, this.hasNext = true, super.key});
+  const ProvidersWizardView({super.key});
 
   @override
   State<ProvidersWizardView> createState() => _ProvidersWizardView();
@@ -32,6 +30,7 @@ class _ProvidersWizardView extends State<ProvidersWizardView> {
 
   @override
   Widget build(BuildContext context) {
+    final AuthModel auth = Provider.of<AuthModel>(context);
     final ProvidersViewModel pvm = Provider.of<ProvidersViewModel>(context);
     items = pvm.editedProviders.indexed
         .map((e) => ProviderWidget(
@@ -41,7 +40,6 @@ class _ProvidersWizardView extends State<ProvidersWizardView> {
     Widget body = const LoadingView(text: "Loading your sources");
     if (items != null) {
       var items_ = items as List<ProviderWidget>;
-
       body = Column(children: [
         Text("Choose the sources for your news",
             style: Theme.of(context).textTheme.headlineMedium),
@@ -63,15 +61,18 @@ class _ProvidersWizardView extends State<ProvidersWizardView> {
           ],
         )),
         WizardNavigationBottomBar(
-          showCancel: widget.cancelable,
-          rText: widget.hasNext ? "Next" : "Done",
+          showCancel: !auth.isOnboardingRequired,
+          rText: auth.isOnboardingRequired ? "Next" : "Done",
           onCancel: () => Navigator.pop(context),
           rOnPressed: () async {
             pvm.updateProvidersFromEdited();
-            if (!await pvm.pushNewsProviders()) {
-              if (Platform.isAndroid) {
-                Fluttertoast.showToast(msg: "Error while updating providers");
-              }
+            if (!await pvm.pushNewsProviders() && Platform.isAndroid) {
+              Fluttertoast.showToast(msg: "Error while updating providers");
+            } else if (auth.isOnboardingRequired) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const AlarmWizardView()));
             } else if (context.mounted) {
               Navigator.pop(context);
             }
