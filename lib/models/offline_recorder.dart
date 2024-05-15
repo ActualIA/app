@@ -125,6 +125,7 @@ class OfflineRecorder {
       return Paragraph(
           transcript: p["transcript"],
           source: p["source"],
+          url: p["url"],
           title: p["title"],
           date: p["date"],
           content: p["content"]);
@@ -133,7 +134,7 @@ class OfflineRecorder {
     return News(
         title: decodedJson["title"],
         date: decodedJson["date"],
-        transcriptID: decodedJson["transcriptID"],
+        transcriptId: decodedJson["transcriptID"],
         audio: decodedJson["audio"],
         paragraphs: paragraphs);
   }
