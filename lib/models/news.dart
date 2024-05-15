@@ -33,13 +33,16 @@ class News {
 
   // Needed when deserializing
   @override
-  operator ==(n) =>
+  bool operator ==(Object n) =>
       n is News &&
       n.title == title &&
       n.date == date &&
       n.transcriptID == transcriptID &&
       n.audio == audio &&
       listEquals(n.paragraphs, paragraphs);
+
+  @override
+  int get hashCode => super.hashCode;
 }
 
 @JsonSerializable()
@@ -61,4 +64,17 @@ class Paragraph {
   factory Paragraph.fromJson(dynamic json) => _$ParagraphFromJson(json);
 
   dynamic toJson() => _$ParagraphToJson(this);
+
+  @override
+  bool operator ==(Object other) {
+    return other is Paragraph &&
+        transcript == other.transcript &&
+        source == other.source &&
+        title == other.title &&
+        date == other.date &&
+        content == other.content;
+  }
+
+  @override
+  int get hashCode => super.hashCode;
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:actualia/models/news.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:actualia/viewmodels/news.dart';
@@ -12,7 +13,7 @@ class OfflineRecorder {
   static const ROOT_OFFLINE_FOLDER = "storage";
 
   late final _appOfflineNewsPath;
-  var _maxStorageSize = 17e+6 as int; // One minute mp3 file ~ 1MB
+  var _maxStorageSize = 17e+6.toInt(); // One minute mp3 file ~ 1MB
 
   OfflineRecorder._create(String appOfflineNewsPath) {
     // Creating the root file to store the news
@@ -39,7 +40,7 @@ class OfflineRecorder {
       await appOfflineNewsFolder.create(recursive: true);
     }
 
-    if (await _dirSize(Directory(_appOfflineNewsPath)) >= newStorageSize) {
+    if (await _dirSize(appOfflineNewsFolder) >= newStorageSize) {
       _cleanStorage();
     }
 
@@ -74,7 +75,7 @@ class OfflineRecorder {
     return dirSize;
   }
 
-  void downloadNews(News news) async {
+  Future<void> downloadNews(News news) async {
     Directory appOfflineNewsFolder = Directory(_appOfflineNewsPath);
 
     // Missing folder -> creates it, even if it should be created the first time the offline recorder is created
@@ -86,13 +87,13 @@ class OfflineRecorder {
         _appOfflineNewsPath + "${news.date.substring(0, 10)}_transcript.json";
     String json = jsonEncode(news);
 
-    // Cannot have to transcripts for the same day
-    if (await File(filePath).exists()) {
-      await File(filePath).delete();
-    }
-
     // Creates the file
     final file = File(filePath);
+
+    // Cannot have two transcripts for the same day
+    if (await file.exists()) {
+      await file.delete();
+    }
 
     await file.writeAsString(json);
 
@@ -112,12 +113,28 @@ class OfflineRecorder {
     }
 
     String filePath = _appOfflineNewsPath + "${date}_transcript.json";
-    if (await File(filePath).exists()) {
+    if (!await File(filePath).exists()) {
       throw FileSystemException("$filePath doesn't exist");
     }
 
     String json = await File(filePath).readAsString();
 
-    return jsonDecode(json) as News;
+    dynamic decodedJson = jsonDecode(json);
+
+    List<Paragraph> paragraphs = (decodedJson["paragraphs"] as List).map((p) {
+      return Paragraph(
+          transcript: p["transcript"],
+          source: p["source"],
+          title: p["title"],
+          date: p["date"],
+          content: p["content"]);
+    }).toList();
+
+    return News(
+        title: decodedJson["title"],
+        date: decodedJson["date"],
+        transcriptID: decodedJson["transcriptID"],
+        audio: decodedJson["audio"],
+        paragraphs: paragraphs);
   }
 }
