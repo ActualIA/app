@@ -48,6 +48,15 @@ class MockHttp extends BaseMockedHttpClient {
             "providers_id": null,
             "voice_wanted": null
           }, 200, req);
+        case "${BaseMockedHttpClient.baseUrl}/rest/v1/news_settings?select=providers&created_by=eq.${BaseMockedHttpClient.uuid}":
+          return response([], 200, req);
+        case "${BaseMockedHttpClient.baseUrl}/rest/v1/news_settings?created_by=eq.${BaseMockedHttpClient.uuid}":
+          expect(
+              jsonDecode(req.body),
+              equals({
+                "providers": ["/google/news/:category"]
+              }));
+          return response([], 200, req);
         default:
       }
 
@@ -98,7 +107,19 @@ void main() async {
     // Select a few interests.
     await selectEntry("Albania");
     await selectEntry("Lausanne");
-    await selectEntry("Gaming", last: true);
+    await selectEntry("Gaming");
+
+    await tester.tap(find.textContaining("Add"));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.textContaining("RSS"));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.textContaining("Google News"));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.textContaining("Next"));
+    await tester.pumpAndSettle();
 
     // Open the profile view.
     await tester.tap(find.byKey(const Key('profile')));

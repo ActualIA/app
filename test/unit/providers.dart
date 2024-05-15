@@ -1,51 +1,45 @@
 import 'package:actualia/models/providers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test("Correctly serializes GNews provider", () {
-    expect(GNewsProvider().serialize(), equals({"type": "gnews"}));
+  test("Correctly parses GNews provider", () {
+    var prov = NewsProvider(url: "/google/news/:query/en");
+    expect(prov.type, equals(ProviderType.google));
+    expect(listEquals(prov.parameters, []), isTrue);
   });
-
-  test("Correctly deserializes GNews provider", () async {
-    expect(NewsProvider.deserialize({"type": "gnews"}).runtimeType,
-        equals(GNewsProvider));
+  test("Correctly parses Telegram provider", () {
+    var prov = NewsProvider(url: "/telegram/channel/clicnews");
+    expect(prov.type, equals(ProviderType.telegram));
+    expect(listEquals(prov.parameters, ["clicnews"]), isTrue);
   });
-
-  test("GNews Provider has correct display name", () {
-    expect(GNewsProvider().displayName(), equals("Google News"));
-  });
-
-  test("Correctly serializes RSS provider", () {
-    expect(RSSFeedProvider(url: "https://rss.example.org").serialize(),
-        equals({"type": "rss", "url": "https://rss.example.org"}));
-  });
-
-  test("Correctly deserializes RSS provider", () async {
-    var provider = NewsProvider.deserialize(
-        {"type": "rss", "url": "https://rss.feed.org"});
-    expect(provider.runtimeType, equals(RSSFeedProvider));
-    expect((provider as RSSFeedProvider).url, equals("https://rss.feed.org"));
-  });
-
-  test("RSS Provider has correct display name", () {
-    expect(RSSFeedProvider(url: "https://rss.epfl.ch").displayName(),
-        equals("EPFL (RSS)"));
-    expect(RSSFeedProvider(url: "https://rss.feed.clic.ch/fr-FR").displayName(),
-        equals("CLIC (RSS)"));
-  });
-
-  test('Handles missing type entry', () {
-    expect(NewsProvider.deserialize({"url": "https://rss.feed.org"}), isNull);
-  });
-
-  test('Handles invalid parameters', () {
-    expect(NewsProvider.deserialize([]), isNull);
-  });
-
-  test('Handles unknown type', () {
+  test("Correctly parses RSS provider", () {
+    var prov = NewsProvider(url: "http://rss.cnn.com/rss/cnn_topstories.rss");
+    expect(prov.type, equals(ProviderType.rss));
     expect(
-        NewsProvider.deserialize(
-            {"type": "not-a-type", "url": "https://rss.feed.org"}),
-        isNull);
+        listEquals(
+            prov.parameters, ["http://rss.cnn.com/rss/cnn_topstories.rss"]),
+        isTrue);
+  });
+
+  test("Correctly displays GNews provider", () {
+    var prov = NewsProvider(url: "/google/news/:query/en");
+    expect(prov.displayName(), equals("Google News"));
+  });
+  test("Correctly displays Telegram provider", () {
+    var prov = NewsProvider(url: "/telegram/channel/clicnews");
+    expect(prov.displayName(), equals("Telegram (clicnews)"));
+  });
+  test("Correctly displays RSS provider", () {
+    var prov = NewsProvider(url: "http://rss.cnn.com/rss/cnn_topstories.rss");
+    expect(prov.displayName(), equals("RSS (cnn)"));
+  });
+
+  test("Telegram provider is correctly built", () async {
+    (await ProviderType.telegram.build(["clicnews"])).fold(
+        (l) => expect(l.url, equals("/telegram/channel/clicnews")),
+        (r) => fail("Provider build should have been successful"));
+    (await ProviderType.telegram.build(["clic.news"]))
+        .fold((l) => fail("Provider build should have failed"), (r) {});
   });
 }

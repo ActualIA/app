@@ -2,18 +2,21 @@ import 'package:actualia/utils/themes.dart';
 import 'package:actualia/widgets/sources_view_widgets.dart';
 import 'package:actualia/widgets/top_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SourceView extends StatefulWidget {
   final String article;
   final String title;
   final String newsPaper;
   final String date;
+  final String url;
 
   const SourceView(
       {this.article = "",
       this.title = "",
       this.date = "",
       this.newsPaper = "",
+      this.url = "",
       super.key});
 
   @override
@@ -25,6 +28,7 @@ class _SourceViewState extends State<SourceView> {
   late String _title;
   late String _date;
   late String _newsPaper;
+  late String _url;
 
   @override
   void initState() {
@@ -34,6 +38,7 @@ class _SourceViewState extends State<SourceView> {
     _title = widget.title;
     _date = widget.date;
     _newsPaper = widget.newsPaper;
+    _url = widget.url;
   }
 
   @override
@@ -58,9 +63,33 @@ class _SourceViewState extends State<SourceView> {
                             vertical: UNIT_PADDING / 2),
                         child: SourceTitle(title: _title)),
                   ]),
-              ScrollableText(text: _article)
+              ScrollableText(text: _article),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                      padding: const EdgeInsets.only(top: UNIT_PADDING * 2),
+                      child: FilledButton.tonal(
+                        onPressed: () {
+                          _launchInBrowser(Uri.parse(_url));
+                        },
+                        child: Text(
+                            style: Theme.of(context).textTheme.displaySmall,
+                            "View site"),
+                      ))
+                ],
+              )
             ],
           )),
     );
+  }
+
+  Future<void> _launchInBrowser(Uri url) async {
+    if (!await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    )) {
+      throw Exception('Could not launch $url');
+    }
   }
 }

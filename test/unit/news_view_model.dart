@@ -67,7 +67,7 @@ class FakeFunctionsClient extends Fake implements FunctionsClient {
       HttpMethod method = HttpMethod.post,
       Map<String, dynamic>? queryParameters}) {
     expect(functionName, equals('generate-transcript'));
-    expect(body, isNull);
+    expect(body, equals({}));
     expect(method, equals(HttpMethod.post));
 
     return Future.value(FunctionResponse(status: 200));
@@ -87,7 +87,7 @@ class AlreadyExistingNewsVM extends NewsViewModel {
     setNews(News(
         date: DateTime.now().toIso8601String(),
         title: "News",
-        transcriptID: -1,
+        transcriptId: -1,
         audio: null,
         paragraphs: [
           Paragraph(
@@ -95,7 +95,8 @@ class AlreadyExistingNewsVM extends NewsViewModel {
               source: "source",
               title: "title",
               date: "12-04-2024",
-              content: "content")
+              content: "content",
+              url: "url")
         ]));
     return Future.value();
   }
@@ -117,7 +118,7 @@ class NonExistingNewsVM extends NewsViewModel {
       setNews(News(
           date: DateTime.now().toIso8601String(),
           title: "News",
-          transcriptID: -1,
+          transcriptId: -1,
           audio: null,
           paragraphs: [
             Paragraph(
@@ -125,7 +126,8 @@ class NonExistingNewsVM extends NewsViewModel {
                 source: "source",
                 title: "title",
                 date: "12-04-2024",
-                content: "content")
+                content: "content",
+                url: "url")
           ]));
     } else {
       setNews(null);
@@ -160,7 +162,7 @@ class NewsListVM extends NewsViewModel {
     setNews(News(
         date: DateTime.now().toIso8601String(),
         title: "News",
-        transcriptID: -1,
+        transcriptId: -1,
         audio: null,
         paragraphs: [
           Paragraph(
@@ -168,7 +170,8 @@ class NewsListVM extends NewsViewModel {
               source: "source",
               title: "title",
               date: "12-04-2024",
-              content: "content")
+              content: "content",
+              url: "url")
         ]));
     return Future.value();
   }
@@ -185,7 +188,8 @@ class NewsListVM extends NewsViewModel {
           "news": [
             {
               "transcript": "text",
-              "source": {"name": "source"},
+              "url": "url",
+              "source": {"name": "source", "url": "url"},
               "title": "title",
               "publishedAt": "12-04-2024",
               "content": "content"
@@ -199,6 +203,16 @@ class NewsListVM extends NewsViewModel {
   @override
   Future<void> invokeTranscriptFunction() {
     fail("invokeTranscriptFunction should not be called");
+  }
+
+  @override
+  Future<void> generateAndGetNews() {
+    return Future.value();
+  }
+
+  @override
+  Future<void> getAudioFile(News news) {
+    return Future.value();
   }
 }
 
@@ -228,12 +242,6 @@ class EmptyNewsListVM extends NewsViewModel {
   @override
   Future<List<dynamic>> fetchNewsList() async {
     return Future.value([]);
-  }
-
-  @override
-  Future<void> generateAndGetNews() {
-    generateNewsCalled = true;
-    return Future.value();
   }
 }
 
@@ -267,6 +275,19 @@ class NotTodayNewsListVM extends NewsViewModel {
         "transcript": {"news": []}
       }
     ]);
+  }
+}
+
+//Tests for audio functions
+
+class AudioNewsVM extends NewsViewModel {
+  AudioNewsVM(SupabaseClient super.supabase);
+  bool generateAudioCalled = false;
+
+  @override
+  Future<String> generateAudio(int transcriptId) {
+    generateAudioCalled = true;
+    return Future.value("audio");
   }
 }
 
@@ -336,10 +357,11 @@ void main() {
     expect(vm.newsList[0].paragraphs[0].content, equals("content"));
   });
 
-  test('getNewsList with Empty list generates news', () async {
+  test('getNewsList with Empty list sets hasNews to false', () async {
     EmptyNewsListVM vm = EmptyNewsListVM(FakeSupabaseClient());
     await vm.getNewsList();
-    expect(vm.generateNewsCalled, isTrue);
+    expect(vm.newsList, isEmpty);
+    expect(vm.hasNews, isFalse);
   });
 
   test('getNewsList with Exception reports error', () async {
@@ -367,5 +389,25 @@ void main() {
     // ignore: invalid_use_of_protected_member
     await vm.generateAndGetNews();
     expect(vm.news?.title, equals("News generation failed and no news found."));
+  });
+
+  // Test generateAudio is called
+  test('generateAudio is called when audio is null', () async {
+    AudioNewsVM vm = AudioNewsVM(FakeSupabaseClient());
+    await vm.getAudioFile(News(
+        date: DateTime.now().toIso8601String(),
+        title: "News",
+        transcriptId: 1,
+        audio: null,
+        paragraphs: [
+          Paragraph(
+              transcript: "text",
+              source: "source",
+              title: "title",
+              date: "12-04-2024",
+              content: "content",
+              url: "url")
+        ]));
+    expect(vm.generateAudioCalled, isTrue);
   });
 }

@@ -1,24 +1,6 @@
 import { News, NewsSettings, Provider } from "../functions/model.ts";
 import { parseFeed } from "https://deno.land/x/rss@1.0.2/mod.ts";
 import OpenAI from "https://deno.land/x/openai@v4.33.0/mod.ts";
-import { URL } from "node:url";
-
-interface GNewsOutput {
-  totalArticles: number;
-  articles: GNewsItem[];
-}
-interface GNewsItem {
-  title: string;
-  description: string;
-  content: string;
-  url: string;
-  image: string;
-  publishedAt: string;
-  source: {
-    name: string;
-    url: string;
-  };
-}
 
 /**
  * Fetch and normalize news from a given provider.
@@ -34,6 +16,77 @@ export async function fetchNews(
     provider: Provider,
     newsSettings: NewsSettings,
   ): Promise<News[]> {
+    async function innerFetch(
+      provider: Provider,
+      topics: string[],
+      topic: string | undefined,
+    ) {
+      let url = provider.replaceAll(":query", topic || "");
+      if (url.startsWith("/")) {
+        url = Deno.env.get("RSSHUB_BASE_URL") + url;
+      }
+      console.info("Fetching from ", url);
+
+      // Fetches and parses the rss feed.
+      const response = await fetch(url);
+      const xml = await response.text();
+      const feed = await parseFeed(xml);
+
+      // Normalizes the output and filters out out of date news.
+      const news: News[] = feed.entries.map((i) => {
+        return {
+          title: i.title?.value || "",
+          description: i.description?.value || "",
+          content: i.description?.value || "",
+          publishedAt: i.published || new Date(Date.now()),
+          url: i.links[0].href || "",
+          source: {
+            name: provider,
+            url: provider,
+          },
+        };
+      })
+        .filter((i: News) => (Date.now() - i.publishedAt.getTime()) < 86400000);
+
+      if (topic) {
+        return news;
+      }
+
+      // Filter news by AI according to user settings.
+      const openai = new OpenAI();
+      const completion = await openai.chat.completions.create({
+        "model": "gpt-3.5-turbo",
+        "response_format": {
+          "type": "json_object",
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content":
+              "You are a trained news assistant. You're given a JSON of news, and in this JSON you must select the news that matches the following themes:" +
+              topics +
+              "You return a JSON in the same form, but without the news that doesn't match the themes.",
+          },
+          {
+            "role": "user",
+            "content": JSON.stringify(news),
+          },
+        ],
+      });
+
+      // Verify that the completion is valid.
+      let filteredNews = { news: [] as News[] };
+      try {
+        filteredNews = JSON.parse(
+          completion.choices[0].message.content || "",
+        );
+      } catch (error) {
+        console.error("Error parsing filtered news:", error);
+      }
+
+      return filteredNews.news;
+    }
+
     let topics: string[] = [];
     if (newsSettings.wants_interests) {
       topics = topics.concat(JSON.parse(newsSettings.interests));
@@ -51,106 +104,14 @@ export async function fetchNews(
     }
 
     try {
-      switch (provider.type) {
-        case "gnews": {
-          // Generate the url with the query, date API key and language parameters.
-          const query = topics.map((s) => `"${s}"`).join(" OR ");
-          console.info(`Fetching from GNews with query ${query}`);
+      console.info("Fetching RSS from ", provider);
 
-          const url = `https://gnews.io/api/v4/search?q=${
-            encodeURIComponent(query)
-          }&apikey=${
-            encodeURIComponent(Deno.env.get("GNEWS_API_KEY") || "")
-          }&from=${
-            encodeURIComponent(new Date(Date.now() - 86400000).toISOString())
-          }&lang=en`;
-
-          // Get the news from GNews.
-          const news: GNewsOutput = await (await fetch(url)).json();
-
-          if (!news || !Array.isArray(news.articles)) {
-            console.error(`Received invalid response: ${JSON.stringify(news)}`);
-            return [];
-          }
-
-          console.log(JSON.stringify(news.articles));
-          // Normalizes the output to the correct format.
-          return news.articles.map((n) => ({
-            ...n,
-            publishedAt: new Date(n.publishedAt),
-          }));
-        }
-        case "rss": {
-          console.info("Fetching RSS from ", provider.url);
-
-          // Fetches and parses the rss feed.
-          const response = await fetch(
-            provider.url,
-          );
-          const xml = await response.text();
-          const feed = await parseFeed(xml);
-
-          // Normalizes the output and filters out out of date news.
-          const news: News[] = feed.entries.map((i) => {
-            const re = /(?:[^./]+\.)*([^./]+)\.[^./]+(?:\/.*)?/;
-            const url = new URL(provider.url);
-            const match = re.exec(url.hostname);
-            const name = match && match.groups ? match.groups[1] : "";
-
-            return {
-              title: i.title?.value || "",
-              description: i.description?.value || "",
-              content: i.description?.value || "",
-              publishedAt: i.published || new Date(Date.now()),
-              url: i.links[0].href || "",
-              source: {
-                name: name,
-                url: url.origin,
-              },
-            };
-          })
-            .filter((i: News) =>
-              (Date.now() - i.publishedAt.getTime()) < 86400000
-            );
-
-          // Filter news by AI according to user settings.
-          const openai = new OpenAI();
-          const completion = await openai.chat.completions.create({
-            "model": "gpt-3.5-turbo",
-            "response_format": {
-              "type": "json_object",
-            },
-            "messages": [
-              {
-                "role": "system",
-                "content":
-                  "You are a trained news assistant. You're given a JSON of news, and in this JSON you must select the news that matches the following themes:" +
-                  topics +
-                  "You return a JSON in the same form, but without the news that doesn't match the themes.",
-              },
-              {
-                "role": "user",
-                "content": JSON.stringify(news),
-              },
-            ],
-          });
-
-          // Verify that the completion is valid.
-          let filteredNews = { news: [] as News[] };
-          try {
-            filteredNews = JSON.parse(
-              completion.choices[0].message.content || "",
-            );
-          } catch (error) {
-            console.error("Error parsing filtered news:", error);
-          }
-
-          return filteredNews.news;
-        }
-        default:
-          throw new Error(
-            `Unknown provider: ${JSON.stringify(provider)}`,
-          );
+      if (provider.match(":query")) {
+        return (await Promise.all(
+          topics.map((t) => innerFetch(provider, topics, t)),
+        )).flat();
+      } else {
+        return await innerFetch(provider, topics, undefined);
       }
     } catch (e) {
       console.error(
@@ -166,7 +127,7 @@ export async function fetchNews(
         provider.map((p) => singleFetch(p, newsSettings)),
       )).flat();
     } else {
-      return await singleFetch({ type: "gnews" }, newsSettings);
+      return await singleFetch("/google/news/:query", newsSettings);
     }
   } else {
     return await singleFetch(provider, newsSettings);

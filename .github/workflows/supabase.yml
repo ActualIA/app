@@ -51,3 +51,4 @@ jobs:
 
       - run: supabase functions deploy --project-ref $PROJECT_ID generate-transcript
       - run: supabase functions deploy --project-ref $PROJECT_ID generate-audio
+      - run: supabase functions deploy --project-ref $PROJECT_ID generate-via-alarms

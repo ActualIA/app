@@ -14,11 +14,13 @@ class NewsSettingsViewModel extends ChangeNotifier {
   }
 
   NewsSettings? _settings;
+  int? _settingsId;
 
   @protected
   void setSettings(NewsSettings value) => {_settings = value};
 
   NewsSettings? get settings => _settings;
+  int? get settingsId => _settingsId;
 
   Future<void> fetchSettings() async {
     try {
@@ -36,6 +38,7 @@ class NewsSettingsViewModel extends ChangeNotifier {
         wantsCountries: res['wants_countries'],
         wantsInterests: res['wants_interests'],
       );
+      _settingsId = res['id'];
       notifyListeners();
     } catch (e) {
       log("Error fetching settings: $e", level: Level.WARNING.value);

@@ -4,29 +4,21 @@ import 'package:flutter/material.dart';
 
 class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool enableReturnButton;
+  final bool enableProfileButton;
   final void Function()? onPressed;
 
   const TopAppBar({
     this.enableReturnButton = false,
+    this.enableProfileButton = true,
     this.onPressed,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      centerTitle: true,
-      title: Container(
-        padding: const EdgeInsets.symmetric(vertical: UNIT_PADDING),
-        child: TextButton(
-          onPressed: () {
-            // Action for the title button
-          },
-          child: Text('ActualIA',
-              style: Theme.of(context).textTheme.displayMedium),
-        ),
-      ),
-      actions: <Widget>[
+    List<Widget> actions = [];
+    if (enableProfileButton) {
+      actions.add(
         IconButton(
           key: const Key("profile"),
           visualDensity: const VisualDensity(horizontal: 4),
@@ -39,7 +31,22 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
                     builder: (builder) => const ProfilePageView()));
           },
         ),
-      ],
+      );
+    }
+
+    return AppBar(
+      centerTitle: true,
+      title: Container(
+        padding: const EdgeInsets.symmetric(vertical: UNIT_PADDING),
+        child: TextButton(
+          onPressed: () {
+            // Action for the title button
+          },
+          child: Text('ActualIA',
+              style: Theme.of(context).textTheme.displayMedium),
+        ),
+      ),
+      actions: actions,
     );
   }
 

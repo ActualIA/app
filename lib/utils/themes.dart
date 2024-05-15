@@ -8,6 +8,9 @@ import 'package:flutter/material.dart';
 const double UNIT_PADDING = 16.0;
 const Color THEME_PRIMARY = Color(0xFF5EDCE4);
 const Color THEME_GREY = Color(0xFFCDCDDC);
+const Color THEME_BUTTON = Color.fromARGB(255, 68, 159, 166);
+const Color THEME_ERROR_TEXT = Color.fromARGB(255, 163, 0, 0);
+const Color THEME_ERROR_BACKGROUND = const Color.fromARGB(255, 255, 204, 204);
 
 ThemeData ACTUALIA_THEME = ThemeData(
     brightness: Brightness.light,
@@ -42,4 +45,5 @@ ThemeData ACTUALIA_THEME = ThemeData(
           height: 1.4,
           fontWeight: FontWeight.w300),
     ),
-    colorScheme: ColorScheme.fromSeed(seedColor: THEME_PRIMARY));
+    colorScheme: ColorScheme.fromSeed(
+        seedColor: THEME_PRIMARY, error: THEME_ERROR_TEXT));

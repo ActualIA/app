@@ -1,10 +1,8 @@
 import 'dart:developer';
-
 import 'package:actualia/models/auth_model.dart';
 import 'package:actualia/models/news_settings.dart';
-import 'package:actualia/utils/themes.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
-import 'package:actualia/widgets/top_app_bar.dart';
+import 'package:actualia/views/providers_wizard_view.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
@@ -44,11 +42,11 @@ class _InterestWizardViewState extends State<InterestWizardView> {
     final NewsSettings predefined = NewsSettings.defaults();
 
     Widget countriesSelector = WizardSelector(
-      items: predefined.predefinedCountries,
-      selectedItems: nsvm.settings!.countries,
+      items: predefined.predefinedCountries.map((e) => (e, e)).toList(),
+      selectedItems: nsvm.settings!.countries.map((e) => (e, e)).toList(),
       onPressed: (selected) {
         setState(() {
-          _selectedCountries = selected;
+          _selectedCountries = selected.map((e) => e.$2).toList();
           _step = WizardStep.CITIES;
         });
       },
@@ -61,11 +59,11 @@ class _InterestWizardViewState extends State<InterestWizardView> {
     );
 
     Widget citiesSelector = WizardSelector(
-      items: predefined.predefinedCities,
-      selectedItems: nsvm.settings!.cities,
+      items: predefined.predefinedCities.map((e) => (e, e)).toList(),
+      selectedItems: nsvm.settings!.cities.map((e) => (e, e)).toList(),
       onPressed: (selected) {
         setState(() {
-          _selectedCities = selected;
+          _selectedCities = selected.map((e) => e.$2).toList();
           _step = WizardStep.INTERESTS;
         });
       },
@@ -80,11 +78,11 @@ class _InterestWizardViewState extends State<InterestWizardView> {
     );
 
     Widget interestsSelector = WizardSelector(
-      items: predefined.predefinedInterests,
-      selectedItems: nsvm.settings!.interests,
+      items: predefined.predefinedInterests.map((e) => (e, e)).toList(),
+      selectedItems: nsvm.settings!.interests.map((e) => (e, e)).toList(),
       onPressed: (selected) async {
         setState(() {
-          _selectedInterests = selected;
+          _selectedInterests = selected.map((e) => e.$2).toList();
         });
         NewsSettings toSend = NewsSettings(
             cities: _selectedCities,
@@ -96,7 +94,8 @@ class _InterestWizardViewState extends State<InterestWizardView> {
         try {
           await nsvm.pushSettings(toSend);
           if (auth.isOnboardingRequired) {
-            await auth.setOnboardingIsDone();
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ProvidersWizardView()));
           } else {
             if (context.mounted) Navigator.pop(context);
           }
@@ -105,7 +104,7 @@ class _InterestWizardViewState extends State<InterestWizardView> {
         }
       },
       title: "Select interests",
-      buttonText: "Finish",
+      buttonText: auth.isOnboardingRequired ? "Next" : "Finish",
       isInitialOnboarding: auth.isOnboardingRequired,
       onCancel: () {
         setState(() {
@@ -128,12 +127,6 @@ class _InterestWizardViewState extends State<InterestWizardView> {
         break;
     }
 
-    return Scaffold(
-        appBar: const TopAppBar(),
-        body: Container(
-          padding: const EdgeInsets.all(4 * UNIT_PADDING),
-          alignment: Alignment.topCenter,
-          child: body,
-        ));
+    return WizardScaffold(body: body);
   }
 }

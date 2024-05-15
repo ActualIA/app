@@ -6,14 +6,14 @@ part 'news.g.dart';
 class News {
   final String title;
   final String date;
-  final int transcriptID;
-  final String? audio;
+  final int transcriptId;
+  String? audio;
   final List<Paragraph> paragraphs;
 
   News({
     required this.title,
     required this.date,
-    required this.transcriptID,
+    required this.transcriptId,
     required this.audio,
     required this.paragraphs,
   });
@@ -22,7 +22,7 @@ class News {
     return News(
         title: json['title'] as String,
         date: json['date'] as String,
-        transcriptID: json['transcriptID'] as int,
+        transcriptId: json['transcriptID'] as int,
         audio: json['audio'] as String?,
         paragraphs: (json['paragraphs'] != null)
             ? (json["paragraphs"]) as List<Paragraph>
@@ -37,7 +37,7 @@ class News {
       n is News &&
       n.title == title &&
       n.date == date &&
-      n.transcriptID == transcriptID &&
+      n.transcriptId == transcriptId &&
       n.audio == audio &&
       listEquals(n.paragraphs, paragraphs);
 }
@@ -46,6 +46,7 @@ class News {
 class Paragraph {
   final String transcript; //Text of the paragraph
   final String source; //Newspaper or website where the article comes from
+  final String url; //URL of the article
   final String title; //Title of the article
   final String date; //Date of the article
   final String content; //Content of the article
@@ -53,6 +54,7 @@ class Paragraph {
   Paragraph({
     required this.transcript,
     required this.source,
+    required this.url,
     required this.title,
     required this.date,
     required this.content,
