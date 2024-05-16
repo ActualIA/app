@@ -1,12 +1,13 @@
 //coverage:ignore-file
 
 import 'package:actualia/models/auth_model.dart';
+import 'package:actualia/viewmodels/news_recognition.dart';
 import 'package:actualia/viewmodels/providers.dart';
 import 'package:actualia/utils/themes.dart';
 import 'package:actualia/viewmodels/alarms.dart';
 import 'package:actualia/views/loading_view.dart';
+import 'package:actualia/views/master_view.dart';
 import 'package:actualia/views/news_alert_view.dart';
-import 'package:actualia/views/news_view.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
 import 'package:actualia/views/login_view.dart';
 import 'package:actualia/views/interests_wizard_view.dart';
@@ -42,6 +43,9 @@ Future<void> main() async {
           create: (context) => ProvidersViewModel(Supabase.instance.client)),
       ChangeNotifierProvider(
           create: (context) => AlarmsViewModel(Supabase.instance.client)),
+      ChangeNotifierProvider(
+          create: (context) =>
+              NewsRecognitionViewModel(Supabase.instance.client)),
     ],
     child: const App(),
   ));
@@ -83,7 +87,7 @@ class _AppState extends State<App> {
           home = const InterestWizardView();
         }
       } else {
-        home = const NewsView();
+        home = const MasterView();
       }
     } else {
       home = const Scaffold(

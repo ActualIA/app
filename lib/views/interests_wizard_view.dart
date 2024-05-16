@@ -15,6 +15,7 @@ class InterestWizardView extends StatefulWidget {
   State<InterestWizardView> createState() => _InterestWizardViewState();
 }
 
+// ignore: constant_identifier_names
 enum WizardStep { COUNTRIES, CITIES, INTERESTS }
 
 class _InterestWizardViewState extends State<InterestWizardView> {

@@ -8,9 +8,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AlarmsViewModel extends ChangeNotifier {
-  late final supabase;
+  late SupabaseClient supabase;
 
-  static int _alarmId = 1;
+  static const int _alarmId = 1;
   bool isAlarmRinging = false;
   bool isAlarmActive = false;
 

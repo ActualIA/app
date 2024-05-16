@@ -13,6 +13,7 @@ interface NewsJsonLLM {
   totalNewsByLLM: string;
   intro: string;
   outro: string;
+  title: string;
   news: Result[];
 }
 
@@ -21,6 +22,7 @@ interface Transcript {
   totalNewsByLLM: string;
   intro: string;
   outro: string;
+  title: string;
   fullTranscript: string;
   news: (News & Result)[];
 }
@@ -55,6 +57,9 @@ export async function generateTranscript(
   const transcript = news.length > 0 ? await createTranscript(news) : {
     totalNews: 0,
     totalNewsByLLM: 0,
+    intro: "",
+    outro: "",
+    title: "",
     news: [],
   };
 
@@ -66,7 +71,7 @@ export async function generateTranscript(
   const { data: transcriptRow, error } = await supabaseClient.from("news")
     .insert({
       user: userId,
-      title: "Hello! This is your daily news",
+      title: transcript.title,
       transcript: transcript,
     }).select().single();
   if (error) {
@@ -113,7 +118,7 @@ async function createTranscript(news: News[]): Promise<Transcript> {
       {
         "role": "system",
         "content":
-          'You\'re an assistant trained to create JSON. You\'re given a text which is a radio chronicle about the news of the day. You\'re asked to recognize each news item and classify it in the JSON below. You should also be able to recognize the intro and conclusion. Don\'t leave out any words from the text. {"totalNewsByLLM":"Number of news you have recognized ","intro":"intro you have recognized","outro":"outro you have recognized","news":[{"transcript":"Content of the first news"},{"transcript":"Content of the second news"},{"transcript":"etc."}]}',
+          'You\'re an assistant trained to create JSON. You\'re given a text which is a radio chronicle about the news of the day. You\'re asked to recognize each news item and classify it in the JSON below. You should also be able to recognize the intro and conclusion. Don\'t leave out any words from the text. {"totalNewsByLLM":"Number of news you have recognized ","intro":"intro you have recognized","outro":"outro you have recognized","title":"very short title that sums up the spirit of today\'s news","news":[{"transcript":"Content of the first news"},{"transcript":"Content of the second news"},{"transcript":"etc."}]}',
       },
       {
         "role": "user",
@@ -133,6 +138,7 @@ async function createTranscript(news: News[]): Promise<Transcript> {
     totalNewsByLLM: transcriptJSON.totalNewsByLLM,
     intro: transcriptJSON.intro,
     outro: transcriptJSON.outro,
+    title: transcriptJSON.title,
     fullTranscript: fullTranscript || "",
     news: news.map((n, i) => ({
       ...transcriptJSON.news[i],

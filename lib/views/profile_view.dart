@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:actualia/utils/themes.dart';
 import 'package:actualia/views/news_alert_setup_view.dart';
 import 'package:actualia/views/interests_wizard_view.dart';
@@ -63,7 +65,7 @@ class _ProfilePageState extends State<ProfilePageView> {
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.CENTER,
             timeInSecForIosWeb: 1,
-            backgroundColor: Color.fromARGB(255, 22, 231, 105),
+            backgroundColor: const Color.fromARGB(255, 22, 231, 105),
             textColor: Colors.white,
             fontSize: 16.0);
         break;

@@ -151,7 +151,7 @@ class _NewsAlertSetupViewState extends State<NewsAlertSetupView> {
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
                 border: Border.all(width: 3, color: Colors.lightBlueAccent),
-                borderRadius: BorderRadius.all(Radius.circular(10))),
+                borderRadius: const BorderRadius.all(Radius.circular(10))),
             child: Column(
               children: [
                 Row(
@@ -224,7 +224,7 @@ class _NewsAlertSetupViewState extends State<NewsAlertSetupView> {
     );
 
     Widget bottomBar = Container(
-      margin: EdgeInsets.all(20),
+      margin: const EdgeInsets.all(20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [

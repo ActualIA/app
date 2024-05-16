@@ -1,3 +1,4 @@
+import 'package:actualia/utils/themes.dart';
 import 'package:flutter/material.dart';
 
 class LoadingView extends StatelessWidget {
@@ -10,13 +11,11 @@ class LoadingView extends StatelessWidget {
       child: ListView(
         shrinkWrap: true,
         children: <Widget>[
-          Align(
-              child: Text(
-            text,
-            style: Theme.of(context).textTheme.titleMedium,
-            textAlign: TextAlign.center,
-          )),
-          const SizedBox(height: 16),
+          Container(
+              padding: const EdgeInsets.all(UNIT_PADDING),
+              child: Text(text,
+                  style: Theme.of(context).textTheme.titleMedium,
+                  textAlign: TextAlign.center)),
           const Align(child: CircularProgressIndicator()),
         ],
       ),

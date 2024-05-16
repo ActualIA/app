@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:actualia/models/auth_model.dart';
 import 'package:actualia/models/news_settings.dart';
 import 'package:actualia/models/providers.dart';
@@ -8,9 +6,7 @@ import 'package:actualia/viewmodels/news_settings.dart';
 import 'package:actualia/viewmodels/providers.dart';
 import 'package:actualia/views/profile_view.dart';
 import 'package:actualia/views/interests_wizard_view.dart';
-import 'package:actualia/views/providers_wizard_view.dart';
 import 'package:actualia/widgets/alarms_widget.dart';
-import 'package:actualia/widgets/wizard_widgets.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

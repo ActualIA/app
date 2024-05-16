@@ -181,12 +181,13 @@ class WizardScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: topBar,
-        body: Container(
-          padding: const EdgeInsets.fromLTRB(48.0, 48.0, 48.0, 48.0),
-          alignment: Alignment.topCenter,
-          child: body,
-        ));
+      appBar: topBar,
+      body: Container(
+        padding: const EdgeInsets.fromLTRB(48.0, 48.0, 48.0, 48.0),
+        alignment: Alignment.topCenter,
+        child: body,
+      ),
+    );
   }
 }
 

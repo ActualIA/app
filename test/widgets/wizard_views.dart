@@ -6,9 +6,7 @@ import "package:actualia/viewmodels/news_settings.dart";
 import "package:actualia/viewmodels/providers.dart";
 import "package:actualia/views/alarm_wizard.dart";
 import "package:actualia/views/interests_wizard_view.dart";
-import "package:actualia/views/providers_wizard_view.dart";
 import "package:actualia/widgets/alarms_widget.dart";
-import "package:actualia/widgets/top_app_bar.dart";
 import "package:actualia/widgets/wizard_widgets.dart";
 import "package:flutter/material.dart";
 import "package:flutter_test/flutter_test.dart";
@@ -176,11 +174,11 @@ void main() {
       await tester.tap(find.text(buttonText));
     }
 
-    await testSelector(Key("countries-selector"), "Chad", "Next");
+    await testSelector(const Key("countries-selector"), "Chad", "Next");
     await tester.pumpAndSettle();
-    await testSelector(Key("cities-selector"), "Basel", "Next");
+    await testSelector(const Key("cities-selector"), "Basel", "Next");
     await tester.pumpAndSettle();
-    await testSelector(Key("interests-selector"), "Gaming", "Next");
+    await testSelector(const Key("interests-selector"), "Gaming", "Next");
   });
 
   testWidgets(
@@ -210,9 +208,9 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    await select(Key("countries-selector"), "Antarctica", "Next");
-    await select(Key("cities-selector"), "Basel", "Next");
-    await select(Key("interests-selector"), "Biology", "Finish");
+    await select(const Key("countries-selector"), "Antarctica", "Next");
+    await select(const Key("cities-selector"), "Basel", "Next");
+    await select(const Key("interests-selector"), "Biology", "Finish");
 
     expect(vm.wasTriggered, isTrue);
   });
