@@ -59,6 +59,7 @@ dependencies:
   google_mlkit_text_recognition: ^0.13.0
   camera: ^0.10.6
   dartz: ^0.10.1
+  path_provider_platform_interface: ^2.1.2
 
 dev_dependencies:
   flutter_test:
