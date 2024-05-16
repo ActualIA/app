@@ -9,7 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class FakeSupabaseClient extends Fake implements SupabaseClient {}
 
 class MockNewsViewModel extends NewsViewModel {
-  MockNewsViewModel() : super(FakeSupabaseClient());
+  MockNewsViewModel.create() : super.create(FakeSupabaseClient());
 
   @override
   Future<Source?> getAudioSource(int transcriptId) async {
@@ -45,7 +45,7 @@ void main() {
 
     await tester.pumpWidget(NewsWrapper(
         const PlayButton(transcriptId: dummyTranscriptID),
-        MockNewsViewModel()));
+        MockNewsViewModel.create()));
 
     expect(find.byType(PlayButton), findsOne);
     expect(find.byType(IconButton), findsOne);
@@ -56,7 +56,7 @@ void main() {
 
     await tester.pumpWidget(NewsWrapper(
         const PlayButton(transcriptId: dummyTranscriptID),
-        MockNewsViewModel()));
+        MockNewsViewModel.create()));
 
     final button = find.byType(PlayButton);
     final PlayButtonState state = tester.state(button);

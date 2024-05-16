@@ -6,9 +6,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:actualia/viewmodels/news.dart';
 
-/**
- * Records news locally to retrieve them offline. Must be created through OfflineRecorder.create(newsProvider)
- */
+/// Records news locally to retrieve them offline. Must be created through OfflineRecorder.create(newsProvider)
 class OfflineRecorder {
   static const ROOT_OFFLINE_FOLDER = "storage";
 
@@ -53,9 +51,7 @@ class OfflineRecorder {
     return _maxStorageSize;
   }
 
-  /**
-   * TODO : Only delete some files
-   */
+  /// TODO : Only delete some files
   void _cleanStorage() async {
     Directory appOfflineNewsFolder = Directory(_appOfflineNewsPath);
 
@@ -64,6 +60,7 @@ class OfflineRecorder {
       appOfflineNewsFolder
           .list(recursive: false, followLinks: false)
           .listen((FileSystemEntity file) {
+        debugPrint("[CLEARSTORAGE] path: ${file.path}");
         if (file.path
             .substring(file.path.length - "XXXX-XX-XX_transcript.json".length)
             .startsWith(RegExp(r"[0-9]{4}-[0-9]{2}-[0-9]{2}"))) {
@@ -96,9 +93,7 @@ class OfflineRecorder {
     await Directory(_appOfflineNewsPath).create(recursive: true);
   }
 
-  /**
-   * Provides the size, in bytes, of a directory
-   */
+  /// Provides the size, in bytes, of a directory
   Future<int> _dirSize(Directory dir) async {
     var files = await dir.list(recursive: true).toList();
     var dirSize = files.fold(0, (int sum, file) => sum + file.statSync().size);
@@ -133,9 +128,7 @@ class OfflineRecorder {
     }
   }
 
-  /**
-   * Load data from local storage. Date must be formated in the following way : <year>-<month>-<day>
-   */
+  /// Load data from local storage. Date must be formated in the following way : <year>-<month>-<day>
   Future<News> loadNews(String date) async {
     RegExp regex = RegExp(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$");
     if (regex.allMatches(date).isEmpty) {

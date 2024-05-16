@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'dart:async';
 import 'package:actualia/models/news.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
@@ -19,6 +20,10 @@ class NewsViewModel extends ChangeNotifier {
 
   late final OfflineRecorder _offlineRecorder;
 
+  set offlineRecorder(OfflineRecorder offline) {
+    _offlineRecorder = offline;
+  }
+
   @protected
   void setNews(News? news) {
     _news = news;
@@ -29,8 +34,14 @@ class NewsViewModel extends ChangeNotifier {
     _newsList = newsList;
   }
 
-  NewsViewModel(this.supabase) {
-    OfflineRecorder.create().then((offRec) => _offlineRecorder = offRec);
+  ///private constructor
+  NewsViewModel.create(this.supabase);
+
+  ///public factory
+  static Future<NewsViewModel> init(SupabaseClient supabase) async {
+    NewsViewModel nvm = NewsViewModel.create(supabase);
+    nvm.offlineRecorder = await OfflineRecorder.create();
+    return nvm;
   }
 
   /// Retrieves news for the specified date.

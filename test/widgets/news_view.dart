@@ -9,7 +9,7 @@ import "package:supabase_flutter/supabase_flutter.dart";
 class FakeSupabaseClient extends Fake implements SupabaseClient {}
 
 class MockNewsViewModel extends NewsViewModel {
-  MockNewsViewModel() : super(FakeSupabaseClient());
+  MockNewsViewModel.create() : super.create(FakeSupabaseClient());
 
   @override
   News? get news => News(
@@ -183,7 +183,8 @@ void main() {
   testWidgets("Has all correct title", (WidgetTester tester) async {
     // Build our app and trigger a frame.
 
-    await tester.pumpWidget(NewsWrapper(const NewsView(), MockNewsViewModel()));
+    await tester
+        .pumpWidget(NewsWrapper(const NewsView(), MockNewsViewModel.create()));
     await tester.pumpAndSettle();
 
     expect(find.text("Title1"), findsOne);
