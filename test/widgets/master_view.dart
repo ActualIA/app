@@ -13,7 +13,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class FakeSupabaseClient extends Fake implements SupabaseClient {}
 
 class MockNewsViewModel extends NewsViewModel {
-  MockNewsViewModel() : super(FakeSupabaseClient());
+  MockNewsViewModel.create() : super.create(FakeSupabaseClient());
 }
 
 class MockNewsRecognitionViewModel extends NewsRecognitionViewModel {
@@ -44,7 +44,7 @@ class MasterWrapper extends StatelessWidget {
 void main() {
   testWidgets('MasterView contains bottom bar', (WidgetTester tester) async {
     await tester.pumpWidget(MasterWrapper(const MasterView(),
-        MockNewsViewModel(), MockNewsRecognitionViewModel()));
+        MockNewsViewModel.create(), MockNewsRecognitionViewModel()));
     //find the app bar
     expect(find.byType(ActualiaBottomNavigationBar), findsOneWidget);
     expect(find.byType(TopAppBar), findsOneWidget);
