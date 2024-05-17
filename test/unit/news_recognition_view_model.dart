@@ -12,7 +12,8 @@ class FakeFunctionsClient extends Fake implements FunctionsClient {
   Future<FunctionResponse> invoke(String functionName,
       {Map<String, String>? headers,
       Map<String, dynamic>? body,
-      HttpMethod method = HttpMethod.post}) {
+      HttpMethod method = HttpMethod.post,
+      Map<String, dynamic>? queryParameters}) {
     expect(functionName, equals('process-image'));
     expect(method, equals(HttpMethod.post));
 
@@ -25,7 +26,8 @@ class FailingFuctionsClient extends Fake implements FunctionsClient {
   Future<FunctionResponse> invoke(String functionName,
       {Map<String, String>? headers,
       Map<String, dynamic>? body,
-      HttpMethod method = HttpMethod.post}) {
+      HttpMethod method = HttpMethod.post,
+      Map<String, dynamic>? queryParameters}) {
     throw Exception("Failed to invoke function");
   }
 }
