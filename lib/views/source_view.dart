@@ -27,7 +27,7 @@ class _SourceViewState extends State<SourceView> {
   late String _article;
   late String _title;
   late String _date;
-  late String _newsPaper;
+  late String _origin;
   late String _url;
 
   @override
@@ -37,7 +37,7 @@ class _SourceViewState extends State<SourceView> {
     _article = widget.article;
     _title = widget.title;
     _date = widget.date;
-    _newsPaper = widget.newsPaper;
+    _origin = widget.newsPaper;
     _url = widget.url;
   }
 
@@ -50,46 +50,12 @@ class _SourceViewState extends State<SourceView> {
       ),
       body: Container(
           padding: const EdgeInsets.all(UNIT_PADDING * 3),
-          child: ListView(
-            children: <Widget>[
-              ListView(
-                  shrinkWrap: true,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: UNIT_PADDING, vertical: UNIT_PADDING * 2),
-                  children: <Widget>[
-                    SourceOrigin(origin: _newsPaper, date: _date),
-                    Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: UNIT_PADDING / 2),
-                        child: SourceTitle(title: _title)),
-                  ]),
-              ScrollableText(text: _article),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                      padding: const EdgeInsets.only(top: UNIT_PADDING * 2),
-                      child: FilledButton.tonal(
-                        onPressed: () {
-                          _launchInBrowser(Uri.parse(_url));
-                        },
-                        child: Text(
-                            style: Theme.of(context).textTheme.displaySmall,
-                            "View site"),
-                      ))
-                ],
-              )
-            ],
-          )),
+          child: SourceArticle(
+              title: _title,
+              date: _date,
+              origin: _origin,
+              article: _article,
+              sourceUrl: _url)),
     );
-  }
-
-  Future<void> _launchInBrowser(Uri url) async {
-    if (!await launchUrl(
-      url,
-      mode: LaunchMode.externalApplication,
-    )) {
-      throw Exception('Could not launch $url');
-    }
   }
 }
