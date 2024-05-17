@@ -27,13 +27,15 @@ class _NewsAlertViewState extends State<NewsAlertView> {
       setState(() {
         transcriptId = news.news!.transcriptId;
       });
+      debugPrint("[FETCHTRANSCRIPT] id: $transcriptId");
     }
   }
 
   @override
   Widget build(BuildContext context) {
     AlarmsViewModel alarms = Provider.of(context);
-    Future.microtask(() async => fetchTranscriptId(context));
+    if (transcriptId == null)
+      Future.microtask(() async => fetchTranscriptId(context));
 
     Widget maybePlayer = transcriptId != null
         ? PlayButton(
