@@ -1,3 +1,4 @@
+import 'package:actualia/models/article.dart';
 import 'package:actualia/utils/themes.dart';
 import 'package:actualia/views/source_view.dart';
 import 'package:flutter/material.dart';
@@ -27,11 +28,12 @@ class NewsText extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                             builder: (builder) => SourceView(
-                                article: paragraph.content,
-                                title: paragraph.title,
-                                date: paragraph.date.substring(0, 10),
-                                newsPaper: paragraph.source,
-                                url: paragraph.url)));
+                                article: Article(
+                                    content: paragraph.content,
+                                    title: paragraph.title,
+                                    date: paragraph.date.substring(0, 10),
+                                    origin: paragraph.source,
+                                    url: paragraph.url))));
                   },
                   child: Column(
                     children: [

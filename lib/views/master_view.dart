@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:actualia/views/feed_view.dart';
+import 'package:actualia/views/rss_feed_view.dart';
 import 'package:actualia/views/news_view.dart';
 import 'package:actualia/widgets/top_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +59,7 @@ class _MasterView extends State<MasterView> {
         body = const Center(child: Text("To be implemented"));
         break;
       case Views.FEED:
-        body = FeedView();
+        body = const FeedView();
         break;
       default:
         body = const Center(child: Text("SHOULD NOT BE DISPLAYED"));

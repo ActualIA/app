@@ -45,18 +45,18 @@ class SourceTitle extends StatelessWidget {
   }
 }
 
-class SourceArticle extends StatelessWidget {
+class ArticleWidget extends StatelessWidget {
   final String title;
   final String date;
   final String origin;
-  final String article;
+  final String content;
   final String sourceUrl;
 
-  const SourceArticle(
+  const ArticleWidget(
       {this.title = "",
       this.origin = "",
       this.date = "",
-      this.article = "",
+      this.content = "",
       this.sourceUrl = "",
       super.key});
 
@@ -78,7 +78,7 @@ class SourceArticle extends StatelessWidget {
                       const EdgeInsets.symmetric(vertical: UNIT_PADDING / 2),
                   child: SourceTitle(title: title)),
             ]),
-        ScrollableText(text: article),
+        ScrollableText(text: content),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
