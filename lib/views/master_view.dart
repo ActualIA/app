@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:actualia/viewmodels/news_recognition.dart';
+import 'package:actualia/views/context_view.dart';
 import 'package:actualia/views/news_view.dart';
 import 'package:actualia/widgets/top_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -75,7 +76,7 @@ class _MasterView extends State<MasterView> {
         body = const Center(child: Text("To be implemented"));
         break;
       case Views.CONTEXT:
-        body = Center(child: Text(_ocrText ?? "No text found"));
+        body = ContextView(text: _ocrText ?? "No text found");
         break;
       default:
         body = const Center(child: Text("SHOULD NOT BE DISPLAYED"));

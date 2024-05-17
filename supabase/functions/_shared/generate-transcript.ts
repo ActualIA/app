@@ -1,9 +1,8 @@
 import OpenAI from "https://deno.land/x/openai@v4.33.0/mod.ts";
 import { corsHeaders } from "../_shared/cors.ts";
-import { fetchNews } from "../providers.ts";
 import { News } from "../model.ts";
 import SupabaseClient from "https://esm.sh/v135/@supabase/supabase-js@2.40.0/dist/module/SupabaseClient.js";
-import { NewsSettings } from "../model.ts";
+import { getUserRawNews } from "./get-user-raw-news.ts";
 
 interface Result {
   transcript: string;
@@ -33,24 +32,7 @@ export async function generateTranscript(
 ) {
   console.log("We start the process for the user with ID:", userId);
 
-  // Get the user's interests.
-  console.log("Fetching user settings");
-  const interestsDB = await supabaseClient.from("news_settings").select(
-    "*",
-  )
-    .filter("created_by", "eq", userId)
-    .filter("wants_interests", "eq", true);
-
-  if (interestsDB.error) {
-    console.error("We can't get the user's interests");
-    console.error(interestsDB.error);
-    return new Response("Internal Server Error", { status: 500 });
-  }
-  const interests: NewsSettings = interestsDB.data[0];
-
-  // Get the news.
-  console.log(`Fetching news from ${interests.providers.length} providers`);
-  const news = await fetchNews(interests.providers || [], interests);
+  const news = await getUserRawNews(userId, supabaseClient) as News[];
 
   // Generate a transcript from the news.
   console.log("Generating transcript from news");

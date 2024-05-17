@@ -1,6 +1,16 @@
 import 'package:actualia/models/providers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart';
+
+class RssClient extends Fake implements Client {
+  @override
+  Future<Response> get(Uri url, {Map<String, String>? headers}) async {
+    return Response(
+        "<!DOCTYPE html><html><head><meta charset='utf-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><title>NY Times</title></head><body><a href=\"https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml\"></a></body></html>",
+        200);
+  }
+}
 
 void main() {
   test("Correctly parses GNews provider", () {
@@ -41,5 +51,14 @@ void main() {
         (r) => fail("Provider build should have been successful"));
     (await ProviderType.telegram.build(["clic.news"]))
         .fold((l) => fail("Provider build should have failed"), (r) {});
+  });
+
+  test("RSS discovery", () async {
+    (await ProviderType.rss.build(["http://nytimes.com"])).fold(
+        (l) => expect(
+            l.url,
+            equals(
+                "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml")),
+        (r) => fail("Provider build should have been successful"));
   });
 }

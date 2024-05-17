@@ -51,17 +51,24 @@ class NewsRecognitionViewModel extends ChangeNotifier {
   }
 
   Future<XFile?> takePicture() async {
-    final permission = await Permission.camera.request();
+    final permission = await askPermission();
 
     if (permission.isGranted) {
       final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
       if (photo != null) {
-        debugPrint('Path to picture: ${photo.path}');
         return photo;
       }
     } else {
       log('Permission denied', level: Level.WARNING.value);
     }
     return null;
+  }
+
+  Future<PermissionStatus> askPermission() async {
+    return await Permission.camera.request();
+  }
+
+  Future<XFile?> pickImage() async {
+    return await _picker.pickImage(source: ImageSource.camera);
   }
 }

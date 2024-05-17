@@ -1,4 +1,7 @@
+import 'package:http/http.dart' as http;
+
 import 'package:dartz/dartz.dart';
+import 'package:xml/xml.dart';
 
 abstract class _ProviderFactory {
   const _ProviderFactory();
@@ -21,8 +24,8 @@ class _DefaultProviderFactory extends _ProviderFactory {
               .join(", ")));
 }
 
-class _TelegramProviderFactory extends _ProviderFactory {
-  const _TelegramProviderFactory();
+class TelegramProviderFactory extends _ProviderFactory {
+  const TelegramProviderFactory();
 
   static final _telegramIdRegex =
       RegExp(r"^(?:https://t\.me/|@)?([a-zA-Z0-9_-]+)$");
@@ -39,12 +42,112 @@ class _TelegramProviderFactory extends _ProviderFactory {
   }
 }
 
+class RSSFeedProviderFactory extends _ProviderFactory {
+  const RSSFeedProviderFactory({this.client});
+
+  final http.Client? client;
+
+  /// Simple paths which may point to a rss feed.
+  static const paths = [
+    "/feed/",
+    "/rss/",
+    "/blog/feed/",
+    "/blog/rss/",
+    "/rss.xml",
+    "/blog/rss.xml",
+    "/pageslug?format=rss"
+  ];
+
+  /// Regex matching any XML attribute containing either "rss" or "feed"
+  static final _rssUrlAttributeRegex =
+      RegExp(r'"([^"]*(feed|rss)[^"]*)"', caseSensitive: false);
+
+  Future<http.Response> _get(Uri url) {
+    if (client != null) {
+      return client!.get(url);
+    } else {
+      return http.get(url);
+    }
+  }
+
+  /// Checks whether a url is a rss document.
+  ///
+  /// To do so, it requests the url, parses it as a XML file and looks for a <rss></rss> tag.
+  Future<bool> _isRss(Uri url) async {
+    try {
+      var document = XmlDocument.parse((await _get(url)).body);
+      return document.findAllElements("rss").isNotEmpty;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<List<Uri>> _listFromSitemap(Uri url) async {
+    try {
+      var document =
+          XmlDocument.parse((await _get(url.resolve("/sitemap.xml"))).body);
+
+      return document
+          .findAllElements("loc")
+          .map((e) =>
+              e.innerText.contains(RegExp("(rss|feed)", caseSensitive: false))
+                  ? Uri.tryParse(e.innerText)
+                  : null)
+          .whereType<Uri>()
+          .toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /// List all the urls that may point to a rss feed in a string. Should be used on HTML documents.
+  List<String> _listRssUrl(String input) {
+    var r = _rssUrlAttributeRegex
+        .allMatches(input)
+        .map((m) => m.group(1))
+        .whereType<String>()
+        .toList();
+    return r;
+  }
+
+  @override
+  Future<Either<NewsProvider, List<String?>>> build(
+      ProviderType type, List<String> values) async {
+    try {
+      var url = Uri.parse(values[0]);
+      var document = (await http.get(url)).body;
+
+      // Finds a related RSS feed by iterating over a list of predefined uris often used for feeds.
+      var urls = [
+        url,
+        ...paths.map((e) => url.resolve(e)),
+        ..._listRssUrl(document).map((e) => Uri.tryParse(e)).whereType<Uri>(),
+        ...(await _listFromSitemap(url))
+      ];
+
+      var feeds = (await Future.wait(
+              urls.map((e) => _isRss(e).then((value) => (e, value)))))
+          .where((element) => element.$2);
+
+      if (feeds.isNotEmpty) {
+        return Left(NewsProvider(url: feeds.firstOrNull!.$1.toString()));
+      } else {
+        return const Right([
+          "Unable to find related RSS feed. Please provide the complete URL instead."
+        ]);
+      }
+    } catch (e) {
+      return const Right(["Must be a valid URL"]);
+    }
+  }
+}
+
 /// List all available provider types, as well as useful information for display
 enum ProviderType {
   telegram("/telegram/channel", "Telegram",
-      parameters: ["Channel ID"], factory: _TelegramProviderFactory()),
+      parameters: ["Channel ID"], factory: TelegramProviderFactory()),
   google("/google/news/:query/en", "Google News"),
-  rss("", "RSS", parameters: ["URL"]);
+  rss("", "RSS", parameters: ["URL"], factory: RSSFeedProviderFactory());
 
   /// Base url of the provider, used for matching
   final String basePath;
