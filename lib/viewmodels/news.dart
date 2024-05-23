@@ -97,7 +97,7 @@ class NewsViewModel extends ChangeNotifier {
     } catch (e) {
       try {
         _offlineRecorder
-            .loadNews("${date.year}-${date.month}-${date.day}")
+            .loadNews(date)
             .then((loadedNews) => _news = loadedNews);
       } catch (e) {
         log("Error fetching news: $e", level: Level.WARNING.value);

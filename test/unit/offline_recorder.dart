@@ -101,19 +101,19 @@ void main() {
             "${storage.path}/${testNews.date.substring(0, 10)}_transcript.json")
         .exists();
     expect(exist, isTrue);
-    expect(await offRec.loadNews(testNews.date.substring(0, 10)),
+    expect(
+        await offRec.loadNews(DateTime(
+            int.parse(testNews.date.substring(0, 4)),
+            int.parse(testNews.date.substring(5, 7)),
+            int.parse(testNews.date.substring(8, 10)))),
         equals(testNews));
-
-    // File("${storage.path}/${testNews.date.substring(0, 10)}_transcript.json")
-    //     .delete();
   });
 
   test("Loading non existing files throw errors", () async {
     PathProviderPlatform.instance = MockPathProviderPlateform();
     IOOverrides.global = MockIOOverrides(MockFileSys());
     OfflineRecorder offRec = await OfflineRecorder.create();
-    expect(offRec.loadNews("UNE MINE !"), throwsUnimplementedError);
-    expect(offRec.loadNews("0476-09-04"), throwsException);
+    expect(offRec.loadNews(DateTime(476, 9, 1)), throwsException);
   });
 
   test("Changing the maximum storage size works well in both directions",
@@ -123,22 +123,22 @@ void main() {
     Directory storage = Directory(
         "${(await getApplicationDocumentsDirectory()).path}/storage/");
     OfflineRecorder offRec = await OfflineRecorder.create();
-    int storageSize = offRec.getCurrentMaxStorageSize();
+    int storageSize = offRec.currentMaxStorageSize();
     await offRec.setMaxStorageSize(storageSize + (17e6.toInt()));
-    expect(offRec.getCurrentMaxStorageSize(),
-        equals(storageSize + (17e6.toInt())));
+    expect(
+        offRec.currentMaxStorageSize(), equals(storageSize + (17e6.toInt())));
 
     await offRec.setMaxStorageSize(storageSize);
 
     await offRec.downloadNews(testNews);
-    expect(offRec.getCurrentMaxStorageSize(), equals(storageSize));
+    expect(offRec.currentMaxStorageSize(), equals(storageSize));
 
     int fileSize = File(
             "${storage.path}/${testNews.date.substring(0, 10)}_transcript.json")
         .statSync()
         .size;
     await offRec.setMaxStorageSize(fileSize - 1);
-    expect(offRec.getCurrentMaxStorageSize(), equals(fileSize - 1));
+    expect(offRec.currentMaxStorageSize(), equals(fileSize - 1));
     expect(
         await File(
                 "${storage.path}/${testNews.date.substring(0, 10)}_transcript.json")

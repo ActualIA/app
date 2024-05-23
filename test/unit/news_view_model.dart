@@ -110,28 +110,10 @@ class AlreadyExistingNewsVM extends NewsViewModel {
   }
 }
 
-class MockOfflineRecorder implements OfflineRecorder {
+class MockOfflineRecorder extends Fake implements OfflineRecorder {
   @override
   Future<void> downloadNews(News news) async {
     //does not need to do anything
-  }
-
-  @override
-  int getCurrentMaxStorageSize() {
-    // TODO: implement getCurrentMaxStorageSize
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<News> loadNews(String date) async {
-    // TODO: implement loadNews
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<int> setMaxStorageSize(int newStorageSize) async {
-    // TODO: implement setMaxStorageSize
-    throw UnimplementedError();
   }
 }
 
