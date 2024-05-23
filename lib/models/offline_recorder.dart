@@ -165,6 +165,8 @@ class OfflineRecorder {
     String json = await File(filePath).readAsString();
 
     // Parsing the json + remapping to a News object
+
+    /*
     dynamic decodedJson = jsonDecode(json);
     List<Paragraph> paragraphs = (decodedJson["paragraphs"] as List).map((p) {
       return Paragraph(
@@ -181,5 +183,8 @@ class OfflineRecorder {
         transcriptId: decodedJson["transcriptID"],
         audio: decodedJson["audio"],
         paragraphs: paragraphs);
+    */
+
+    return News.fromJson(jsonDecode(json));
   }
 }
