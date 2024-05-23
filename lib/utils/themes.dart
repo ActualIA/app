@@ -12,6 +12,7 @@ const double ICON_NAV_SIZE = 40;
 const Color THEME_PRIMARY = Color(0xFF5EDCE4);
 const Color THEME_GREY = Color(0xFFCDCDDC);
 const Color THEME_LIGHTGRAY = Color(0xFFf2f5f5);
+const Color THEME_WHITE = Color(0xFFFFFFFF);
 const Color THEME_BUTTON = Color.fromARGB(255, 68, 159, 166);
 const Color THEME_ERROR_TEXT = Color.fromARGB(255, 163, 0, 0);
 const Color THEME_ERROR_BACKGROUND = Color.fromARGB(255, 255, 204, 204);

@@ -13,40 +13,41 @@ class MockNewsViewModel extends NewsViewModel {
 
   @override
   News? get news => News(
-          title: "Title",
-          date: "1970-01-01",
-          transcriptId: -1,
-          audio: null,
-          paragraphs: [
-            Paragraph(
-                transcript: "text1",
-                source: "source1",
-                title: "title1",
-                date: "1970-01-01",
-                content: "content1",
-                url: "url1"),
-            Paragraph(
-                transcript: "text2",
-                source: "source2",
-                title: "title2",
-                date: "1970-01-01",
-                content: "content2",
-                url: "url2"),
-            Paragraph(
-                transcript: "text3",
-                source: "source3",
-                title: "title3",
-                date: "1970-01-01",
-                content: "content3",
-                url: "url3"),
-            Paragraph(
-                transcript: "text4",
-                source: "source4",
-                title: "title4",
-                date: "1970-01-01",
-                content: "content4",
-                url: "url4")
-          ]);
+      title: "Title",
+      date: "1970-01-01",
+      transcriptId: -1,
+      audio: null,
+      paragraphs: [
+        Paragraph(
+            transcript: "text1",
+            source: "source1",
+            title: "title1",
+            date: "1970-01-01",
+            content: "content1",
+            url: "url1"),
+        Paragraph(
+            transcript: "text2",
+            source: "source2",
+            title: "title2",
+            date: "1970-01-01",
+            content: "content2",
+            url: "url2"),
+        Paragraph(
+            transcript: "text3",
+            source: "source3",
+            title: "title3",
+            date: "1970-01-01",
+            content: "content3",
+            url: "url3"),
+        Paragraph(
+            transcript: "text4",
+            source: "source4",
+            title: "title4",
+            date: "1970-01-01",
+            content: "content4",
+            url: "url4")
+      ],
+      fullTranscript: "full-transcript");
 
   @override
   List<News> get newsList => [
@@ -84,7 +85,8 @@ class MockNewsViewModel extends NewsViewModel {
                   date: "1970-01-01",
                   content: "content4",
                   url: "url4")
-            ]),
+            ],
+            fullTranscript: "full-transcript"),
         News(
             title: "Title2",
             date: "1970-01-01",
@@ -119,7 +121,8 @@ class MockNewsViewModel extends NewsViewModel {
                   date: "1970-01-01",
                   content: "content4",
                   url: "url4")
-            ]),
+            ],
+            fullTranscript: "full-transcript"),
         News(
             title: "Title3",
             date: "1970-01-01",
@@ -140,7 +143,8 @@ class MockNewsViewModel extends NewsViewModel {
                   date: "1970-01-01",
                   content: "content2",
                   url: "url2"),
-            ]),
+            ],
+            fullTranscript: "full-transcript"),
       ];
 
   @override

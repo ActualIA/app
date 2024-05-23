@@ -14,7 +14,7 @@ class RssClient extends Fake implements Client {
 
 void main() {
   test("Correctly parses GNews provider", () {
-    var prov = NewsProvider(url: "/google/news/:query/en");
+    var prov = NewsProvider(url: "gnews");
     expect(prov.type, equals(ProviderType.google));
     expect(listEquals(prov.parameters, []), isTrue);
   });
@@ -33,7 +33,7 @@ void main() {
   });
 
   test("Correctly displays GNews provider", () {
-    var prov = NewsProvider(url: "/google/news/:query/en");
+    var prov = NewsProvider(url: "gnews");
     expect(prov.displayName(), equals("Google News"));
   });
   test("Correctly displays Telegram provider", () {
