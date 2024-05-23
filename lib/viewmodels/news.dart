@@ -150,7 +150,12 @@ class NewsViewModel extends ChangeNotifier {
       hasNews = true;
       _newsList.insert(0, _news!);
       getAudioFile(_news!).whenComplete(() => notifyListeners());
-      _offlineRecorder.downloadNews(_news!);
+      try {
+        _offlineRecorder.downloadNews(_news!);
+        log("Today news is stored");
+      } catch (e) {
+        log("News wasn't stored, the following error occured : ${e.toString()}");
+      }
     }
     notifyListeners();
   }
