@@ -2,6 +2,14 @@
 import OpenAI from "https://deno.land/x/openai@v4.33.0/mod.ts";
 import { SupabaseClient } from "https://esm.sh/v135/@supabase/supabase-js@2.42.4/dist/module/index.js";
 
+/**
+ * Generates the audio for a transcript and uploads it to the database. If the audio already exists, does nothing.
+ *
+ * @param transcriptId id of the transcript to convert to an audio
+ * @param voiceWanted name of the voice model to use for generation
+ * @param supabaseClient Supabase client where the transcript will be fetched and audio uploaded
+ * @returns HTTP Response describing the outcome of the function
+ */
 export async function generateAudio(
   transcriptId: number,
   voiceWanted: string,
