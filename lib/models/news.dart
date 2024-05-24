@@ -26,6 +26,7 @@ class News {
         date: json['date'] as String,
         transcriptId: json['transcriptID'] as int,
         audio: json['audio'] as String?,
+        fullTranscript: json['fullTranscript'],
         paragraphs: (json['paragraphs'] != null)
             ? (json["paragraphs"]) as List<Paragraph>
             : List.empty());
