@@ -1,6 +1,6 @@
-import { fetchNews } from "../providers.ts";
-import SupabaseClient from "https://esm.sh/v135/@supabase/supabase-js@2.40.0/dist/module/SupabaseClient.js";
-import { NewsSettings } from "../model.ts";
+import { fetchNews } from "./providers.ts";
+import SupabaseClient from "https://esm.sh/v135/@supabase/supabase-js@2.42.4/dist/module/SupabaseClient.js";
+import { NewsSettings } from "./model.ts";
 
 export async function getUserRawNews(
   userId: string,
