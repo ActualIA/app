@@ -23,7 +23,9 @@ Deno.serve(async (request) => {
       return new Response(JSON.stringify({ errors }), { status: 400 });
     }
     textFromImage = body.textFromImage;
-  } catch (_) {}
+  } catch (_) {
+    console.trace('Received body is not a valid JSON')
+  }
 
   // Create a Supabase client with the user's token.
   const authHeader = request.headers.get("Authorization")!;
@@ -39,8 +41,6 @@ Deno.serve(async (request) => {
     console.error(user.error);
     return new Response("Authentication error", { status: 401 });
   }
-
-  const userId = user.data.user.id;
 
   const openai = new OpenAI();
   const completion = await openai.chat.completions.create({

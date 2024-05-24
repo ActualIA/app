@@ -3,7 +3,7 @@ import { generateAudio } from "../_shared/generate-audio.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.42.4";
 
 // This function is called periodically to generate a new transcript & audio via alarms.
-Deno.serve(async (req) => {
+Deno.serve(async (_) => {
   // We get the timestamp of the request.
   const timestampz = new Date().toISOString();
   // We get the timetz of the request.

@@ -1,10 +1,11 @@
 // index.ts
 import OpenAI from "https://deno.land/x/openai@v4.33.0/mod.ts";
+import { SupabaseClient } from "https://esm.sh/v135/@supabase/supabase-js@2.42.4/dist/module/index.js";
 
 export async function generateAudio(
   transcriptId: number,
   voiceWanted: string,
-  supabaseClient: any,
+  supabaseClient: SupabaseClient,
 ) {
   console.log(
     "Generating audio for transcriptId:",
@@ -40,7 +41,13 @@ export async function generateAudio(
   try {
     const audio = await openai.audio.speech.create({
       model: "tts-1",
-      voice: voiceWanted as any,
+      voice: voiceWanted as
+        | "alloy"
+        | "echo"
+        | "fable"
+        | "onyx"
+        | "nova"
+        | "shimmer",
       input: full_transcript,
     });
 
