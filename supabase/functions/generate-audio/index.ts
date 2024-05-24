@@ -1,5 +1,6 @@
+import { generateAudio } from "../_shared/generate-audio.ts";
+import { assertHasEnv } from "../_shared/util.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.42.4";
-import { assertHasEnv } from "../util.ts";
 import {
   isIn,
   isNumber,
@@ -7,8 +8,6 @@ import {
   required,
   validate,
 } from "https://deno.land/x/validasaur@v0.15.0/mod.ts";
-
-import { generateAudio } from "../_shared/generate-audio.ts";
 
 const bodySchema = {
   transcriptId: [required, isNumber],

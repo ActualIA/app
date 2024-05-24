@@ -1,8 +1,8 @@
+import { assertHasEnv } from "../_shared/util.ts";
 import {
   isString,
   validate,
 } from "https://deno.land/x/validasaur@v0.15.0/mod.ts";
-import { assertHasEnv } from "../util.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.42.4";
 import OpenAI from "https://deno.land/x/openai@v4.33.0/mod.ts";
 

@@ -1,6 +1,6 @@
 import OpenAI from "https://deno.land/x/openai@v4.33.0/mod.ts";
 import { corsHeaders } from "../_shared/cors.ts";
-import { News } from "../model.ts";
+import { News } from "../_shared/model.ts";
 import SupabaseClient from "https://esm.sh/v135/@supabase/supabase-js@2.40.0/dist/module/SupabaseClient.js";
 import { getUserRawNews } from "./get-user-raw-news.ts";
 
