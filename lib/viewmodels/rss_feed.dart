@@ -1,12 +1,19 @@
-import 'dart:developer';
-
 import 'package:actualia/models/article.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RSSFeedViewModel extends ChangeNotifier {
-  late final List<Article> articles;
+  List<Article>? _articles;
   late final SupabaseClient supabase;
+
+  @protected
+  void setArticles(List<Article> articles) {
+    _articles = articles;
+  }
+
+  List<Article> get articles => _articles ?? [];
+
+  RSSFeedViewModel(this.supabase);
 
   Future<List<dynamic>> fetchRawNewsList() async {
     try {
@@ -17,8 +24,8 @@ class RSSFeedViewModel extends ChangeNotifier {
     }
   }
 
-  List<Article> parseIntoArticles(List<dynamic> response) {
-    return response
+  List<Article> parseIntoArticles(List<dynamic> items) {
+    return items
         .map((item) => Article(
               title: item['title'],
               description: item['description'],
@@ -29,6 +36,4 @@ class RSSFeedViewModel extends ChangeNotifier {
             ))
         .toList();
   }
-
-  RSSFeedViewModel(this.articles);
 }
