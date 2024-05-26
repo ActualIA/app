@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import "package:flutter_test/flutter_test.dart";
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FakeSupabaseClient extends Fake implements SupabaseClient {}
 
@@ -37,7 +38,11 @@ class MasterWrapper extends StatelessWidget {
               create: (context) => newsRecognitionVM)
         ],
         child: MaterialApp(
-            title: "ActualIA", theme: ACTUALIA_THEME, home: master));
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            title: "ActualIA",
+            theme: ACTUALIA_THEME,
+            home: master));
   }
 }
 

@@ -8,8 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../unit/news_view_model.dart';
-import 'play_button.dart' as pb;
-import 'profile_view.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FakeSupabaseClient extends Fake implements SupabaseClient {}
 
@@ -27,7 +26,6 @@ class ExistingNewsNVM extends AlreadyExistingNewsVM {
 
   @override
   Future<void> getAudioFile(News news) async {
-    debugPrint("[GETAUDIO]");
     return;
   }
 }
@@ -52,6 +50,8 @@ class AlertWrapper extends StatelessWidget {
           ChangeNotifierProvider<AlarmsViewModel>(create: (context) => avm)
         ],
         child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           title: "ActualIA",
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

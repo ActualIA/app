@@ -58,6 +58,8 @@ dependencies:
   dartz: ^0.10.1
   xml: ^6.5.0
   http: ^1.2.1
+  flutter_localizations:
+    sdk: flutter
   introduction_screen: ^3.1.14
 
 dev_dependencies:
@@ -73,7 +75,6 @@ dev_dependencies:
   test: ^1.24.9
   integration_test:
     sdk: flutter
-  messages: ^0.2.0
   gotrue: ^2.6.1
 
 # For information on the generic Dart part of this file, see the
@@ -81,6 +82,9 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  # Generate l10n files.
+  generate: true
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

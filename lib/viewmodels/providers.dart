@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/providers.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 typedef EditedProviderData = (
   ProviderType type,
@@ -77,13 +78,13 @@ class ProvidersViewModel extends ChangeNotifier {
     // Does not call notifyListeners() to avoid redrawing the edition widgets.
   }
 
-  Future<bool> pushNewsProviders() async {
+  Future<bool> pushNewsProviders(AppLocalizations loc) async {
     try {
       isPushing = true;
       notifyListeners();
 
       var providers =
-          await Future.wait(editedProviders.map((e) => e.$1.build(e.$2)));
+          await Future.wait(editedProviders.map((e) => e.$1.build(e.$2, loc)));
 
       // If an error occurred, reports it and do not push.
       if (providers.any((e) => e.isRight())) {
