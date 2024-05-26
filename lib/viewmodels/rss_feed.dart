@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class RSSFeedViewModel extends ChangeNotifier {
   List<Article>? _articles;
   late final SupabaseClient supabase;
+  bool hasNews = false;
 
   @protected
   void setArticles(List<Article> articles) {
@@ -15,11 +16,21 @@ class RSSFeedViewModel extends ChangeNotifier {
 
   RSSFeedViewModel(this.supabase);
 
+  geRawNewsList() async {
+    hasNews = false;
+    final rawNewsList = await fetchRawNewsList();
+    final articles = parseIntoArticles(rawNewsList);
+    setArticles(articles);
+    hasNews = true;
+    notifyListeners();
+  }
+
   Future<List<dynamic>> fetchRawNewsList() async {
     try {
       final res = await supabase.functions.invoke('generate-raw-feed');
       return res.data as List<dynamic>;
     } catch (e) {
+      hasNews = false;
       throw Exception("Failed to invoke generate-raw-feed function");
     }
   }
