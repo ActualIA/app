@@ -1,5 +1,5 @@
 import { assertHasEnv } from "../util.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.40.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.42.4";
 import {
   isString,
   match,
