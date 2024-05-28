@@ -55,7 +55,9 @@ class _NewsViewState extends State<NewsView> {
             distance: 112,
             children: [
               ActionButton(
-                onPressed: () => Share.share(firstTranscript.fullTranscript),
+                onPressed: () =>
+                    Share.share('${firstTranscript.fullTranscript}\n\n'
+                        '${loc.newsShareText}'),
                 icon: const Icon(Icons.text_fields),
               ),
               ActionButton(
@@ -63,12 +65,16 @@ class _NewsViewState extends State<NewsView> {
                   XFile(
                       // ignore: use_build_context_synchronously
                       '${(await getApplicationDocumentsDirectory()).path}/audios/${firstTranscript.transcriptId}.mp3')
-                ], text: loc.newsShareAudio),
+                ], text: loc.newsShareText),
                 icon: const Icon(Icons.audiotrack),
               ),
               ActionButton(
-                onPressed: () => Share.share(
-                    'https://actualia.app/shared/${firstTranscript.transcriptId}'),
+                onPressed: () {
+                  Provider.of<NewsViewModel>(context, listen: false)
+                      .setNewsPublicInDatabase(firstTranscript);
+                  Share.share(
+                      'https://actualia.pages.dev/share?transcriptId=${firstTranscript.transcriptId}');
+                },
                 icon: const Icon(Icons.link),
               ),
             ],

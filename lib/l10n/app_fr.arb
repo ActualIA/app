@@ -35,7 +35,7 @@
     "newsEmptyTitle": "Vous n'avez pas encore de news",
     "newsEmptyDescription": "La première sera générée lorsque votre alarme s'activera",
     "newsEmptyGenerateButton": "Générer maintenant",
-    "newsShareAudio": "Regardez mon audio personnalisé",
+    "newsShareText": "Ces actualités ont été générées par ActualIA, votre assistant quotidien pour rester à jour sur ce qui compte.",
     "sourceView": "Voir sur le site d'origine",
     "rssFeedNotFound": "Impossible de trouver un flux RSS associé",
     "rssInvalidUrl": "Doit être une URL valide",
