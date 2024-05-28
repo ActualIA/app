@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:actualia/utils/themes.dart';
+import 'package:actualia/views/accessibility.dart';
 import 'package:actualia/views/narrator_settings_view.dart';
 import 'package:actualia/views/news_alert_setup_view.dart';
 import 'package:actualia/views/interests_wizard_view.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:actualia/models/auth_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ProfilePageView extends StatefulWidget {
   const ProfilePageView({super.key});
@@ -18,15 +20,34 @@ class ProfilePageView extends StatefulWidget {
 }
 
 enum SettingsRows {
-  INTERESTS("Interests"),
-  SOURCES("Sources"),
-  ALARM("Alarm"),
-  STORAGE("Storage"),
-  NARRATOR("Narrator"),
-  ACCESSIBILITY("Accessibility");
+  INTERESTS("profileInterests"),
+  SOURCES("profileSources"),
+  ALARM("profileAlarm"),
+  STORAGE("profileStorage"),
+  NARRATOR("profileNarrator"),
+  ACCESSIBILITY("profileAccessibility");
 
-  const SettingsRows(this.name);
-  final String name;
+  String displayName(AppLocalizations loc) {
+    switch (key) {
+      case "profileInterests":
+        return loc.profileInterests;
+      case "profileSources":
+        return loc.profileSources;
+      case "profileAlarm":
+        return loc.profileAlarm;
+      case "profileStorage":
+        return loc.profileStorage;
+      case "profileNarrator":
+        return loc.profileNarrator;
+      case "profileAccessibility":
+        return loc.profileAccessibility;
+    }
+
+    throw Exception("Unknown profile menu key: $key");
+  }
+
+  const SettingsRows(this.key);
+  final String key;
 }
 
 class _ProfilePageState extends State<ProfilePageView> {
@@ -64,10 +85,12 @@ class _ProfilePageState extends State<ProfilePageView> {
             context,
             MaterialPageRoute(
                 builder: (context) => const NarratorSettingsView()));
+      case SettingsRows.ACCESSIBILITY:
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const AccessibilityView()));
       default:
-        debugPrint("Click on ${e.name}");
         Fluttertoast.showToast(
-            msg: "The view for ${e.name} is not yet implemented.",
+            msg: AppLocalizations.of(context)!.notImplemented,
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.CENTER,
             timeInSecForIosWeb: 1,
@@ -80,9 +103,10 @@ class _ProfilePageState extends State<ProfilePageView> {
 
   @override
   Widget build(BuildContext context) {
+    var loc = AppLocalizations.of(context)!;
     AuthModel authModel = Provider.of<AuthModel>(context);
 
-    String? _username = authModel.user?.email;
+    String? username = authModel.user?.email;
 
     Widget profilePage = Center(
         child: ListView(
@@ -96,7 +120,9 @@ class _ProfilePageState extends State<ProfilePageView> {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(style: Theme.of(context).textTheme.titleLarge, "Hello!"),
+                  Text(
+                      style: Theme.of(context).textTheme.titleLarge,
+                      loc.profileGreeting),
                   Container(
                       padding: const EdgeInsets.symmetric(
                         vertical: UNIT_PADDING,
@@ -104,14 +130,15 @@ class _ProfilePageState extends State<ProfilePageView> {
                       ),
                       child: Text(
                           style: Theme.of(context).textTheme.bodyMedium,
-                          _username ?? "Unknown User")),
+                          username ?? loc.profileUnknownUser)),
                   FilledButton.tonal(
                     onPressed: () async {
                       Navigator.pop(context);
                       await authModel.signOut();
                     },
-                    child: const Text(
-                        style: TextStyle(fontFamily: "Fira Code"), "Logout"),
+                    child: Text(
+                        style: const TextStyle(fontFamily: "Fira Code"),
+                        loc.logout),
                   )
                 ])),
 
@@ -127,7 +154,7 @@ class _ProfilePageState extends State<ProfilePageView> {
                     dense: true,
                     title: Text(
                         style: Theme.of(context).textTheme.displaySmall,
-                        row.name),
+                        row.displayName(loc)),
                     titleAlignment: ListTileTitleAlignment.center,
                     onTap: () {
                       handleRowTap(row);
@@ -146,8 +173,8 @@ class _ProfilePageState extends State<ProfilePageView> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: const Text('Done',
-                      style: TextStyle(color: Colors.black)))),
+                  child: Text(loc.done,
+                      style: const TextStyle(color: Colors.black)))),
         ]),
       ],
     ));

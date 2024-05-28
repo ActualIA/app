@@ -1,7 +1,8 @@
 import OpenAI from "https://deno.land/x/openai@v4.33.0/mod.ts";
 import { corsHeaders } from "../_shared/cors.ts";
-import { News, NewsSettings } from "../model.ts";
-import SupabaseClient from "https://esm.sh/v135/@supabase/supabase-js@2.40.0/dist/module/SupabaseClient.js";
+import { News } from "../model.ts";
+import SupabaseClient from "https://esm.sh/v135/@supabase/supabase-js@2.42.4/dist/module/SupabaseClient.js";
+import { getUserSettings } from "../database.ts";
 import { getUserRawNews } from "./get-user-raw-news.ts";
 
 interface Result {
@@ -32,24 +33,14 @@ export async function generateTranscript(
 ) {
   console.log("We start the process for the user with ID:", userId);
 
-  // Get the user's interests.
-  console.log("Fetching user settings");
-  const interestsDB = await supabaseClient.from("news_settings").select(
-    "*",
-  )
-    .filter("created_by", "eq", userId)
-    .filter("wants_interests", "eq", true);
+  // Get the news.
+  const news = await getUserRawNews(userId, supabaseClient) as News[];
 
-  if (interestsDB.error) {
-    console.error("We can't get the user's interests");
-    console.error(interestsDB.error);
+  // Get the user's interests.
+  const interests = await getUserSettings(userId, supabaseClient);
+  if (interests == null) {
     return new Response("Internal Server Error", { status: 500 });
   }
-  const interests: NewsSettings = interestsDB.data[0];
-  console.log(interests);
-  console.log(interestsDB);
-
-  const news = await getUserRawNews(interests, supabaseClient) as News[];
 
   // Generate a transcript from the news.
   console.log("Generating transcript from news");
@@ -101,7 +92,7 @@ async function createTranscript(
       {
         "role": "system",
         "content":
-          `You're a radio journalist writing a script to announce the day's news. The user gives you the news to announce. Your radio broadcast should only last 2-3 minutes, so try to find interesting transitions between the news items. You are targeting an audience who can understand to locale '${lang}', adapt the language accordingly. Write the script.`,
+          `You're a radio journalist writing a script to announce the day's news. The user gives you the news to announce. Your radio broadcast should only last 2-3 minutes, so try to find interesting transitions between the news items. You are targeting an audience able to understand the locale '${lang}', choose the language accordingly. Write the script.`,
       },
       {
         "role": "user",

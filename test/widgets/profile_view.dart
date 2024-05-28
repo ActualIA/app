@@ -14,6 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 // START : Taken from Jacopo who copied it form internet
 class FakeSupabaseClient extends Fake implements SupabaseClient {
@@ -66,7 +67,7 @@ class MockNewsSettingsViewModel extends NewsSettingsViewModel {
   }
 
   @override
-  Future<bool> pushSettings(NewsSettings settings) {
+  Future<bool> pushSettings(NewsSettings? settings) {
     return Future.value(true);
   }
 }
@@ -85,7 +86,7 @@ class MockProvidersViewModel extends ProvidersViewModel {
   }
 
   @override
-  Future<bool> pushNewsProviders() async {
+  Future<bool> pushNewsProviders(AppLocalizations loc) async {
     return true;
   }
 }
@@ -136,6 +137,8 @@ class ProfilePageWrapper extends StatelessWidget {
               create: (context) => _narratorModel),
         ],
         child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           title: "ActualIA",
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -158,10 +161,9 @@ void main() {
         MockAlarmsViewModel(FakeSupabaseClient()),
         MockNarratorViewModel()));
 
-    expect(find.text('Logout'), findsOne);
+    expect(find.text('Log out'), findsOne);
 
     testButton(String text) async {
-      debugPrint("[DEBUG] testing $text");
       await tester.dragUntilVisible(
           find.text(text), find.byType(ListView), Offset.fromDirection(90.0));
       await tester.tap(find.text(findRichText: true, text));
