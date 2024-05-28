@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:actualia/models/auth_model.dart';
 import 'package:actualia/models/news_settings.dart';
 import 'package:actualia/models/providers.dart';
@@ -8,15 +6,14 @@ import 'package:actualia/viewmodels/news_settings.dart';
 import 'package:actualia/viewmodels/providers.dart';
 import 'package:actualia/views/profile_view.dart';
 import 'package:actualia/views/interests_wizard_view.dart';
-import 'package:actualia/views/providers_wizard_view.dart';
 import 'package:actualia/widgets/alarms_widget.dart';
-import 'package:actualia/widgets/wizard_widgets.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 // START : Taken from Jacopo who copied it form internet
 class FakeSupabaseClient extends Fake implements SupabaseClient {
@@ -69,7 +66,7 @@ class MockNewsSettingsViewModel extends NewsSettingsViewModel {
   }
 
   @override
-  Future<bool> pushSettings(NewsSettings settings) {
+  Future<bool> pushSettings(NewsSettings? settings) {
     return Future.value(true);
   }
 }
@@ -88,7 +85,7 @@ class MockProvidersViewModel extends ProvidersViewModel {
   }
 
   @override
-  Future<bool> pushNewsProviders() async {
+  Future<bool> pushNewsProviders(AppLocalizations loc) async {
     return true;
   }
 }
@@ -132,6 +129,8 @@ class ProfilePageWrapper extends StatelessWidget {
               create: (context) => _alarmsModel)
         ],
         child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           title: "ActualIA",
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -153,10 +152,9 @@ void main() {
         MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin()),
         MockAlarmsViewModel(FakeSupabaseClient())));
 
-    expect(find.text('Logout'), findsOne);
+    expect(find.text('Log out'), findsOne);
 
     testButton(String text) async {
-      debugPrint("[DEBUG] testing $text");
       await tester.dragUntilVisible(
           find.text(text), find.byType(ListView), Offset.fromDirection(90.0));
       await tester.tap(find.text(findRichText: true, text));

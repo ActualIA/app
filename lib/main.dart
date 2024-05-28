@@ -1,6 +1,7 @@
 //coverage:ignore-file
 
 import 'package:actualia/models/auth_model.dart';
+import 'package:actualia/viewmodels/news_recognition.dart';
 import 'package:actualia/viewmodels/providers.dart';
 import 'package:actualia/utils/themes.dart';
 import 'package:actualia/viewmodels/alarms.dart';
@@ -11,12 +12,14 @@ import 'package:actualia/views/news_alert_view.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
 import 'package:actualia/views/login_view.dart';
 import 'package:actualia/views/interests_wizard_view.dart';
+import 'package:actualia/views/pre-onboarding_view.dart';
 import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:actualia/viewmodels/news.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,7 +47,8 @@ Future<void> main() async {
       ChangeNotifierProvider(
           create: (context) => AlarmsViewModel(Supabase.instance.client)),
       ChangeNotifierProvider(
-          create: (context) => RSSFeedViewModel([])) // TODO: change
+          create: (context) =>
+              NewsRecognitionViewModel(Supabase.instance.client)),
     ],
     child: const App(),
   ));
@@ -85,7 +89,7 @@ class _AppState extends State<App> {
             providersModel.newsProviders == null) {
           home = const LoadingView(text: 'Fetching your settings...');
         } else {
-          home = const InterestWizardView();
+          home = const PreOnBoardingPage();
         }
       } else {
         home = const MasterView();
@@ -100,7 +104,10 @@ class _AppState extends State<App> {
       title: 'ActualIA',
       theme: ACTUALIA_THEME,
       home: home,
+      locale: Locale(newsSettings.locale),
       navigatorKey: _navKey,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
     );
   }
 }

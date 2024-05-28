@@ -5,6 +5,7 @@ import 'package:actualia/widgets/alarms_widget.dart';
 import 'package:actualia/widgets/wizard_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AlarmWizardView extends StatefulWidget {
   const AlarmWizardView({super.key});
@@ -34,14 +35,14 @@ class _AlarmWizardView extends State<AlarmWizardView> {
 
   @override
   Widget build(BuildContext context) {
+    var loc = AppLocalizations.of(context)!;
     AlarmsViewModel avm = Provider.of<AlarmsViewModel>(context);
     AuthModel auth = Provider.of<AuthModel>(context);
 
     Widget body = Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text("Choose your first alarm!",
-            style: Theme.of(context).textTheme.titleLarge),
+        Text(loc.setFirstAlarm, style: Theme.of(context).textTheme.titleLarge),
         PickTimeButton(
             initialTime: _selectedTime,
             onTimeSelected: (time) {
@@ -49,14 +50,13 @@ class _AlarmWizardView extends State<AlarmWizardView> {
             }),
         WizardNavigationBottomBar(
           showCancel: true,
-          cancelText: "Skip",
+          cancelText: loc.skip,
           onCancel: () async {
             if (auth.isOnboardingRequired) {
               await auth.setOnboardingIsDone();
             }
             if (context.mounted) {
-              Navigator.popUntil(
-                  context, (route) => !route.hasActiveRouteBelow);
+              Navigator.popUntil(context, (route) => route.isFirst);
             }
           },
           showRight: true,
@@ -73,7 +73,10 @@ class _AlarmWizardView extends State<AlarmWizardView> {
             if (auth.isOnboardingRequired) {
               await auth.setOnboardingIsDone();
             }
-            Navigator.popUntil(context, (route) => !route.hasActiveRouteBelow);
+
+            if (context.mounted) {
+              Navigator.popUntil(context, (route) => route.isFirst);
+            }
           },
         )
       ],

@@ -4,6 +4,7 @@ import 'package:actualia/views/source_view.dart';
 import 'package:flutter/material.dart';
 import 'package:actualia/models/news.dart';
 import 'package:actualia/widgets/play_button.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewsText extends StatelessWidget {
   final News news;
@@ -11,6 +12,8 @@ class NewsText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var loc = AppLocalizations.of(context)!;
+
     return ListView(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -44,7 +47,7 @@ class NewsText extends StatelessWidget {
                       Align(
                           alignment: Alignment.centerRight,
                           child: Text(
-                            "Read more\n",
+                            loc.readMore,
                             style: (Theme.of(context).textTheme.displaySmall)!
                                 .apply(
                               color: THEME_BUTTON,

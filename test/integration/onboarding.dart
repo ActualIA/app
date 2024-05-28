@@ -93,6 +93,10 @@ void main() async {
     await tester.tap(loginButton);
     await tester.pumpAndSettle();
 
+    // Pass the pre-onboarding view
+    await tester.tap(find.text("Skip"));
+    await tester.pumpAndSettle();
+
     // Util function to select an interest entry from a given list.
     Future<void> selectEntry(String entry, {bool last = false}) async {
       final entryButton = find.text(entry);

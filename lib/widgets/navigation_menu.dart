@@ -16,11 +16,9 @@ class _ActualiaBottomNavigationBar extends State<ActualiaBottomNavigationBar> {
   Views _currentView = Views.NEWS;
 
   void setCurrentViewState(Views view) {
-    if (view != Views.CAMERA) {
-      setState(() {
-        _currentView = view;
-      });
-    }
+    setState(() {
+      _currentView = view;
+    });
   }
 
   @override

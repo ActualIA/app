@@ -9,4 +9,5 @@ class Destination {
       {required this.view, required this.icon, required this.onPressed});
 }
 
-enum Views { NEWS, CAMERA, FEED }
+// ignore: constant_identifier_names
+enum Views { NEWS, CAMERA, FEED, CONTEXT }

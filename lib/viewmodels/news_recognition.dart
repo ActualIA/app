@@ -4,12 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:logging/logging.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class NewsRecognitionViewModel extends ChangeNotifier {
   late final SupabaseClient supabase;
+  final ImagePicker _picker = ImagePicker();
 
   NewsRecognitionViewModel(SupabaseClient supabaseClient) {
     supabase = supabaseClient;
+  }
+
+  Future<String?> ocr(String filePath) async {
+    try {
+      final textFromImage = await recognizeText(filePath);
+      log("Text from image: $textFromImage", level: Level.INFO.value);
+      return await invokeProcessImage(textFromImage);
+    } catch (e) {
+      log("Error processing image: $e", level: Level.WARNING.value);
+      throw Exception("Failed to process image");
+    }
   }
 
   Future<String> recognizeText(String filePath) async {
@@ -21,7 +35,7 @@ class NewsRecognitionViewModel extends ChangeNotifier {
     return recognizedText.text;
   }
 
-  Future<void> invokeProcessImage(String textFromImage) async {
+  Future<String?> invokeProcessImage(String textFromImage) async {
     try {
       final processImageResponse = await supabase.functions
           .invoke('process-image', body: {"textFromImage": textFromImage});
@@ -34,5 +48,27 @@ class NewsRecognitionViewModel extends ChangeNotifier {
           level: Level.WARNING.value);
       throw Exception("Failed to invoke process-image function");
     }
+  }
+
+  Future<XFile?> takePicture() async {
+    final permission = await askPermission();
+
+    if (permission.isGranted) {
+      final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
+      if (photo != null) {
+        return photo;
+      }
+    } else {
+      log('Permission denied', level: Level.WARNING.value);
+    }
+    return null;
+  }
+
+  Future<PermissionStatus> askPermission() async {
+    return await Permission.camera.request();
+  }
+
+  Future<XFile?> pickImage() async {
+    return await _picker.pickImage(source: ImageSource.camera);
   }
 }

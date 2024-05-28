@@ -27,6 +27,7 @@ export interface NewsSettings {
   wants_cities: boolean;
   user_prompt: string;
   providers: string[];
+  locale: string;
 }
 
 export interface News {

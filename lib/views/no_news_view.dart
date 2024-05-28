@@ -2,6 +2,7 @@ import 'package:actualia/utils/themes.dart';
 import 'package:actualia/viewmodels/news.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NoNewsView extends StatefulWidget {
   final String title;
@@ -17,7 +18,9 @@ class _NoNewsViewState extends State<NoNewsView> {
 
   @override
   Widget build(BuildContext context) {
+    var loc = AppLocalizations.of(context)!;
     final newsViewModel = Provider.of<NewsViewModel>(context);
+
     Widget button = loading
         ? const Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -35,7 +38,7 @@ class _NoNewsViewState extends State<NoNewsView> {
               },
               child: Text(
                   style: Theme.of(context).textTheme.displayMedium,
-                  "Generate now"),
+                  loc.newsEmptyGenerateButton),
             )
           ]);
 

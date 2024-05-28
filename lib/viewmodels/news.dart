@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:actualia/models/news.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logging/logging.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:path_provider/path_provider.dart';
@@ -142,6 +143,9 @@ class NewsViewModel extends ChangeNotifier {
   }
 
   News parseNews(dynamic response) {
+    if (response['transcript']['totalNewsByLLM'] == "0") {
+      throw Exception("The given news item has no transcript.");
+    }
     List<dynamic> newsItems = response['transcript']['news'];
 
     List<Paragraph> paragraphs = newsItems
@@ -156,13 +160,13 @@ class NewsViewModel extends ChangeNotifier {
         .toList();
 
     return News(
-      title: response['title'],
-      // Dates are stored in UTC timezone in the database.
-      date: DateTime.parse(response['date']).toLocal().toIso8601String(),
-      transcriptId: response['id'],
-      audio: response['audio'],
-      paragraphs: paragraphs,
-    );
+        title: response['title'],
+        // Dates are stored in UTC timezone in the database.
+        date: DateTime.parse(response['date']).toLocal().toIso8601String(),
+        transcriptId: response['id'],
+        audio: response['audio'],
+        paragraphs: paragraphs,
+        fullTranscript: response['transcript']['fullTranscript']);
   }
 
   /// Invokes a cloud function to generate news transcripts.
@@ -261,6 +265,20 @@ class NewsViewModel extends ChangeNotifier {
             content: '',
             url: '')
       ],
+      fullTranscript: message,
     );
+    _newsList.insert(0, _news!);
+  }
+
+  void setNewsPublicInDatabase(News news) async {
+    try {
+      await supabase
+          .from('news')
+          .update({'is_public': true}).eq('id', news.transcriptId);
+      log('News set as public in the database.', level: Level.INFO.value);
+    } catch (e) {
+      log('Error setting news as public in the database: $e',
+          level: Level.WARNING.value);
+    }
   }
 }

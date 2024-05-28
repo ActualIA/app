@@ -9,6 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../models/auth_model.dart';
 import 'alarm_wizard.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ProvidersWizardView extends StatefulWidget {
   const ProvidersWizardView({super.key});
@@ -30,6 +31,7 @@ class _ProvidersWizardView extends State<ProvidersWizardView> {
 
   @override
   Widget build(BuildContext context) {
+    var loc = AppLocalizations.of(context)!;
     final AuthModel auth = Provider.of<AuthModel>(context);
     final ProvidersViewModel pvm = Provider.of<ProvidersViewModel>(context);
     items = pvm.editedProviders.indexed
@@ -37,11 +39,13 @@ class _ProvidersWizardView extends State<ProvidersWizardView> {
             idx: e.$1, onDelete: (w) => pvm.removeEditedProvider(e.$1)))
         .toList();
 
-    Widget body = const LoadingView(text: "Loading your sources");
-    if (items != null) {
+    Widget body = LoadingView(text: loc.providersWizardLoading);
+    if (pvm.isPushing) {
+      body = LoadingView(text: loc.providersWizardUpdating);
+    } else if (items != null) {
       var items_ = items as List<ProviderWidget>;
       body = Column(children: [
-        Text("Choose the sources for your news",
+        Text(loc.providersWizardTitle,
             style: Theme.of(context).textTheme.headlineMedium),
         const SizedBox(height: UNIT_PADDING),
         Expanded(
@@ -55,26 +59,30 @@ class _ProvidersWizardView extends State<ProvidersWizardView> {
                 FilledButton.tonalIcon(
                     icon: const Icon(Icons.add),
                     onPressed: () => pvm.addEditedProvider(),
-                    label: const Text("Add"))
+                    label: Text(loc.add))
               ],
             )
           ],
         )),
         WizardNavigationBottomBar(
           showCancel: !auth.isOnboardingRequired,
-          rText: auth.isOnboardingRequired ? "Next" : "Done",
+          rText: auth.isOnboardingRequired ? loc.next : loc.done,
           onCancel: () => Navigator.pop(context),
           rOnPressed: () async {
             pvm.updateProvidersFromEdited();
-            if (!await pvm.pushNewsProviders() && Platform.isAndroid) {
-              Fluttertoast.showToast(msg: "Error while updating providers");
-            } else if (auth.isOnboardingRequired) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const AlarmWizardView()));
+            if (!await pvm.pushNewsProviders(loc)) {
+              if (context.mounted && Platform.isAndroid) {
+                Fluttertoast.showToast(msg: loc.providersUpdateError);
+              }
             } else if (context.mounted) {
-              Navigator.pop(context);
+              if (auth.isOnboardingRequired) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AlarmWizardView()));
+              } else if (context.mounted) {
+                Navigator.pop(context);
+              }
             }
           },
         ),

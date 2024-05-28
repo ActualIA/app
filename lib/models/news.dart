@@ -4,6 +4,7 @@ class News {
   final int transcriptId;
   String? audio;
   final List<Paragraph> paragraphs;
+  final String fullTranscript;
 
   News({
     required this.title,
@@ -11,6 +12,7 @@ class News {
     required this.transcriptId,
     required this.audio,
     required this.paragraphs,
+    required this.fullTranscript,
   });
 }
 

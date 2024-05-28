@@ -3,6 +3,8 @@ import 'package:actualia/utils/themes.dart';
 import 'package:actualia/widgets/sources_view_widgets.dart';
 import 'package:actualia/widgets/top_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SourceView extends StatefulWidget {
   final Article article;
@@ -37,6 +39,8 @@ class _SourceViewState extends State<SourceView> {
 
   @override
   Widget build(BuildContext context) {
+    var loc = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: TopAppBar(
         enableReturnButton: true,

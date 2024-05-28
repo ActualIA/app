@@ -2,6 +2,52 @@ import { News, NewsSettings, Provider } from "../functions/model.ts";
 import { parseFeed } from "https://deno.land/x/rss@1.0.2/mod.ts";
 import OpenAI from "https://deno.land/x/openai@v4.33.0/mod.ts";
 
+const DEFAULT_FEEDS = ["gnews"];
+
+async function fetchGnews(topics: string[]): Promise<News[]> {
+  interface GNewsItem {
+    title: string;
+    description: string;
+    content: string;
+    url: string;
+    image: string;
+    publishedAt: string;
+    source: {
+      name: string;
+      url: string;
+    };
+  }
+  interface GNewsOutput {
+    totalArticles: number;
+    articles: GNewsItem[];
+  }
+
+  // Generate the url with the query, date API key and language parameters.
+  const query = topics.map((s) => `"${s}"`).join(" OR ");
+  console.info(`Fetching from GNews with query ${query}`);
+
+  const url = `https://gnews.io/api/v4/search?q=${
+    encodeURIComponent(query)
+  }&apikey=${encodeURIComponent(Deno.env.get("GNEWS_API_KEY") || "")}&from=${
+    encodeURIComponent(new Date(Date.now() - 86400000).toISOString())
+  }&lang=en`;
+
+  // Get the news from GNews.
+  const news: GNewsOutput = await (await fetch(url)).json();
+
+  if (!news || !Array.isArray(news.articles)) {
+    console.error(`Received invalid response: ${JSON.stringify(news)}`);
+    return [];
+  }
+
+  console.log(JSON.stringify(news.articles));
+  // Normalizes the output to the correct format.
+  return news.articles.map((n) => ({
+    ...n,
+    publishedAt: new Date(n.publishedAt),
+  }));
+}
+
 /**
  * Fetch and normalize news from a given provider.
  * @param provider One or several providers where to fetch the news.
@@ -46,7 +92,8 @@ export async function fetchNews(
           },
         };
       })
-        .filter((i: News) => (Date.now() - i.publishedAt.getTime()) < 86400000);
+        .filter((i: News) => (Date.now() - i.publishedAt.getTime()) < 86400000)
+        .slice(0, 6); // Avoid to much news, since the OpenAI API limits the characters count of the request.
 
       if (topic) {
         return news;
@@ -84,7 +131,7 @@ export async function fetchNews(
         console.error("Error parsing filtered news:", error);
       }
 
-      return filteredNews.news;
+      return filteredNews.news || [];
     }
 
     let topics: string[] = [];
@@ -104,6 +151,11 @@ export async function fetchNews(
     }
 
     try {
+      if (provider === "gnews") {
+        console.info("Fetching from GNews");
+        return fetchGnews(topics);
+      }
+
       console.info("Fetching RSS from ", provider);
 
       if (provider.match(":query")) {
@@ -127,7 +179,7 @@ export async function fetchNews(
         provider.map((p) => singleFetch(p, newsSettings)),
       )).flat();
     } else {
-      return await singleFetch("/google/news/:query", newsSettings);
+      return await fetchNews(DEFAULT_FEEDS, newsSettings);
     }
   } else {
     return await singleFetch(provider, newsSettings);

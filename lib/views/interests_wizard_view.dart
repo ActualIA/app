@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import '../widgets/wizard_widgets.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class InterestWizardView extends StatefulWidget {
   const InterestWizardView({super.key});
@@ -15,6 +16,7 @@ class InterestWizardView extends StatefulWidget {
   State<InterestWizardView> createState() => _InterestWizardViewState();
 }
 
+// ignore: constant_identifier_names
 enum WizardStep { COUNTRIES, CITIES, INTERESTS }
 
 class _InterestWizardViewState extends State<InterestWizardView> {
@@ -36,6 +38,7 @@ class _InterestWizardViewState extends State<InterestWizardView> {
 
   @override
   Widget build(BuildContext context) {
+    var loc = AppLocalizations.of(context)!;
     final NewsSettingsViewModel nsvm =
         Provider.of<NewsSettingsViewModel>(context);
     final AuthModel auth = Provider.of<AuthModel>(context);
@@ -50,7 +53,7 @@ class _InterestWizardViewState extends State<InterestWizardView> {
           _step = WizardStep.CITIES;
         });
       },
-      title: "Select countries",
+      title: loc.wizardCountriesTitle,
       isInitialOnboarding: auth.isOnboardingRequired,
       onCancel: () {
         Navigator.pop(context);
@@ -67,7 +70,7 @@ class _InterestWizardViewState extends State<InterestWizardView> {
           _step = WizardStep.INTERESTS;
         });
       },
-      title: "Select cities",
+      title: loc.wizardCitiesTitle,
       isInitialOnboarding: auth.isOnboardingRequired,
       onCancel: () {
         setState(() {
@@ -90,23 +93,26 @@ class _InterestWizardViewState extends State<InterestWizardView> {
             interests: _selectedInterests,
             wantsCities: true,
             wantsCountries: true,
-            wantsInterests: true);
+            wantsInterests: true,
+            locale: loc.localeName);
         try {
           await nsvm.pushSettings(toSend);
-          if (auth.isOnboardingRequired) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const ProvidersWizardView()));
-          } else {
-            if (context.mounted) Navigator.pop(context);
+          if (context.mounted) {
+            if (auth.isOnboardingRequired) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ProvidersWizardView()));
+            } else {
+              Navigator.pop(context);
+            }
           }
         } catch (e) {
           log("Error in wizard: $e", name: "ERROR", level: Level.WARNING.value);
         }
       },
-      title: "Select interests",
-      buttonText: auth.isOnboardingRequired ? "Next" : "Finish",
+      title: loc.wizardInterestsTitle,
+      buttonText: auth.isOnboardingRequired ? loc.next : loc.done,
       isInitialOnboarding: auth.isOnboardingRequired,
       onCancel: () {
         setState(() {

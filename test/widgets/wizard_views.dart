@@ -6,15 +6,14 @@ import "package:actualia/viewmodels/news_settings.dart";
 import "package:actualia/viewmodels/providers.dart";
 import "package:actualia/views/alarm_wizard.dart";
 import "package:actualia/views/interests_wizard_view.dart";
-import "package:actualia/views/providers_wizard_view.dart";
 import "package:actualia/widgets/alarms_widget.dart";
-import "package:actualia/widgets/top_app_bar.dart";
 import "package:actualia/widgets/wizard_widgets.dart";
 import "package:flutter/material.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:google_sign_in/google_sign_in.dart";
 import "package:provider/provider.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FakeSupabaseClient extends Fake implements SupabaseClient {
   final GoTrueClient client = FakeGoTrueClient();
@@ -40,7 +39,7 @@ class MockProvidersViewModel extends ProvidersViewModel {
   }
 
   @override
-  Future<bool> pushNewsProviders() async {
+  Future<bool> pushNewsProviders(AppLocalizations loc) async {
     return true;
   }
 }
@@ -57,7 +56,6 @@ class MockAlarmsViewModel extends AlarmsViewModel {
   Future<void> setAlarm(DateTime time, String assetAudio, bool loopAudio,
       bool vibrate, double volume, int? settingsId) async {
     _alarmSet = true;
-    debugPrint("Alarm set do not worry");
   }
 }
 
@@ -73,7 +71,7 @@ class MockNewsSettingsViewModel extends NewsSettingsViewModel {
   }
 
   @override
-  Future<bool> pushSettings(NewsSettings settings) {
+  Future<bool> pushSettings(NewsSettings? settings) {
     return Future.value(true);
   }
 }
@@ -89,9 +87,9 @@ class ValidateVM extends MockNewsSettingsViewModel {
   }
 
   @override
-  Future<bool> pushSettings(NewsSettings settings) {
+  Future<bool> pushSettings(NewsSettings? settings) {
     if (expected != null) {
-      expect(settings.cities, equals(expected!.cities));
+      expect(settings!.cities, equals(expected!.cities));
       expect(settings.countries, equals(expected!.countries));
       expect(settings.interests, equals(expected!.interests));
     }
@@ -119,6 +117,8 @@ class WizardWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         title: "ActualIA",
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -176,11 +176,11 @@ void main() {
       await tester.tap(find.text(buttonText));
     }
 
-    await testSelector(Key("countries-selector"), "Chad", "Next");
+    await testSelector(const Key("countries-selector"), "Chad", "Next");
     await tester.pumpAndSettle();
-    await testSelector(Key("cities-selector"), "Basel", "Next");
+    await testSelector(const Key("cities-selector"), "Basel", "Next");
     await tester.pumpAndSettle();
-    await testSelector(Key("interests-selector"), "Gaming", "Next");
+    await testSelector(const Key("interests-selector"), "Gaming", "Next");
   });
 
   testWidgets(
@@ -188,13 +188,13 @@ void main() {
       (WidgetTester tester) async {
     final vm = ValidateVM(
         NewsSettings(
-          interests: ["Biology"],
-          cities: ["Basel"],
-          countries: ["Antarctica"],
-          wantsCities: false,
-          wantsCountries: false,
-          wantsInterests: false,
-        ),
+            interests: ["Biology"],
+            cities: ["Basel"],
+            countries: ["Antarctica"],
+            wantsCities: false,
+            wantsCountries: false,
+            wantsInterests: false,
+            locale: "en"),
         null);
     await tester.pumpWidget(WizardWrapper(
         wizard: const InterestWizardView(),
@@ -210,9 +210,9 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    await select(Key("countries-selector"), "Antarctica", "Next");
-    await select(Key("cities-selector"), "Basel", "Next");
-    await select(Key("interests-selector"), "Biology", "Finish");
+    await select(const Key("countries-selector"), "Antarctica", "Next");
+    await select(const Key("cities-selector"), "Basel", "Next");
+    await select(const Key("interests-selector"), "Biology", "Done");
 
     expect(vm.wasTriggered, isTrue);
   });
@@ -220,13 +220,13 @@ void main() {
   testWidgets("Interests wizard: Keep initial values",
       (WidgetTester tester) async {
     NewsSettings ns = NewsSettings(
-      interests: ["Gaming"],
-      cities: ["Basel"],
-      countries: ["Antarctica"],
-      wantsCities: false,
-      wantsCountries: false,
-      wantsInterests: false,
-    );
+        interests: ["Gaming"],
+        cities: ["Basel"],
+        countries: ["Antarctica"],
+        wantsCities: false,
+        wantsCountries: false,
+        wantsInterests: false,
+        locale: "en");
     final vm = ValidateVM(ns, ns);
 
     await tester.pumpWidget(WizardWrapper(
@@ -242,7 +242,7 @@ void main() {
 
     await nextScreen("Next");
     await nextScreen("Next");
-    await nextScreen("Finish");
+    await nextScreen("Done");
 
     expect(vm.wasTriggered, isTrue);
   });
