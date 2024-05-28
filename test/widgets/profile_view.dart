@@ -247,28 +247,4 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(ProfilePageView), findsOneWidget);
   });
-
-  testWidgets("Narrator button work as intended", (tester) async {
-    await tester.pumpWidget(ProfilePageWrapper(
-        const ProfilePageView(),
-        MockNewsSettingsViewModel(),
-        MockProvidersViewModel(),
-        MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin()),
-        MockAlarmsViewModel(FakeSupabaseClient()),
-        MockNarratorViewModel()));
-
-    /*
-    await tester.tap(find.text("Narrator"));
-    await tester.pumpAndSettle();
-    expect(find.text("Choose a voice for your audio"), findsOne);
-    
-    await tester.tap(find.byKey(const Key("switch-on-off")));
-    await tester.pumpAndSettle();
-
-    final NavigatorState navigator = tester.state(find.byType(Navigator));
-    navigator.pop();
-    await tester.pumpAndSettle();
-    expect(find.byType(ProfilePageView), findsOneWidget);
-    */
-  });
 }
