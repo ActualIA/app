@@ -42,8 +42,8 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
           onPressed: () {
             // Action for the title button
           },
-          child: Text('ActualIA',
-              style: Theme.of(context).textTheme.displayMedium),
+          child:
+              Text('ActualIA', style: Theme.of(context).textTheme.displayLarge),
         ),
       ),
       actions: actions,

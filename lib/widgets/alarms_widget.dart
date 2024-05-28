@@ -60,7 +60,7 @@ class _PickTimeButton extends State<PickTimeButton> {
         margin: const EdgeInsets.all(UNIT_PADDING),
         child: Text(
           TimeOfDay.fromDateTime(_selectedTime).format(context),
-          style: Theme.of(context).textTheme.displayMedium!,
+          style: Theme.of(context).textTheme.displayLarge!,
         ),
       ),
     );

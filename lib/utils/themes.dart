@@ -41,9 +41,9 @@ ThemeData ACTUALIA_THEME = ThemeData(
           fontWeight: FontWeight.w300),
       // MONOSPACED BODIES
       displayLarge: TextStyle(
-          fontFamily: "Fira Code", fontSize: 32.0, fontWeight: FontWeight.w700),
+          fontFamily: "Fira Code", fontSize: 24.0, fontWeight: FontWeight.w700),
       displayMedium: TextStyle(
-          fontFamily: "Fira Code", fontSize: 24.0, fontWeight: FontWeight.w500),
+          fontFamily: "Fira Code", fontSize: 20.0, fontWeight: FontWeight.w500),
       displaySmall: TextStyle(
           fontFamily: "Fira Code",
           fontSize: 14.0,

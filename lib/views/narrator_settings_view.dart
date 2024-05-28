@@ -46,27 +46,41 @@ class _NarratorSettingsViewState extends State<NarratorSettingsView> {
             ),
             Expanded(
                 child: ListView.builder(
-              itemCount: options.length,
+              itemCount: options.length + 1,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(
-                      'Voice ${NarratorViewModel.capitalize(options[index])}',
-                      style: Theme.of(context).textTheme.displayMedium),
-                  leading: Radio(
-                    value: index,
-                    groupValue: _selectedOption,
-                    onChanged: (int? value) {
-                      setState(() {
-                        _selectedOption = value!;
-                        voiceWanted = options[value];
-                        narratorViewModel.pushVoiceWanted(voiceWanted);
-                      });
-                    },
-                  ),
-                  trailing: PlayButton(
-                      transcriptId: -1,
-                      source: AssetSource("audio/${options[index]}.mp3")),
-                );
+                return (index != options.length)
+                    ? ListTile(
+                        title: Text(
+                            'Voice ${NarratorViewModel.capitalize(options[index])}',
+                            style: Theme.of(context).textTheme.displayMedium),
+                        leading: Radio(
+                          value: index,
+                          groupValue: _selectedOption,
+                          onChanged: (int? value) {
+                            setState(() {
+                              _selectedOption = value!;
+                              voiceWanted = options[value];
+                              narratorViewModel.pushVoiceWanted(voiceWanted);
+                            });
+                          },
+                        ),
+                        trailing: PlayButton(
+                            transcriptId: -1,
+                            source: AssetSource("audio/${options[index]}.mp3")),
+                      )
+                    : Container(
+                        alignment: Alignment.bottomRight,
+                        padding: const EdgeInsets.fromLTRB(UNIT_PADDING * 2,
+                            UNIT_PADDING * 2, UNIT_PADDING * 2, 0),
+                        child: FilledButton.tonal(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                              style: Theme.of(context).textTheme.displaySmall,
+                              "Done"),
+                        ),
+                      );
               },
             )),
           ]),
