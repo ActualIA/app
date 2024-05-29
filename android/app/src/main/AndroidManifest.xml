@@ -9,7 +9,7 @@
     <application
         android:label="actualia"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/launcher_icon"
         android:usesCleartextTraffic="false"
         android:enableOnBackInvokedCallback="true"        
         android:allowBackup="false"> <!-- qtztz: set cleartext as false as
