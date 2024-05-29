@@ -124,7 +124,6 @@ class MockFileSys {
   }
 
   bool dirExist(MockDir dir) {
-    // debugPrint("[DIREXIST] dir: $dir");
     List<String> path = dir.path.split("/");
     return pathExist(path);
   }
