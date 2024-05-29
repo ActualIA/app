@@ -39,8 +39,9 @@ class _NarratorSettingsViewState extends State<NarratorSettingsView> {
         appBar: const TopAppBar(),
         body: Container(
           alignment: Alignment.center,
-          child: ListView(
-              physics: const NeverScrollableScrollPhysics(),
+          child: Column(
+              //shrinkWrap: true,
+              //physics: const NeverScrollableScrollPhysics(),
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(UNIT_PADDING * 3,
@@ -49,50 +50,59 @@ class _NarratorSettingsViewState extends State<NarratorSettingsView> {
                       style: Theme.of(context).textTheme.titleLarge),
                 ),
                 Expanded(
-                    // Creates a scrollable list of options, followed by a done button
-                    child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: options.length + 1,
-                  itemBuilder: (context, index) {
-                    return (index != options.length)
-                        ? ListTile(
-                            title: Text(
-                                '${loc.voice} ${NarratorViewModel.capitalize(options[index])}',
-                                style:
-                                    Theme.of(context).textTheme.displayMedium),
-                            leading: Radio(
-                              value: index,
-                              groupValue: _selectedOption,
-                              onChanged: (int? value) {
-                                setState(() {
-                                  _selectedOption = value!;
-                                  voiceWanted = options[value];
-                                  narratorViewModel
-                                      .pushVoiceWanted(voiceWanted);
-                                });
-                              },
-                            ),
-                            trailing: PlayButton(
-                                transcriptId: -1,
-                                source:
-                                    AssetSource("audio/${options[index]}.mp3")),
-                          )
-                        : Container(
-                            alignment: Alignment.bottomRight,
-                            padding: const EdgeInsets.fromLTRB(UNIT_PADDING * 2,
-                                UNIT_PADDING * 2, UNIT_PADDING * 2, 0),
-                            child: FilledButton.tonal(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text(
-                                  style:
-                                      Theme.of(context).textTheme.displaySmall,
-                                  loc.done),
-                            ),
-                          );
-                  },
-                )),
+                    child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: UNIT_PADDING),
+                        child:
+                            // Creates a scrollable list of options, followed by a done button
+                            ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: options.length + 1,
+                          itemBuilder: (context, index) {
+                            return (index != options.length)
+                                ? ListTile(
+                                    title: Text(
+                                        '${loc.voice} ${NarratorViewModel.capitalize(options[index])}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .displayMedium),
+                                    leading: Radio(
+                                      value: index,
+                                      groupValue: _selectedOption,
+                                      onChanged: (int? value) {
+                                        setState(() {
+                                          _selectedOption = value!;
+                                          voiceWanted = options[value];
+                                          narratorViewModel
+                                              .pushVoiceWanted(voiceWanted);
+                                        });
+                                      },
+                                    ),
+                                    trailing: PlayButton(
+                                        transcriptId: -1,
+                                        source: AssetSource(
+                                            "audio/${options[index]}.mp3")),
+                                  )
+                                : Container(
+                                    alignment: Alignment.bottomRight,
+                                    padding: const EdgeInsets.fromLTRB(
+                                        UNIT_PADDING * 2,
+                                        UNIT_PADDING * 2,
+                                        UNIT_PADDING * 2,
+                                        0),
+                                    child: FilledButton.tonal(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text(
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displaySmall,
+                                          loc.done),
+                                    ),
+                                  );
+                          },
+                        ))),
               ]),
         ));
   }
