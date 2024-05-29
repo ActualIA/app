@@ -65,7 +65,6 @@ class MockFileSys {
         subFiles[path[depth]] = createSubDir(path.sublist(depth), depth++);
       }
     }
-    // debugPrint("[ADDDIR] files: $FILES");
   }
 
   void addFile(MockFile file, String content) {
