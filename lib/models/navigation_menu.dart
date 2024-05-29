@@ -10,4 +10,4 @@ class Destination {
 }
 
 // ignore: constant_identifier_names
-enum Views { NEWS, CAMERA, FEED, CONTEXT }
+enum Views { NEWS, FEED, CONTEXT }

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ActualIA</title>
+</head>
+
+<body>
+    <script>
+        // Fonction pour obtenir les paramètres de l'URL
+        function getParameterByName(name, url = window.location.href) {
+            name = name.replace(/[\[\]]/g, '\\$&');
+            let regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+            let results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        // Récupérer le paramètre transcriptId
+        const transcriptId = getParameterByName('transcriptId');
+
+        // Vérifier si le paramètre transcriptId est présent
+        if (transcriptId) {
+            // Construire l'URL de redirection
+            const redirectUrl = `https://dpxddbjyjdscvuhwutwu.supabase.co/functions/v1/return-share-page?transcriptId=${transcriptId}`;
+            // Rediriger vers l'URL
+            window.location.href = redirectUrl;
+        } else {
+            // Afficher un message d'erreur si transcriptId n'est pas présent
+            document.body.innerHTML = 'ActualIA';
+        }
+    </script>
+</body>
+
+</html>

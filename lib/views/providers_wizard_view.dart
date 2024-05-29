@@ -64,31 +64,35 @@ class _ProvidersWizardView extends State<ProvidersWizardView> {
             )
           ],
         )),
-        WizardNavigationBottomBar(
-          showCancel: !auth.isOnboardingRequired,
-          rText: auth.isOnboardingRequired ? loc.next : loc.done,
-          onCancel: () => Navigator.pop(context),
-          rOnPressed: () async {
-            pvm.updateProvidersFromEdited();
-            if (!await pvm.pushNewsProviders(loc)) {
-              if (context.mounted && Platform.isAndroid) {
-                Fluttertoast.showToast(msg: loc.providersUpdateError);
-              }
-            } else if (context.mounted) {
-              if (auth.isOnboardingRequired) {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const AlarmWizardView()));
-              } else if (context.mounted) {
-                Navigator.pop(context);
-              }
-            }
-          },
-        ),
       ]);
     }
 
-    return WizardScaffold(body: Material(child: body));
+    Widget bottomBar = WizardNavigationBottomBar(
+      showCancel: !auth.isOnboardingRequired,
+      rText: auth.isOnboardingRequired ? loc.next : loc.done,
+      onCancel: () => Navigator.pop(context),
+      rOnPressed: () async {
+        pvm.updateProvidersFromEdited();
+        if (!await pvm.pushNewsProviders(loc)) {
+          if (Platform.isAndroid) {
+            Fluttertoast.showToast(msg: loc.providersUpdateError);
+          }
+        } else if (context.mounted) {
+          if (auth.isOnboardingRequired) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const AlarmWizardView()));
+          } else {
+            Navigator.pop(context);
+          }
+        }
+      },
+    );
+
+    return WizardScaffold(
+      body: Material(child: body),
+      bottomBar: bottomBar,
+    );
   }
 }

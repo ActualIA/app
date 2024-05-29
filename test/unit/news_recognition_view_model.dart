@@ -91,8 +91,8 @@ void main() {
 
   test("InvokeProcessImage returns data from the response", () async {
     FakeNewsRecognitionVM vm = FakeNewsRecognitionVM();
-    String? data = await vm.invokeProcessImage("Test");
-    expect(data, equals("Hello, world!"));
+    await vm.invokeProcessImage("Test");
+    expect(vm.result, equals("Hello, world!"));
   });
 
   test("InvokeProcessImage throws an exception on failure", () async {

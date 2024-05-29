@@ -61,6 +61,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   introduction_screen: ^3.1.14
+  fading_edge_scrollview: ^4.1.1
 
 dev_dependencies:
   flutter_test:
