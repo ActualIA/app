@@ -129,7 +129,6 @@ class MockFileSys {
   }
 
   bool fileExist(MockFile file) {
-    // debugPrint("[FILEEXIST] file: $file");
     List<String> path = file.path.split("/");
     return pathExist(path);
   }
