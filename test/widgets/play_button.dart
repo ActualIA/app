@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FakeSupabaseClient extends Fake implements SupabaseClient {}
 
@@ -30,6 +31,8 @@ class NewsWrapper extends StatelessWidget {
           ChangeNotifierProvider<NewsViewModel>(create: (context) => _model)
         ],
         child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             title: "ActualIA",
             theme: ThemeData(
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

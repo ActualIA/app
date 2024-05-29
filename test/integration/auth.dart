@@ -111,7 +111,7 @@ void main() {
     await tester.tap(find.byKey(const Key("profile")));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Logout'));
+    await tester.tap(find.text('Log out'));
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key("signin-guest")), findsOneWidget);

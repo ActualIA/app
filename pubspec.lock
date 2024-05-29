@@ -475,6 +475,11 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
+  flutter_localizations:
+    dependency: "direct main"
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -847,14 +852,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.8.0"
-  messages:
-    dependency: "direct dev"
-    description:
-      name: messages
-      sha256: e6b01fc90935e46f39c7bcf47bfa888e692fc213ca2cc4da6f854524d43ff10b
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.0"
   meta:
     dependency: transitive
     description:

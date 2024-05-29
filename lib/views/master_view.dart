@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/navigation_menu.dart';
 import '../widgets/navigation_menu.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MasterView extends StatefulWidget {
   const MasterView({super.key});
@@ -65,22 +66,24 @@ class _MasterView extends State<MasterView> {
 
   @override
   Widget build(BuildContext context) {
+    var loc = AppLocalizations.of(context)!;
+
     Widget body;
     switch (_currentViews) {
       case Views.NEWS:
         body = const NewsView();
         break;
       case Views.CAMERA:
-        body = const Center(child: Text("To be implemented"));
+        body = Center(child: Text(loc.notImplemented));
         break;
       case Views.FEED:
-        body = const Center(child: Text("To be implemented"));
+        body = Center(child: Text(loc.notImplemented));
         break;
       case Views.CONTEXT:
-        body = ContextView(text: _ocrText ?? "No text found");
+        body = ContextView(text: _ocrText ?? loc.newsContextNoText);
         break;
       default:
-        body = const Center(child: Text("SHOULD NOT BE DISPLAYED"));
+        body = Center(child: Text(loc.notImplemented));
         break;
     }
 

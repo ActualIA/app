@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:actualia/models/news.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logging/logging.dart';
 import 'package:actualia/models/offline_recorder.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -295,5 +296,17 @@ class NewsViewModel extends ChangeNotifier {
       fullTranscript: message,
     );
     _newsList.insert(0, _news!);
+  }
+
+  void setNewsPublicInDatabase(News news) async {
+    try {
+      await supabase
+          .from('news')
+          .update({'is_public': true}).eq('id', news.transcriptId);
+      log('News set as public in the database.', level: Level.INFO.value);
+    } catch (e) {
+      log('Error setting news as public in the database: $e',
+          level: Level.WARNING.value);
+    }
   }
 }

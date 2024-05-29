@@ -2,6 +2,18 @@ import 'package:actualia/models/providers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+class FakeL10n extends Fake implements AppLocalizations {
+  @override
+  String get rssFeedNotFound => "";
+
+  @override
+  String get rssInvalidUrl => "";
+
+  @override
+  String get telegramInvalidId => "";
+}
 
 class RssClient extends Fake implements Client {
   @override
@@ -46,15 +58,15 @@ void main() {
   });
 
   test("Telegram provider is correctly built", () async {
-    (await ProviderType.telegram.build(["clicnews"])).fold(
+    (await ProviderType.telegram.build(["clicnews"], FakeL10n())).fold(
         (l) => expect(l.url, equals("/telegram/channel/clicnews")),
         (r) => fail("Provider build should have been successful"));
-    (await ProviderType.telegram.build(["clic.news"]))
+    (await ProviderType.telegram.build(["clic.news"], FakeL10n()))
         .fold((l) => fail("Provider build should have failed"), (r) {});
   });
 
   test("RSS discovery", () async {
-    (await ProviderType.rss.build(["http://nytimes.com"])).fold(
+    (await ProviderType.rss.build(["http://nytimes.com"], FakeL10n())).fold(
         (l) => expect(
             l.url,
             equals(

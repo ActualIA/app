@@ -40,8 +40,8 @@ class FakeFailingQueryBuilder extends Fake implements SupabaseQueryBuilder {
 class FakeFailingFunctionsClient extends Fake implements FunctionsClient {
   @override
   Future<FunctionResponse> invoke(String functionName,
-      {Map<String, dynamic>? body,
-      Map<String, String>? headers,
+      {Map<String, String>? headers,
+      Map<String, dynamic>? body,
       HttpMethod method = HttpMethod.post,
       Map<String, dynamic>? queryParameters}) {
     throw UnimplementedError();
