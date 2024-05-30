@@ -1,3 +1,4 @@
+import "package:actualia/viewmodels/news.dart";
 import "package:flutter/material.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:provider/provider.dart";
@@ -18,11 +19,17 @@ class MockNarratorViewModel extends NarratorViewModel {
   }
 }
 
+class MockNewsViewModel extends NewsViewModel {
+  MockNewsViewModel() : super(FakeSupabaseClient());
+}
+
 class NarratorWrapper extends StatelessWidget {
   final Widget narrator;
   final NarratorViewModel narratorVM;
+  final NewsViewModel newsSettingsVM;
 
-  const NarratorWrapper(this.narrator, this.narratorVM, {super.key});
+  const NarratorWrapper(this.narrator, this.narratorVM, this.newsSettingsVM,
+      {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +44,9 @@ class NarratorWrapper extends StatelessWidget {
         home: MultiProvider(
           providers: [
             ChangeNotifierProvider<NarratorViewModel>(
-                create: (context) => narratorVM)
+                create: (context) => narratorVM),
+            ChangeNotifierProvider<NewsViewModel>(
+                create: (context) => newsSettingsVM)
           ],
           child: narrator,
         ));
@@ -46,18 +55,16 @@ class NarratorWrapper extends StatelessWidget {
 
 void main() {
   testWidgets("NarratorSettingsView has a title", (WidgetTester tester) async {
-    await tester.pumpWidget(
-        NarratorWrapper(const NarratorSettingsView(), MockNarratorViewModel()));
+    await tester.pumpWidget(NarratorWrapper(const NarratorSettingsView(),
+        MockNarratorViewModel(), MockNewsViewModel()));
 
     expect(find.text("Choose a voice for your audio"), findsOne);
   });
 
   testWidgets("NarratorSettingsView has a done button",
       (WidgetTester tester) async {
-    await tester.pumpWidget(NarratorWrapper(
-      const NarratorSettingsView(),
-      MockNarratorViewModel(),
-    ));
+    await tester.pumpWidget(NarratorWrapper(const NarratorSettingsView(),
+        MockNarratorViewModel(), MockNewsViewModel()));
 
     expect(find.text("Done"), findsOne);
   });
