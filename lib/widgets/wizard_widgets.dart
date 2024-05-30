@@ -1,11 +1,8 @@
-import 'dart:developer';
-
 import 'package:actualia/models/providers.dart';
 import 'package:actualia/viewmodels/providers.dart';
 import 'package:actualia/widgets/top_app_bar.dart';
 import 'package:actualia/utils/themes.dart';
 import 'package:fading_edge_scrollview/fading_edge_scrollview.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
