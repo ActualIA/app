@@ -44,14 +44,16 @@ export async function generateTranscript(
 
   // Generate a transcript from the news.
   console.log("Generating transcript from news");
-  const transcript = news.length > 0 ? await createTranscript(news, interests.locale) : {
-    totalNews: 0,
-    totalNewsByLLM: 0,
-    intro: "",
-    outro: "",
-    title: "",
-    news: [],
-  };
+  const transcript = news.length > 0
+    ? await createTranscript(news, interests.locale, interests.user_prompt)
+    : {
+      totalNews: 0,
+      totalNewsByLLM: 0,
+      intro: "",
+      outro: "",
+      title: "",
+      news: [],
+    };
 
   // Insert the transcript into the database.
   console.log(
@@ -79,6 +81,7 @@ export async function generateTranscript(
 async function createTranscript(
   news: News[],
   lang: string,
+  userPrompt: string,
 ): Promise<Transcript> {
   const newsToGenerate = news.reduce(
     (s, n) => `${s}${n.title}\n${n.description}\n\n`,
@@ -92,7 +95,7 @@ async function createTranscript(
       {
         "role": "system",
         "content":
-          `You're a radio journalist writing a script to announce the day's news. The user gives you the news to announce. Your radio broadcast should only last 2-3 minutes, so try to find interesting transitions between the news items. You are targeting an audience able to understand the locale '${lang}', choose the language accordingly. Write the script.`,
+          `You're a journalist writing a script to announce the day's news. The user gives you the news to announce. Your should only last 2-3 minutes, so try to find interesting transitions between the news items. You are targeting an audience able to understand the locale '${lang}', choose the language accordingly. The user wants you to write the script ${userPrompt}`,
       },
       {
         "role": "user",

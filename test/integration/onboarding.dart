@@ -34,11 +34,13 @@ class MockHttp extends BaseMockedHttpClient {
         case "${BaseMockedHttpClient.baseUrl}/rest/v1/news_settings?on_conflict=created_by":
           var body = json.decode(req.body);
 
-          expect(listEquals(List<String>.from(body['cities']), ['Lausanne']),
+          expect(
+              listEquals(List<String>.from(body['cities']),
+                  ['Abobo (Côte d\'Ivoire)']),
               isTrue);
           expect(listEquals(List<String>.from(body['countries']), ['Albania']),
               isTrue);
-          expect(listEquals(List<String>.from(body['interests']), ['Gaming']),
+          expect(listEquals(List<String>.from(body['interests']), ['Aviation']),
               isTrue);
           return http.StreamedResponse(Stream.fromIterable(["".codeUnits]), 201,
               request: req);
@@ -47,11 +49,12 @@ class MockHttp extends BaseMockedHttpClient {
             "id": 345,
             "created_at": "2024-04-30T14:39:28.189469+00:00",
             "created_by": BaseMockedHttpClient.uuid,
-            "interests": onboardingDone ? jsonEncode(["Gaming"]) : "[]",
+            "interests": onboardingDone ? jsonEncode(["Aviation"]) : "[]",
             "wants_interests": true,
             "countries": onboardingDone ? jsonEncode(["Albania"]) : "[]",
             "wants_countries": true,
-            "cities": onboardingDone ? jsonEncode(["Lausanne"]) : "[]",
+            "cities":
+                onboardingDone ? jsonEncode(["Abobo (Côte d'Ivoire)"]) : "[]",
             "wants_cities": true,
             "user_prompt": null,
             "providers_id": null,
@@ -63,7 +66,7 @@ class MockHttp extends BaseMockedHttpClient {
           expect(
               jsonDecode(req.body),
               equals({
-                "providers": ["/google/news/:category"]
+                "providers": ["gnews"]
               }));
           return response([], 200, req);
         default:
@@ -148,8 +151,8 @@ void main() async {
 
     // Select a few interests.
     await selectEntry("Albania");
-    await selectEntry("Lausanne");
-    await selectEntry("Gaming");
+    await selectEntry("Abobo (Côte d'Ivoire)");
+    await selectEntry("Aviation");
 
     await tester.tap(find.textContaining("Add"));
     await tester.pumpAndSettle();
@@ -161,6 +164,9 @@ void main() async {
     await tester.pumpAndSettle();
 
     await tester.tap(find.textContaining("Next"));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text("Skip"));
     await tester.pumpAndSettle();
 
     // Open the profile view.

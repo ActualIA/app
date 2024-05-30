@@ -118,7 +118,8 @@ void main() {
     PathProviderPlatform.instance = MockPathProviderPlateform();
     IOOverrides.global = MockIOOverrides(MockFileSys());
     OfflineRecorder offRec = await OfflineRecorder.create();
-    expect(await offRec.loadNews(DateTime(476, 9, 1)), throwsException);
+    expect(() async => await offRec.loadNews(DateTime(476, 9, 1)),
+        throwsException);
   });
 
   test("Changing the maximum storage size works well in both directions",

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:convert';
 import 'dart:io';
@@ -146,23 +147,14 @@ class OfflineRecorder {
     }
   }
 
-  /// Gets the news of the given date, throws FileSystemException if the file containing the date's news doesn't exist
-  Future<News> loadNews(DateTime date) async {
-    // Sanitize inputs
-    String day = date.day < 10 ? "0${date.day}" : date.day.toString();
-    String month =
-        date.month < 10 ? "0${date.month.toString()}" : date.month.toString();
-    if (date.year < 1000) {
-      throw UnimplementedError("The date is too far in the past");
+  Future<News?> _readNewsFile(File file) async {
+    if (!(file.path
+        .substring(file.path.length - "XXXX-XX-XX_transcript.json".length)
+        .startsWith(RegExp(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")))) {
+      return Future(() => null);
     }
 
-    String filePath =
-        _appOfflineNewsPath + "${date.year}-$month-${day}_transcript.json";
-    if (!await File(filePath).exists()) {
-      throw FileSystemException("$filePath doesn't exist");
-    }
-
-    String json = await File(filePath).readAsString();
+    String json = await file.readAsString();
 
     // Parsing the json + remapping to a News object
 
@@ -183,5 +175,40 @@ class OfflineRecorder {
         audio: decodedJson["audio"],
         fullTranscript: decodedJson["fullTranscript"],
         paragraphs: paragraphs);
+  }
+
+  /// Gets the news of the given date, throws FileSystemException if the file containing the date's news doesn't exist
+  Future<News> loadNews(DateTime date) async {
+    // Sanitize inputs
+    String day = date.day < 10 ? "0${date.day}" : date.day.toString();
+    String month =
+        date.month < 10 ? "0${date.month.toString()}" : date.month.toString();
+    if (date.year < 1000) {
+      throw Exception("The date is too far in the past");
+    }
+
+    String filePath =
+        _appOfflineNewsPath + "${date.year}-$month-${day}_transcript.json";
+    if (!await File(filePath).exists()) {
+      throw FileSystemException("$filePath doesn't exist");
+    }
+
+    return _readNewsFile(File(filePath)).then((value) =>
+        value ??
+        (throw Exception("News for date ${date.toString()} doesn't exist")));
+  }
+
+  Future<List<News>> loadAllNews() async {
+    final dir = Directory(_appOfflineNewsPath);
+    final Iterable<File> files = (await dir.list().toList()).whereType<File>();
+
+    List<News> news = List.empty();
+    for (var f in files) {
+      _readNewsFile(f).then((n) => {
+            if (n != null) {news.add(n)}
+          });
+    }
+
+    return Future.value(news);
   }
 }
