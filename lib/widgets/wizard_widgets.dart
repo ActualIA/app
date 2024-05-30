@@ -85,11 +85,9 @@ class _WizardSelector extends State<WizardSelector> {
                         runSpacing: UNIT_PADDING / 2.5,
                         alignment: WrapAlignment.center,
                         children: _items
-                            .where((item) =>
-                                _filter
-                                    .toLowerCase()
-                                    .matchAsPrefix(item.$2.toLowerCase()) !=
-                                null)
+                            .where((item) => item.$2
+                                .toLowerCase()
+                                .contains(_filter.toLowerCase()))
                             .map((e) => FilterChip(
                                 label: Text(e.$2),
                                 onSelected: (v) {
