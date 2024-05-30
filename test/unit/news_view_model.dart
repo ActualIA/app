@@ -338,42 +338,43 @@ void main() {
   test('getNews with invalid date reports error', () async {
     NewsViewModel vm = NewsViewModel(FakeSupabaseClient());
     await vm.getNews(DateTime.fromMicrosecondsSinceEpoch(0));
-    expect(vm.news?.title, equals("No news found for this date."));
+    expect(vm.hasError, isTrue);
   });
 
   test('getNews with non working EF reports error', () async {
     NewsViewModel vm = NeverExistingNewsVM();
     await vm.getNews(DateTime.now());
-    expect(vm.news?.title, equals("News generation failed and no news found."));
+    expect(vm.hasError, isTrue);
   });
 
   test('getNewsList with non working EF reports error', () async {
     NewsViewModel vm = NeverExistingNewsVM();
     await vm.getNewsList();
-    expect(vm.newsList.length, 1);
+    expect(vm.hasError, isTrue);
   });
 
   test('getNewsList with working EF returns correct list', () async {
     NewsListVM vm = NewsListVM(FakeSupabaseClient());
     await vm.getNewsList();
-    expect(vm.newsList.length, equals(1));
-    expect(vm.newsList[0].title, equals("News"));
-    expect(vm.newsList[0].paragraphs[0].source, equals("source"));
-    expect(vm.newsList[0].paragraphs[0].title, equals("title"));
-    expect(vm.newsList[0].paragraphs[0].content, equals("content"));
+    expect(vm.newsList, isNotNull);
+    expect(vm.newsList!.length, equals(1));
+    expect(vm.newsList![0].title, equals("News"));
+    expect(vm.newsList![0].paragraphs[0].source, equals("source"));
+    expect(vm.newsList![0].paragraphs[0].title, equals("title"));
+    expect(vm.newsList![0].paragraphs[0].content, equals("content"));
   });
 
   test('getNewsList with Empty list sets hasNews to false', () async {
     EmptyNewsListVM vm = EmptyNewsListVM(FakeSupabaseClient());
     await vm.getNewsList();
     expect(vm.newsList, isEmpty);
-    expect(vm.hasNews, isFalse);
+    expect(vm.isEmpty, isTrue);
   });
 
   test('getNewsList with Exception reports error', () async {
     ExceptionNewsListVM vm = ExceptionNewsListVM(FakeSupabaseClient());
     await vm.getNewsList();
-    expect(vm.newsList.length, 1);
+    expect(vm.hasError, isTrue);
   });
 
   test('getNewsList with non-today news generates news', () async {
@@ -394,7 +395,7 @@ void main() {
     NewsList2VM vm = NewsList2VM(FakeSupabaseClient());
     // ignore: invalid_use_of_protected_member
     await vm.generateAndGetNews();
-    expect(vm.news?.title, equals("News generation failed and no news found."));
+    expect(vm.hasError, isTrue);
   });
 
   // Test generateAudio is called

@@ -281,7 +281,7 @@ void main() {
 
     expect(find.byType(PickTimeButton), findsOneWidget);
     expect(find.byType(WizardNavigationBottomBar), findsOneWidget);
-    await tester.tap(find.text("Validate"));
+    await tester.tap(find.text("Done"));
     expect(avm.isAlarmSet, isTrue);
   });
 }

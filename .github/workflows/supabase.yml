@@ -52,3 +52,6 @@ jobs:
       - run: supabase functions deploy --project-ref $PROJECT_ID generate-transcript
       - run: supabase functions deploy --project-ref $PROJECT_ID generate-audio
       - run: supabase functions deploy --project-ref $PROJECT_ID generate-via-alarms
+      - run: supabase functions deploy --project-ref $PROJECT_ID process-image
+      - run: supabase functions deploy --project-ref $PROJECT_ID generate-raw-feed
+      - run: supabase functions deploy --project-ref $PROJECT_ID return-share-page --no-verify-jwt

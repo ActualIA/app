@@ -18,52 +18,53 @@ class AccessibilityView extends StatelessWidget {
     var nsvm = Provider.of<NewsSettingsViewModel>(context);
 
     return WizardScaffold(
+        bottomBar: WizardNavigationBottomBar(
+          showCancel: true,
+          rText: loc.done,
+          rOnPressed: () async {
+            if (!await nsvm.pushSettings(null)) {
+              if (context.mounted && Platform.isAndroid) {
+                Fluttertoast.showToast(msg: loc.accessibilityUpdateError);
+              }
+            } else {
+              if (context.mounted) {
+                Navigator.pop(context);
+              }
+            }
+          },
+        ),
         body: Column(children: [
-      Expanded(
-          child: ListView(
-        children: [
-          Card(
-            child: Container(
-              padding: const EdgeInsets.all(UNIT_PADDING),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      loc.accessibilityLanguage,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    DropdownButton(
-                      value: loc.localeName,
-                      items: AppLocalizations.supportedLocales
-                          .map((l) => DropdownMenuItem(
-                              value: l.toLanguageTag(),
-                              child: Text(
-                                LOCALES[l.languageCode]!,
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              )))
-                          .toList(),
-                      onChanged: (value) => nsvm.setLocale(value),
-                    )
-                  ]),
-            ),
-          )
-        ],
-      )),
-      WizardNavigationBottomBar(
-        showCancel: true,
-        rText: loc.done,
-        rOnPressed: () async {
-          if (!await nsvm.pushSettings(null)) {
-            if (context.mounted && Platform.isAndroid) {
-              Fluttertoast.showToast(msg: loc.accessibilityUpdateError);
-            }
-          } else {
-            if (context.mounted) {
-              Navigator.pop(context);
-            }
-          }
-        },
-      )
-    ]));
+          Expanded(
+              child: ListView(
+            children: [
+              Card(
+                child: Container(
+                  padding: const EdgeInsets.all(UNIT_PADDING),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          loc.accessibilityLanguage,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        DropdownButton(
+                          value: loc.localeName,
+                          items: AppLocalizations.supportedLocales
+                              .map((l) => DropdownMenuItem(
+                                  value: l.toLanguageTag(),
+                                  child: Text(
+                                    LOCALES[l.languageCode]!,
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
+                                  )))
+                              .toList(),
+                          onChanged: (value) => nsvm.setLocale(value),
+                        )
+                      ]),
+                ),
+              )
+            ],
+          )),
+        ]));
   }
 }
