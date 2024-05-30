@@ -24,7 +24,9 @@ class News {
     return News(
         title: json['title'] as String,
         date: json['date'] as String,
-        transcriptId: json['transcriptID'] as int,
+        transcriptId: (json['transcriptId'] == null)
+            ? -1
+            : (json['transcriptId'] as num).toInt(),
         audio: json['audio'] as String?,
         fullTranscript: json['fullTranscript'],
         paragraphs: (json['paragraphs'] != null)

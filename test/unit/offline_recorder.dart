@@ -1,6 +1,9 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/widgets.dart';
+import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
+import 'dart:developer' as dev;
 
 import 'package:actualia/models/news.dart';
 import 'package:actualia/models/offline_recorder.dart';
@@ -14,7 +17,7 @@ import 'offline_recorder_mocks/mock_filesystem.dart';
 News testNews = News(
     title: "Test title",
     date: "2002-10-17",
-    transcriptId: 0,
+    transcriptId: 1,
     audio: null,
     fullTranscript: "Test",
     paragraphs: [
@@ -70,11 +73,12 @@ class MockIOOverrides extends IOOverrides {
 void main() {
   // Allows async functions in main
   WidgetsFlutterBinding.ensureInitialized();
-  // if (Platform.isAndroid) PathProviderAndroid.registerWith();
-  // if (Platform.isIOS) PathProviderIOS.registerWith();
 
   test("Correct Serialisation and Deserialization", () {
-    expect(News.fromJson(testNews.toJson()), equals(testNews));
+    var json = testNews.toJson();
+    var news = News.fromJson(json);
+
+    expect(news, equals(testNews));
   });
 
   test(
@@ -102,19 +106,19 @@ void main() {
             "${storage.path}/${testNews.date.substring(0, 10)}_transcript.json")
         .exists();
     expect(exist, isTrue);
-    expect(
-        await offRec.loadNews(DateTime(
-            int.parse(testNews.date.substring(0, 4)),
-            int.parse(testNews.date.substring(5, 7)),
-            int.parse(testNews.date.substring(8, 10)))),
-        equals(testNews));
+
+    var loadedNews = await offRec.loadNews(DateTime(
+        int.parse(testNews.date.substring(0, 4)),
+        int.parse(testNews.date.substring(5, 7)),
+        int.parse(testNews.date.substring(8, 10))));
+    expect(loadedNews, equals(testNews));
   });
 
   test("Loading non existing files throw errors", () async {
     PathProviderPlatform.instance = MockPathProviderPlateform();
     IOOverrides.global = MockIOOverrides(MockFileSys());
     OfflineRecorder offRec = await OfflineRecorder.create();
-    expect(offRec.loadNews(DateTime(476, 9, 1)), throwsException);
+    expect(await offRec.loadNews(DateTime(476, 9, 1)), throwsException);
   });
 
   test("Changing the maximum storage size works well in both directions",

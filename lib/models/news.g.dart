@@ -9,9 +9,9 @@ part of 'news.dart';
 News _$NewsFromJson(Map<String, dynamic> json) => News(
       title: json['title'] as String,
       date: json['date'] as String,
-      transcriptId: (json['transcriptId'] as num).toInt(),
+      transcriptId: json['transcriptId'] as int,
       audio: json['audio'] as String?,
-      paragraphs: (json['paragraphs'] as List<dynamic>)
+      paragraphs: (json['paragraphs'] as List<Paragraph>)
           .map(Paragraph.fromJson)
           .toList(),
       fullTranscript: json['fullTranscript'] as String,

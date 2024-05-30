@@ -166,7 +166,6 @@ class OfflineRecorder {
 
     // Parsing the json + remapping to a News object
 
-    /*
     dynamic decodedJson = jsonDecode(json);
     List<Paragraph> paragraphs = (decodedJson["paragraphs"] as List).map((p) {
       return Paragraph(
@@ -180,11 +179,9 @@ class OfflineRecorder {
     return News(
         title: decodedJson["title"],
         date: decodedJson["date"],
-        transcriptId: decodedJson["transcriptID"],
+        transcriptId: decodedJson["transcriptId"],
         audio: decodedJson["audio"],
+        fullTranscript: decodedJson["fullTranscript"],
         paragraphs: paragraphs);
-    */
-
-    return News.fromJson(jsonDecode(json));
   }
 }
