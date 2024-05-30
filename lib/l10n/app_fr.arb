@@ -54,6 +54,7 @@
     "alarmLoop": "Répétez l'audio",
     "alarmNotSet": "Alarme désactivée",
     "alarmSetFor": "Alarme activée pour {date} prochain",
+    "search": "Filtrer",
     "errorTitle": "Une erreur est survenue",
     "errorNewsFetch": "Impossible de récupérer les actualités",
     "errorNoNews": "Il n'y a aucune actualité pour cette date",

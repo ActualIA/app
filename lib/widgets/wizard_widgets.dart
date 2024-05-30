@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:actualia/models/providers.dart';
 import 'package:actualia/viewmodels/providers.dart';
 import 'package:actualia/widgets/top_app_bar.dart';
 import 'package:actualia/utils/themes.dart';
 import 'package:fading_edge_scrollview/fading_edge_scrollview.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -26,16 +29,50 @@ class WizardSelector extends StatefulWidget {
 
 class _WizardSelector extends State<WizardSelector> {
   late List<(Object, String)> _items;
+  final TextEditingController _filterController = TextEditingController();
+  late String _filter = "";
 
   @override
   void initState() {
     super.initState();
     _items = widget.items;
+    _filterController.addListener(() {
+      setState(() {
+        _filter = _filterController.text;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _filterController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     var loc = AppLocalizations.of(context)!;
+
+    Widget filter = Container(
+        padding: const EdgeInsets.fromLTRB(
+            UNIT_PADDING / 4, UNIT_PADDING, UNIT_PADDING / 4, 0),
+        child: Container(
+            decoration: BoxDecoration(
+                border: Border.all(width: BORDER_WIDTH),
+                borderRadius: BorderRadius.circular(BOX_BORDER_RADIUS)),
+            child: TextField(
+              controller: _filterController,
+              style: Theme.of(context).textTheme.bodyMedium,
+              decoration: InputDecoration(
+                icon: Container(
+                    padding:
+                        const EdgeInsets.fromLTRB(UNIT_PADDING / 2, 0, 0, 0),
+                    child: const Icon(Icons.search)),
+                iconColor: THEME_BUTTON,
+                hintText: loc.search,
+                border: InputBorder.none,
+              ),
+            )));
 
     Widget title = WizardSelectorTitle(title: widget.title);
 
@@ -51,6 +88,11 @@ class _WizardSelector extends State<WizardSelector> {
                         runSpacing: UNIT_PADDING / 2.5,
                         alignment: WrapAlignment.center,
                         children: _items
+                            .where((item) =>
+                                _filter
+                                    .toLowerCase()
+                                    .matchAsPrefix(item.$2.toLowerCase()) !=
+                                null)
                             .map((e) => FilterChip(
                                 label: Text(e.$2),
                                 onSelected: (v) {
@@ -60,7 +102,7 @@ class _WizardSelector extends State<WizardSelector> {
                             .toList())))));
 
     return Column(
-      children: [title, body],
+      children: [title, filter, body],
     );
   }
 }

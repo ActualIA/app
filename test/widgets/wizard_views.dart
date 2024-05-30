@@ -217,6 +217,20 @@ void main() {
     expect(vm.wasTriggered, isTrue);
   });
 
+  testWidgets("interests wizard: filter work as intended", (tester) async {
+    await tester.pumpWidget(WizardWrapper(
+        wizard: const InterestWizardView(),
+        nsvm: MockNewsSettingsViewModel(),
+        auth: MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin()),
+        pvm: MockProvidersViewModel()));
+
+    expect(find.byIcon(Icons.search), findsOneWidget);
+    await tester.enterText(find.byType(TextField), "switzerland");
+    await tester.pumpAndSettle();
+
+    expect(find.byType(FilterChip), findsOneWidget);
+  });
+
   testWidgets("Interests wizard: Keep initial values",
       (WidgetTester tester) async {
     NewsSettings ns = NewsSettings(

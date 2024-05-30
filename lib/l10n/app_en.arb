@@ -74,6 +74,7 @@
       }
     }
   },
+  "search": "Search",
   "errorTitle": "An error occurred",
   "errorNewsFetch": "Unable to fetch news.",
   "errorNoNews": "There are no news for you on this date.",
