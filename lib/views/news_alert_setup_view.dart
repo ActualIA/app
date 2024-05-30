@@ -4,6 +4,7 @@ import 'package:actualia/widgets/alarms_widget.dart';
 import 'package:actualia/widgets/top_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewsAlertSetupView extends StatefulWidget {
   const NewsAlertSetupView({super.key});
@@ -77,25 +78,9 @@ class _NewsAlertSetupViewState extends State<NewsAlertSetupView> {
   }
   // coverage:ignore-end
 
-  String getDay() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final difference = selectedDateTime.difference(today).inDays;
-
-    switch (difference) {
-      case 0:
-        return 'today';
-      case 1:
-        return 'tomorrow';
-      case 2:
-        return 'after tomorrow';
-      default:
-        return '$difference days';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    var loc = AppLocalizations.of(context)!;
     AlarmsViewModel alarmModel = Provider.of(context);
 
     Widget body = Padding(
@@ -137,8 +122,8 @@ class _NewsAlertSetupViewState extends State<NewsAlertSetupView> {
                   margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                   child: Text(
                     alarmModel.isAlarmSet
-                        ? "Alarm set for ${getDay()}!"
-                        : "Alarm not set",
+                        ? loc.alarmSetFor(selectedDateTime)
+                        : loc.alarmNotSet,
                     style: Theme.of(context)
                         .textTheme
                         .titleMedium!
@@ -183,7 +168,7 @@ class _NewsAlertSetupViewState extends State<NewsAlertSetupView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Loop alarm audio',
+                      loc.alarmLoop,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     Switch(
@@ -214,8 +199,7 @@ class _NewsAlertSetupViewState extends State<NewsAlertSetupView> {
                   ],
                 ),
                 FilledButton.tonal(
-                    onPressed: () => testAlarm(context),
-                    child: const Text("Test!")),
+                    onPressed: () => testAlarm(context), child: Text(loc.test)),
               ],
             ),
           ),
@@ -232,7 +216,7 @@ class _NewsAlertSetupViewState extends State<NewsAlertSetupView> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text("Done")),
+              child: Text(loc.done)),
         ],
       ),
     );

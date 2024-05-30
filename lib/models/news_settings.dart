@@ -7,6 +7,7 @@ class NewsSettings {
   bool wantsCities;
   bool wantsCountries;
   bool wantsInterests;
+  String locale;
 
   // Predefined lists
   List<String> predefinedCities = [
@@ -35,14 +36,14 @@ class NewsSettings {
     'Events',
   ];
 
-  NewsSettings({
-    required this.cities,
-    required this.countries,
-    required this.interests,
-    required this.wantsCities,
-    required this.wantsCountries,
-    required this.wantsInterests,
-  });
+  NewsSettings(
+      {required this.cities,
+      required this.countries,
+      required this.interests,
+      required this.wantsCities,
+      required this.wantsCountries,
+      required this.wantsInterests,
+      required this.locale});
 
   factory NewsSettings.defaults() {
     return NewsSettings(
@@ -52,6 +53,7 @@ class NewsSettings {
       wantsCities: false,
       wantsCountries: false,
       wantsInterests: false,
+      locale: 'en',
     );
   }
 }

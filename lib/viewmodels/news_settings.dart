@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:actualia/models/news_settings.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -22,6 +23,13 @@ class NewsSettingsViewModel extends ChangeNotifier {
   NewsSettings? get settings => _settings;
   int? get settingsId => _settingsId;
 
+  String get locale => settings?.locale ?? "en";
+
+  void setLocale(String? loc) {
+    if (_settings != null) _settings!.locale = loc ?? "en";
+    notifyListeners();
+  }
+
   Future<void> fetchSettings() async {
     try {
       final res = await supabase
@@ -31,13 +39,13 @@ class NewsSettingsViewModel extends ChangeNotifier {
           .single();
 
       _settings = NewsSettings(
-        cities: List<String>.from(jsonDecode(res['cities'])),
-        countries: List<String>.from(jsonDecode(res['countries'])),
-        interests: List<String>.from(jsonDecode(res['interests'])),
-        wantsCities: res['wants_cities'],
-        wantsCountries: res['wants_countries'],
-        wantsInterests: res['wants_interests'],
-      );
+          cities: List<String>.from(jsonDecode(res['cities'])),
+          countries: List<String>.from(jsonDecode(res['countries'])),
+          interests: List<String>.from(jsonDecode(res['interests'])),
+          wantsCities: res['wants_cities'],
+          wantsCountries: res['wants_countries'],
+          wantsInterests: res['wants_interests'],
+          locale: res['locale']);
       _settingsId = res['id'];
       notifyListeners();
     } catch (e) {
@@ -48,16 +56,19 @@ class NewsSettingsViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> pushSettings(NewsSettings settings) async {
+  Future<bool> pushSettings(NewsSettings? settings) async {
+    NewsSettings set = settings ?? _settings ?? NewsSettings.defaults();
+
     try {
       await supabase.from("news_settings").upsert({
         'created_by': supabase.auth.currentUser!.id,
-        'cities': settings.cities,
-        'countries': settings.countries,
-        'interests': settings.interests,
-        'wants_cities': settings.wantsCities,
-        'wants_countries': settings.wantsCountries,
-        'wants_interests': settings.wantsInterests,
+        'cities': set.cities,
+        'countries': set.countries,
+        'interests': set.interests,
+        'wants_cities': set.wantsCities,
+        'wants_countries': set.wantsCountries,
+        'wants_interests': set.wantsInterests,
+        'locale': set.locale
       }, onConflict: "created_by");
       fetchSettings();
       return true;

@@ -54,7 +54,7 @@ class MockHttp extends BaseMockedHttpClient {
           expect(
               jsonDecode(req.body),
               equals({
-                "providers": ["/google/news/:category"]
+                "providers": ["gnews"]
               }));
           return response([], 200, req);
         default:
@@ -123,6 +123,9 @@ void main() async {
     await tester.pumpAndSettle();
 
     await tester.tap(find.textContaining("Next"));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text("Skip"));
     await tester.pumpAndSettle();
 
     // Open the profile view.

@@ -2,6 +2,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:dartz/dartz.dart';
 import 'package:xml/xml.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 abstract class _ProviderFactory {
   const _ProviderFactory();
@@ -9,7 +10,7 @@ abstract class _ProviderFactory {
   /// Builds a NewsProvider from its different parameters.
   /// If one or more of the parameters is invalid, returns a list of errors for each one of them (in the same order as fed to the function).
   Future<Either<NewsProvider, List<String?>>> build(
-      ProviderType type, List<String> values);
+      ProviderType type, List<String> values, AppLocalizations loc);
 }
 
 class _DefaultProviderFactory extends _ProviderFactory {
@@ -17,7 +18,7 @@ class _DefaultProviderFactory extends _ProviderFactory {
 
   @override
   Future<Either<NewsProvider, List<String?>>> build(
-          ProviderType type, List<String> values) async =>
+          ProviderType type, List<String> values, AppLocalizations loc) async =>
       Left(NewsProvider(
           url: [type.basePath, ...values]
               .where((e) => e.isNotEmpty)
@@ -32,12 +33,12 @@ class TelegramProviderFactory extends _ProviderFactory {
 
   @override
   Future<Either<NewsProvider, List<String?>>> build(
-      ProviderType type, List<String> values) async {
+      ProviderType type, List<String> values, AppLocalizations loc) async {
     var match = _telegramIdRegex.firstMatch(values[0]);
     if (match != null) {
       return Left(NewsProvider(url: "${type.basePath}/${match.group(1)}"));
     } else {
-      return const Right(["Must be a channel name or an invite link"]);
+      return Right([loc.telegramInvalidId]);
     }
   }
 }
@@ -112,7 +113,7 @@ class RSSFeedProviderFactory extends _ProviderFactory {
 
   @override
   Future<Either<NewsProvider, List<String?>>> build(
-      ProviderType type, List<String> values) async {
+      ProviderType type, List<String> values, AppLocalizations loc) async {
     try {
       var url = Uri.parse(values[0]);
       var document = (await http.get(url)).body;
@@ -132,12 +133,10 @@ class RSSFeedProviderFactory extends _ProviderFactory {
       if (feeds.isNotEmpty) {
         return Left(NewsProvider(url: feeds.firstOrNull!.$1.toString()));
       } else {
-        return const Right([
-          "Unable to find related RSS feed. Please provide the complete URL instead."
-        ]);
+        return Right([loc.rssFeedNotFound]);
       }
     } catch (e) {
-      return const Right(["Must be a valid URL"]);
+      return Right([loc.rssInvalidUrl]);
     }
   }
 }
@@ -166,8 +165,9 @@ enum ProviderType {
       _ProviderFactory factory = const _DefaultProviderFactory()})
       : _factory = factory;
 
-  Future<Either<NewsProvider, List<String?>>> build(List<String> values) {
-    return _factory.build(this, values);
+  Future<Either<NewsProvider, List<String?>>> build(
+      List<String> values, AppLocalizations loc) {
+    return _factory.build(this, values, loc);
   }
 }
 

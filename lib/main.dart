@@ -18,6 +18,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:actualia/viewmodels/news.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -83,7 +84,7 @@ class _AppState extends State<App> {
       newsSettings = Provider.of(context);
       if (authModel.isOnboardingRequired) {
         if (newsSettings.settings == null || pvm.newsProviders == null) {
-          home = const LoadingView(text: 'Fetching your settings...');
+          home = LoadingView(text: AppLocalizations.of(context)!.loading);
         } else {
           home = const PreOnBoardingPage();
         }
@@ -100,7 +101,10 @@ class _AppState extends State<App> {
       title: 'ActualIA',
       theme: ACTUALIA_THEME,
       home: home,
+      locale: Locale(newsSettings.locale),
       navigatorKey: _navKey,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
     );
   }
 }

@@ -1,6 +1,7 @@
 import OpenAI from "https://deno.land/x/openai@v4.33.0/mod.ts";
-import { News } from "../_shared/model.ts";
 import SupabaseClient from "https://esm.sh/v135/@supabase/supabase-js@2.42.4/dist/module/SupabaseClient.js";
+import { News } from "./model.ts";
+import { getUserSettings } from "./database.ts";
 import { getUserRawNews } from "./get-user-raw-news.ts";
 import { corsHeaders } from "./util.ts";
 
@@ -40,18 +41,27 @@ export async function generateTranscript(
 ) {
   console.log("We start the process for the user with ID:", userId);
 
+  // Get the news.
   const news = await getUserRawNews(userId, supabaseClient) as News[];
+
+  // Get the user's interests.
+  const interests = await getUserSettings(userId, supabaseClient);
+  if (interests == null) {
+    return new Response("Internal Server Error", { status: 500 });
+  }
 
   // Generate a transcript from the news.
   console.log("Generating transcript from news");
-  const transcript = news.length > 0 ? await createTranscript(news) : {
-    totalNews: 0,
-    totalNewsByLLM: 0,
-    intro: "",
-    outro: "",
-    title: "",
-    news: [],
-  };
+  const transcript = news.length > 0
+    ? await createTranscript(news, interests.locale)
+    : {
+      totalNews: 0,
+      totalNewsByLLM: 0,
+      intro: "",
+      outro: "",
+      title: "",
+      news: [],
+    };
 
   // Insert the transcript into the database.
   console.log(
@@ -76,7 +86,10 @@ export async function generateTranscript(
 }
 
 // Call OpenAI API for json generation
-async function createTranscript(news: News[]): Promise<Transcript> {
+async function createTranscript(
+  news: News[],
+  lang: string,
+): Promise<Transcript> {
   const newsToGenerate = news.reduce(
     (s, n) => `${s}${n.title}\n${n.description}\n\n`,
     "",
@@ -90,7 +103,7 @@ async function createTranscript(news: News[]): Promise<Transcript> {
       {
         "role": "system",
         "content":
-          "You're a radio journalist writing a script to announce the day's news. The user gives you the news to announce. Your radio broadcast should only last 2-3 minutes, so try to find interesting transitions between the news items. Write the script.",
+          `You're a radio journalist writing a script to announce the day's news. The user gives you the news to announce. Your radio broadcast should only last 2-3 minutes, so try to find interesting transitions between the news items. You are targeting an audience able to understand the locale '${lang}', choose the language accordingly. Write the script.`,
       },
       {
         "role": "user",

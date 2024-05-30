@@ -2,26 +2,22 @@ import 'package:actualia/models/providers.dart';
 import 'package:actualia/viewmodels/providers.dart';
 import 'package:actualia/widgets/top_app_bar.dart';
 import 'package:actualia/utils/themes.dart';
+import 'package:fading_edge_scrollview/fading_edge_scrollview.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class WizardSelector extends StatefulWidget {
   final String title;
-  final String buttonText;
   final List<(Object, String)> items;
   final List<(Object, String)> selectedItems;
-  final void Function(List<(Object, String)>) onPressed;
-  final bool isInitialOnboarding;
-  final void Function()? onCancel;
+  final void Function((Object, String)) onSelected;
 
   const WizardSelector(
       {required this.items,
-      required this.onPressed,
+      required this.onSelected,
       this.selectedItems = const [],
       this.title = "",
-      this.buttonText = "Next",
-      this.isInitialOnboarding = false,
-      this.onCancel,
       super.key});
 
   @override
@@ -30,52 +26,41 @@ class WizardSelector extends StatefulWidget {
 
 class _WizardSelector extends State<WizardSelector> {
   late List<(Object, String)> _items;
-  List<(Object, String)> _selectedItems = [];
 
   @override
   void initState() {
     super.initState();
     _items = widget.items;
-    _selectedItems = widget.selectedItems.toList();
   }
 
   @override
   Widget build(BuildContext context) {
+    var loc = AppLocalizations.of(context)!;
+
     Widget title = WizardSelectorTitle(title: widget.title);
 
     Widget body = Expanded(
         child: Container(
-            padding: const EdgeInsets.fromLTRB(0.0, 24.0, 0.0, 24.0),
-            child: SingleChildScrollView(
-                child: Wrap(
-                    spacing: UNIT_PADDING / 2,
-                    runSpacing: UNIT_PADDING / 2.5,
-                    alignment: WrapAlignment.center,
-                    children: _items
-                        .map((e) => FilterChip(
-                            label: Text(e.$2),
-                            onSelected: (v) {
-                              setState(() {
-                                _selectedItems.contains(e)
-                                    ? _selectedItems.remove(e)
-                                    : _selectedItems.add(e);
-                              });
-                            },
-                            selected: _selectedItems.contains(e)))
-                        .toList()))));
-
-    Widget bottomBar = WizardNavigationBottomBar(
-      showCancel: !widget.isInitialOnboarding,
-      onCancel: widget.onCancel,
-      showRight: true,
-      rText: widget.buttonText,
-      rOnPressed: () {
-        widget.onPressed(_selectedItems);
-      },
-    );
+            padding:
+                const EdgeInsets.fromLTRB(0.0, UNIT_PADDING * 1.5, 0.0, 0.0),
+            child: FadingEdgeScrollView.fromSingleChildScrollView(
+                child: SingleChildScrollView(
+                    controller: ScrollController(),
+                    child: Wrap(
+                        spacing: UNIT_PADDING / 2,
+                        runSpacing: UNIT_PADDING / 2.5,
+                        alignment: WrapAlignment.center,
+                        children: _items
+                            .map((e) => FilterChip(
+                                label: Text(e.$2),
+                                onSelected: (v) {
+                                  widget.onSelected(e);
+                                },
+                                selected: widget.selectedItems.contains(e)))
+                            .toList())))));
 
     return Column(
-      children: [title, body, bottomBar],
+      children: [title, body],
     );
   }
 }
@@ -122,70 +107,90 @@ class WizardSelectorTitle extends StatelessWidget {
 class WizardNavigationBottomBar extends StatelessWidget {
   final bool showCancel;
   final bool showRight;
-  final String rText;
-  final String cancelText;
+  final String? rText;
+  final String? cancelText;
   final void Function()? rOnPressed;
   final void Function()? onCancel;
 
   const WizardNavigationBottomBar(
       {this.showCancel = true,
       this.showRight = true,
-      this.rText = "right button",
-      this.cancelText = "Cancel",
+      this.rText,
+      this.cancelText,
       this.rOnPressed,
       this.onCancel,
       super.key});
 
   @override
   Widget build(BuildContext context) {
+    var loc = AppLocalizations.of(context)!;
     Widget right = const SizedBox();
     Widget cancel = const SizedBox();
+    ThemeData theme = Theme.of(context);
+
     if (showRight) {
-      right = FilledButton.tonal(
-          onPressed: rOnPressed,
-          style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateColor.resolveWith((states) => THEME_BUTTON)),
-          child: Text(
-            rText,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ));
+      right = Container(
+        padding: const EdgeInsets.all(UNIT_PADDING),
+        child: FilledButton.tonal(
+            onPressed: rOnPressed,
+            style: ButtonStyle(
+                backgroundColor: MaterialStateColor.resolveWith(
+                    (states) => THEME_LIGHTGRAY)),
+            child: Text(
+              rText ?? loc.button,
+              style: theme.textTheme.bodyMedium?.copyWith(color: THEME_BUTTON),
+              textScaler: const TextScaler.linear(2),
+            )),
+      );
     }
     if (showCancel) {
-      cancel = FilledButton.tonal(
-          onPressed: onCancel,
-          style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateColor.resolveWith((states) => THEME_BUTTON)),
-          child: Text(
-            cancelText,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ));
+      cancel = Container(
+          padding: const EdgeInsets.all(UNIT_PADDING),
+          child: FilledButton.tonal(
+              onPressed: onCancel,
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateColor.resolveWith(
+                      (states) => THEME_LIGHTGRAY)),
+              child: Text(
+                cancelText ?? loc.cancel,
+                style:
+                    theme.textTheme.bodyMedium?.copyWith(color: THEME_BUTTON),
+                textScaler: const TextScaler.linear(2),
+              )));
     }
 
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [cancel, right]);
+    return Container(
+        color: THEME_LIGHTGRAY,
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [cancel, right]));
   }
 }
 
 class WizardScaffold extends StatelessWidget {
   final PreferredSizeWidget topBar;
   final Widget body;
+  final Widget bottomBar;
 
   const WizardScaffold(
-      {this.topBar = const TopAppBar(),
-      this.body = const Text("unimplemented"),
+      {this.topBar = const TopAppBar(
+        enableProfileButton: false,
+      ),
+      required this.body,
+      required this.bottomBar,
       super.key});
 
   @override
   Widget build(BuildContext context) {
+    var loc = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: topBar,
+      bottomNavigationBar: bottomBar,
       body: Container(
         padding: const EdgeInsets.fromLTRB(48.0, 48.0, 48.0, 48.0),
         alignment: Alignment.topCenter,
-        child: body,
+        child: body ?? Text(loc.notImplemented),
       ),
     );
   }
@@ -204,6 +209,7 @@ class ProviderWidget extends StatefulWidget {
 class _ProviderWidgetState extends State<ProviderWidget> {
   @override
   Widget build(BuildContext context) {
+    var loc = AppLocalizations.of(context)!;
     var pvm = Provider.of<ProvidersViewModel>(context);
 
     var type = pvm.editedProviders[widget.idx].$1;
@@ -270,7 +276,7 @@ class _ProviderWidgetState extends State<ProviderWidget> {
               const SizedBox(height: UNIT_PADDING / 2),
               Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                 FilledButton.tonalIcon(
-                    label: const Text("Remove"),
+                    label: Text(loc.remove),
                     onPressed: () => widget.onDelete(widget),
                     icon: const Icon(Icons.delete))
               ]),
