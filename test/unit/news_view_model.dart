@@ -5,8 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../widgets/news_view.dart';
-
 class FakeGoTrueClient extends Fake implements GoTrueClient {
   @override
   User? get currentUser => const User(
@@ -80,6 +78,11 @@ class FakeFunctionsClient extends Fake implements FunctionsClient {
 class FakeSupabaseClient extends Fake implements SupabaseClient {
   @override
   FunctionsClient get functions => FakeFunctionsClient();
+}
+
+class MockFailingOfflineRecorder extends Fake implements OfflineRecorder {
+  @override
+  Future<void> downloadNews(News news) async {}
 }
 
 class MockOfflineRecorder extends Fake implements OfflineRecorder {
@@ -384,14 +387,14 @@ void main() {
 
   test('getNewsList with non working EF reports error', () async {
     NewsViewModel vm = NeverExistingNewsVM.create();
-    vm.offlineRecorder = MockOfflineRecorder();
+    vm.offlineRecorder = MockFailingOfflineRecorder();
     await vm.getNewsList();
     expect(vm.hasError, isTrue);
   });
 
   test('getNewsList with working EF returns correct list', () async {
     NewsListVM vm = NewsListVM.create(FakeSupabaseClient());
-    vm.offlineRecorder = MockOfflineRecorder();
+    vm.offlineRecorder = MockFailingOfflineRecorder();
     await vm.getNewsList();
     expect(vm.newsList, isNotNull);
     expect(vm.newsList!.length, equals(1));
@@ -411,14 +414,14 @@ void main() {
 
   test('getNewsList with Exception reports error', () async {
     ExceptionNewsListVM vm = ExceptionNewsListVM.create(FakeSupabaseClient());
-    vm.offlineRecorder = MockOfflineRecorder();
+    vm.offlineRecorder = MockFailingOfflineRecorder();
     await vm.getNewsList();
     expect(vm.hasError, isTrue);
   });
 
   test('getNewsList with non-today news generates news', () async {
     NotTodayNewsListVM vm = NotTodayNewsListVM.create(FakeSupabaseClient());
-    vm.offlineRecorder = MockOfflineRecorder();
+    vm.offlineRecorder = MockFailingOfflineRecorder();
     await vm.getNewsList();
     expect(vm.generateNewsCalled, isTrue);
   });

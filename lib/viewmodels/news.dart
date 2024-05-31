@@ -160,8 +160,16 @@ class NewsViewModel extends ChangeNotifier {
         }
       }
     } catch (e) {
-      log("Error fetching news list: $e", level: Level.WARNING.value);
-      _setError(ErrorType.fetch);
+      try {
+        _offlineRecorder
+            .loadAllNews()
+            .then((loadedNews) => setNewsList(loadedNews));
+      } catch (e) {
+        log("Error while fetching downloaded news: $e",
+            level: Level.WARNING.value);
+        _setError(ErrorType.fetch);
+      }
+      log("Error fetching news: $e", level: Level.WARNING.value);
     }
   }
 
