@@ -1,4 +1,5 @@
 import 'package:actualia/models/news.dart';
+import 'package:actualia/models/offline_recorder.dart';
 import 'package:actualia/viewmodels/news.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -79,8 +80,36 @@ class FakeSupabaseClient extends Fake implements SupabaseClient {
   FunctionsClient get functions => FakeFunctionsClient();
 }
 
+class MockFailingOfflineRecorder extends Fake implements OfflineRecorder {
+  @override
+  Future<void> downloadNews(News news) async {}
+}
+
+class MockOfflineRecorder extends Fake implements OfflineRecorder {
+  @override
+  Future<void> downloadNews(News news) {
+    return Future(() => null);
+  }
+
+  @override
+  Future<List<News>> loadAllNews() {
+    return Future(() => List.empty());
+  }
+
+  @override
+  Future<News> loadNews(DateTime date) {
+    return Future(() => News(
+        title: "test",
+        date: "test",
+        transcriptId: 17,
+        audio: "test",
+        paragraphs: List.empty(),
+        fullTranscript: ""));
+  }
+}
+
 class AlreadyExistingNewsVM extends NewsViewModel {
-  AlreadyExistingNewsVM(super.supabase);
+  AlreadyExistingNewsVM.create(super.supabase) : super.create();
 
   @override
   Future<void> fetchNews(DateTime date) {
@@ -111,7 +140,13 @@ class AlreadyExistingNewsVM extends NewsViewModel {
 class NonExistingNewsVM extends NewsViewModel {
   bool invokedTranscriptFunction = false;
 
-  NonExistingNewsVM() : super(FakeSupabaseClient());
+  NonExistingNewsVM.create() : super.create(FakeSupabaseClient());
+
+  static Future<NonExistingNewsVM> init() async {
+    NonExistingNewsVM nvm = NonExistingNewsVM.create();
+    nvm.offlineRecorder = MockOfflineRecorder();
+    return nvm;
+  }
 
   @override
   Future<void> fetchNews(DateTime date) {
@@ -146,7 +181,7 @@ class NonExistingNewsVM extends NewsViewModel {
 }
 
 class NeverExistingNewsVM extends NewsViewModel {
-  NeverExistingNewsVM() : super(FakeSupabaseClient());
+  NeverExistingNewsVM.create() : super.create(FakeSupabaseClient());
 
   @override
   Future<void> fetchNews(DateTime date) {
@@ -159,7 +194,7 @@ class NeverExistingNewsVM extends NewsViewModel {
 }
 
 class NewsListVM extends NewsViewModel {
-  NewsListVM(super.supabase);
+  NewsListVM.create(super.supabase) : super.create();
 
   @override
   Future<void> fetchNews(DateTime date) {
@@ -223,7 +258,7 @@ class NewsListVM extends NewsViewModel {
 }
 
 class NewsList2VM extends NewsViewModel {
-  NewsList2VM(super.supabase);
+  NewsList2VM.create(super.supabase) : super.create();
   bool invokedTranscriptFunction = false;
   bool fetchNewsCalled = false;
 
@@ -242,7 +277,7 @@ class NewsList2VM extends NewsViewModel {
 }
 
 class EmptyNewsListVM extends NewsViewModel {
-  EmptyNewsListVM(super.supabase);
+  EmptyNewsListVM.create(super.supabase) : super.create();
   bool generateNewsCalled = false;
 
   @override
@@ -252,7 +287,7 @@ class EmptyNewsListVM extends NewsViewModel {
 }
 
 class ExceptionNewsListVM extends NewsViewModel {
-  ExceptionNewsListVM(super.supabase);
+  ExceptionNewsListVM.create(super.supabase) : super.create();
 
   @override
   Future<List<dynamic>> fetchNewsList() async {
@@ -261,7 +296,7 @@ class ExceptionNewsListVM extends NewsViewModel {
 }
 
 class NotTodayNewsListVM extends NewsViewModel {
-  NotTodayNewsListVM(super.supabase);
+  NotTodayNewsListVM.create(super.supabase) : super.create();
   bool generateNewsCalled = false;
 
   @override
@@ -287,7 +322,7 @@ class NotTodayNewsListVM extends NewsViewModel {
 //Tests for audio functions
 
 class AudioNewsVM extends NewsViewModel {
-  AudioNewsVM(super.supabase);
+  AudioNewsVM.create(super.supabase) : super.create();
   bool generateAudioCalled = false;
 
   @override
@@ -299,7 +334,7 @@ class AudioNewsVM extends NewsViewModel {
 
 void main() {
   test("generate-transcript failure is reported", () async {
-    NewsViewModel vm = NewsViewModel(FakeFailingSupabaseClient());
+    NewsViewModel vm = NewsViewModel.create(FakeFailingSupabaseClient());
     bool hasThrown = false;
 
     try {
@@ -312,49 +347,54 @@ void main() {
   });
 
   test("correctly invokes cloud function", () async {
-    NewsViewModel vm = NewsViewModel(FakeSupabaseClient());
+    NewsViewModel vm = NewsViewModel.create(FakeSupabaseClient());
     await vm.invokeTranscriptFunction();
   });
 
   test('database failure is handled', () async {
-    NewsViewModel vm = NewsViewModel(FakeFailingSupabaseClient());
+    NewsViewModel vm = NewsViewModel.create(FakeFailingSupabaseClient());
     await vm.fetchNews(DateTime.now());
     expect(vm.news, isNull);
   });
 
   test('already existing news are correctly fetched', () async {
-    NewsViewModel vm = AlreadyExistingNewsVM(FakeSupabaseClient());
+    NewsViewModel vm = AlreadyExistingNewsVM.create(FakeSupabaseClient());
+    vm.offlineRecorder = MockOfflineRecorder();
     await vm.getNews(DateTime.now());
     expect(vm.news?.title, equals("News"));
   });
 
   test('non existing news are correctly generated', () async {
-    NonExistingNewsVM vm = NonExistingNewsVM();
+    NonExistingNewsVM vm = await NonExistingNewsVM.init();
     await vm.getNews(DateTime.now());
     expect(vm.news?.title, equals("News"));
     expect(vm.invokedTranscriptFunction, isTrue);
   });
 
   test('getNews with invalid date reports error', () async {
-    NewsViewModel vm = NewsViewModel(FakeSupabaseClient());
+    NewsViewModel vm = NewsViewModel.create(FakeSupabaseClient());
+    vm.offlineRecorder = MockOfflineRecorder();
     await vm.getNews(DateTime.fromMicrosecondsSinceEpoch(0));
     expect(vm.hasError, isTrue);
   });
 
   test('getNews with non working EF reports error', () async {
-    NewsViewModel vm = NeverExistingNewsVM();
+    NewsViewModel vm = NeverExistingNewsVM.create();
+    vm.offlineRecorder = MockOfflineRecorder();
     await vm.getNews(DateTime.now());
     expect(vm.hasError, isTrue);
   });
 
   test('getNewsList with non working EF reports error', () async {
-    NewsViewModel vm = NeverExistingNewsVM();
+    NewsViewModel vm = NeverExistingNewsVM.create();
+    vm.offlineRecorder = MockFailingOfflineRecorder();
     await vm.getNewsList();
     expect(vm.hasError, isTrue);
   });
 
   test('getNewsList with working EF returns correct list', () async {
-    NewsListVM vm = NewsListVM(FakeSupabaseClient());
+    NewsListVM vm = NewsListVM.create(FakeSupabaseClient());
+    vm.offlineRecorder = MockFailingOfflineRecorder();
     await vm.getNewsList();
     expect(vm.newsList, isNotNull);
     expect(vm.newsList!.length, equals(1));
@@ -365,26 +405,29 @@ void main() {
   });
 
   test('getNewsList with Empty list sets hasNews to false', () async {
-    EmptyNewsListVM vm = EmptyNewsListVM(FakeSupabaseClient());
+    EmptyNewsListVM vm = EmptyNewsListVM.create(FakeSupabaseClient());
+    vm.offlineRecorder = MockOfflineRecorder();
     await vm.getNewsList();
     expect(vm.newsList, isEmpty);
     expect(vm.isEmpty, isTrue);
   });
 
   test('getNewsList with Exception reports error', () async {
-    ExceptionNewsListVM vm = ExceptionNewsListVM(FakeSupabaseClient());
+    ExceptionNewsListVM vm = ExceptionNewsListVM.create(FakeSupabaseClient());
+    vm.offlineRecorder = MockFailingOfflineRecorder();
     await vm.getNewsList();
     expect(vm.hasError, isTrue);
   });
 
   test('getNewsList with non-today news generates news', () async {
-    NotTodayNewsListVM vm = NotTodayNewsListVM(FakeSupabaseClient());
+    NotTodayNewsListVM vm = NotTodayNewsListVM.create(FakeSupabaseClient());
+    vm.offlineRecorder = MockFailingOfflineRecorder();
     await vm.getNewsList();
     expect(vm.generateNewsCalled, isTrue);
   });
 
   test('generateAndGetNews calls invoke and fetchNews', () async {
-    NewsList2VM vm = NewsList2VM(FakeSupabaseClient());
+    NewsList2VM vm = NewsList2VM.create(FakeSupabaseClient());
     // ignore: invalid_use_of_protected_member
     await vm.generateAndGetNews();
     expect(vm.invokedTranscriptFunction, isTrue);
@@ -392,7 +435,7 @@ void main() {
   });
 
   test('setNewsError is called when news is null', () async {
-    NewsList2VM vm = NewsList2VM(FakeSupabaseClient());
+    NewsList2VM vm = NewsList2VM.create(FakeSupabaseClient());
     // ignore: invalid_use_of_protected_member
     await vm.generateAndGetNews();
     expect(vm.hasError, isTrue);
@@ -400,7 +443,7 @@ void main() {
 
   // Test generateAudio is called
   test('generateAudio is called when audio is null', () async {
-    AudioNewsVM vm = AudioNewsVM(FakeSupabaseClient());
+    AudioNewsVM vm = AudioNewsVM.create(FakeSupabaseClient());
     await vm.getAudioFile(News(
         date: DateTime.now().toIso8601String(),
         title: "News",

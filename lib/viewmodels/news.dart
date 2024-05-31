@@ -1,10 +1,12 @@
 import 'dart:developer';
 import 'dart:io';
+import 'dart:async';
 import 'package:actualia/models/news.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
+import 'package:actualia/models/offline_recorder.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -38,6 +40,12 @@ class NewsViewModel extends ChangeNotifier {
     }
   }
 
+  late final OfflineRecorder _offlineRecorder;
+
+  set offlineRecorder(OfflineRecorder offline) {
+    _offlineRecorder = offline;
+  }
+
   @protected
   void setNews(News? news) {
     setNewsList(news != null ? [news] : []);
@@ -45,8 +53,22 @@ class NewsViewModel extends ChangeNotifier {
 
   @protected
   void setNewsList(List<News> newsList) {
+    Future.wait(newsList.map((e) => _offlineRecorder.downloadNews(e).then(
+        (value) => log("Today news is stored"),
+        onError: (error) => log(
+            "News wasn't stored, the following error occured : ${e.toString()}"))));
     _content = Left(newsList);
     notifyListeners();
+  }
+
+  ///private constructor
+  NewsViewModel.create(this.supabase);
+
+  ///public factory
+  static Future<NewsViewModel> init(SupabaseClient supabase) async {
+    NewsViewModel nvm = NewsViewModel.create(supabase);
+    nvm.offlineRecorder = await OfflineRecorder.create();
+    return nvm;
   }
 
   void _setError(ErrorType error) {
@@ -104,8 +126,16 @@ class NewsViewModel extends ChangeNotifier {
 
       setNewsList([parseNews(response), ...newsList ?? []]);
     } catch (e) {
+      try {
+        _offlineRecorder
+            .loadAllNews()
+            .then((loadedNews) => setNewsList(loadedNews));
+      } catch (e) {
+        log("Error while fetching downloaded news: $e",
+            level: Level.WARNING.value);
+        _setError(ErrorType.fetch);
+      }
       log("Error fetching news: $e", level: Level.WARNING.value);
-      _setError(ErrorType.fetch);
     }
   }
 
@@ -130,8 +160,16 @@ class NewsViewModel extends ChangeNotifier {
         }
       }
     } catch (e) {
-      log("Error fetching news list: $e", level: Level.WARNING.value);
-      _setError(ErrorType.fetch);
+      try {
+        _offlineRecorder
+            .loadAllNews()
+            .then((loadedNews) => setNewsList(loadedNews));
+      } catch (e) {
+        log("Error while fetching downloaded news: $e",
+            level: Level.WARNING.value);
+        _setError(ErrorType.fetch);
+      }
+      log("Error fetching news: $e", level: Level.WARNING.value);
     }
   }
 
