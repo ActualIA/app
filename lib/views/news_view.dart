@@ -47,11 +47,14 @@ class _NewsViewState extends State<NewsView> {
       final newsList = newsViewModel.newsList!;
       var firstTranscript = newsViewModel.news!;
       body = Scaffold(
-          body: ListView.builder(
-              itemCount: newsList.length,
-              itemBuilder: (context, index) {
-                return NewsText(news: newsList[index]);
-              }),
+          body: RefreshIndicator(
+              onRefresh: Provider.of<NewsViewModel>(context, listen: false)
+                  .generateAndGetNews,
+              child: ListView.builder(
+                  itemCount: newsList.length,
+                  itemBuilder: (context, index) {
+                    return NewsText(news: newsList[index]);
+                  })),
           floatingActionButton: ExpandableFab(
             distance: 112,
             children: [
