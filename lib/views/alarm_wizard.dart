@@ -1,4 +1,5 @@
 import 'package:actualia/models/auth_model.dart';
+import 'package:actualia/utils/themes.dart';
 import 'package:actualia/viewmodels/alarms.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
 import 'package:actualia/widgets/alarms_widget.dart';
@@ -40,9 +41,12 @@ class _AlarmWizardView extends State<AlarmWizardView> {
     AuthModel auth = Provider.of<AuthModel>(context);
 
     Widget body = Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(loc.setFirstAlarm, style: Theme.of(context).textTheme.titleLarge),
+        const SizedBox(
+          height: UNIT_PADDING * 4,
+        ),
         PickTimeButton(
             initialTime: _selectedTime,
             onTimeSelected: (time) {

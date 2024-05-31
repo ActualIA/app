@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class WizardSelector extends StatefulWidget {
+class WizardSelector extends StatelessWidget {
   final String title;
   final List<(Object, String)> items;
   final List<(Object, String)> selectedItems;
@@ -21,23 +21,8 @@ class WizardSelector extends StatefulWidget {
       super.key});
 
   @override
-  State<WizardSelector> createState() => _WizardSelector();
-}
-
-class _WizardSelector extends State<WizardSelector> {
-  late List<(Object, String)> _items;
-
-  @override
-  void initState() {
-    super.initState();
-    _items = widget.items;
-  }
-
-  @override
   Widget build(BuildContext context) {
-    var loc = AppLocalizations.of(context)!;
-
-    Widget title = WizardSelectorTitle(title: widget.title);
+    Widget title = WizardSelectorTitle(title: this.title);
 
     Widget body = Expanded(
         child: Container(
@@ -50,18 +35,16 @@ class _WizardSelector extends State<WizardSelector> {
                         spacing: UNIT_PADDING / 2,
                         runSpacing: UNIT_PADDING / 2.5,
                         alignment: WrapAlignment.center,
-                        children: _items
+                        children: items
                             .map((e) => FilterChip(
                                 label: Text(e.$2),
                                 onSelected: (v) {
-                                  widget.onSelected(e);
+                                  onSelected(e);
                                 },
-                                selected: widget.selectedItems.contains(e)))
+                                selected: selectedItems.contains(e)))
                             .toList())))));
 
-    return Column(
-      children: [title, body],
-    );
+    return Column(children: [title, body]);
   }
 }
 

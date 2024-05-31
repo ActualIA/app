@@ -16,6 +16,7 @@ class ProvidersViewModel extends ChangeNotifier {
   late final SupabaseClient supabase;
 
   List<NewsProvider>? _newsProviders;
+
   List<NewsProvider>? get newsProviders => _newsProviders;
 
   List<EditedProviderData> get editedProviders => _editedProviders;
@@ -29,6 +30,7 @@ class ProvidersViewModel extends ChangeNotifier {
 
   void setNewsProviders(List<NewsProvider> newsProviders) {
     _newsProviders = newsProviders;
+    notifyListeners();
   }
 
   Future<bool> fetchNewsProviders() async {
@@ -45,6 +47,7 @@ class ProvidersViewModel extends ChangeNotifier {
       _editedProviders = _newsProviders!
           .map((e) => (e.type, e.parameters.toList(), null as List<String?>?))
           .toList(growable: true);
+      notifyListeners();
 
       log("fetch result: $_newsProviders", level: Level.FINEST.value);
       return true;
@@ -52,6 +55,7 @@ class ProvidersViewModel extends ChangeNotifier {
       log("Could not fetch news providers: $e", level: Level.WARNING.value);
       _newsProviders = [];
       _editedProviders = [];
+      notifyListeners();
       return false;
     }
   }
@@ -61,6 +65,7 @@ class ProvidersViewModel extends ChangeNotifier {
         .map((e) => NewsProvider(
             url: [e.$1.basePath, ...e.$2].where((e) => e.isNotEmpty).join("/")))
         .toList();
+    notifyListeners();
   }
 
   void addEditedProvider() {

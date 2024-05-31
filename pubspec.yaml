@@ -46,8 +46,13 @@ dependencies:
   alarm: ^3.1.2
   permission_handler: ^11.3.1
   logging: ^1.2.0
-  audioplayers: ^6.0.0
+  json_annotation: ^4.9.0
+  freezed: ^2.5.2
+  freezed_annotation: ^2.4.1
   path_provider: ^2.1.3
+  path_provider_android: ^2.2.4
+  path_provider_ios: ^2.0.11
+  audioplayers: ^6.0.0
   shared_preferences: ^2.2.3
   fluttertoast: ^8.2.5
   url_launcher: ^6.2.6
@@ -56,6 +61,7 @@ dependencies:
   google_mlkit_text_recognition: ^0.13.0
   camera: ^0.10.6
   dartz: ^0.10.1
+  path_provider_platform_interface: ^2.1.2
   xml: ^6.5.0
   http: ^1.2.1
   flutter_localizations:
@@ -75,6 +81,8 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
   test: ^1.24.9
+  build_runner: ^2.4.9
+  json_serializable: ^6.8.0
   integration_test:
     sdk: flutter
   gotrue: ^2.6.1
