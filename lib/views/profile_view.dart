@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:actualia/utils/themes.dart';
+import 'package:actualia/viewmodels/providers.dart';
 import 'package:actualia/views/accessibility.dart';
 import 'package:actualia/views/news_alert_setup_view.dart';
 import 'package:actualia/views/interests_wizard_view.dart';
@@ -46,6 +47,7 @@ enum SettingsRows {
   }
 
   const SettingsRows(this.key);
+
   final String key;
 }
 
