@@ -28,6 +28,7 @@ Future<void> main() async {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRweGRkYmp5amRzY3Z1aHd1dHd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTA5NTQzNDcsImV4cCI6MjAyNjUzMDM0N30.0vB8huUmdJIYp3M1nMeoixQBSAX_w2keY0JsYj2Gt8c',
   );
   await Alarm.init();
+  NewsViewModel nvm = await NewsViewModel.init(Supabase.instance.client);
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
@@ -37,8 +38,7 @@ Future<void> main() async {
                 serverClientId:
                     '505202936017-bn8uc2veq2hv5h6ksbsvr9pr38g12gde.apps.googleusercontent.com',
               ))),
-      ChangeNotifierProvider(
-          create: (context) => NewsViewModel(Supabase.instance.client)),
+      ChangeNotifierProvider(create: (context) => nvm),
       ChangeNotifierProvider(
           create: (context) => NewsSettingsViewModel(Supabase.instance.client)),
       ChangeNotifierProvider(

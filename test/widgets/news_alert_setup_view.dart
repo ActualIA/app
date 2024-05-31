@@ -23,7 +23,7 @@ void main() {
           ChangeNotifierProvider<AlarmsViewModel>(
               create: (context) => MockAlarmsViewModel(FakeSupabaseClient())),
           ChangeNotifierProvider<NewsViewModel>(
-              create: (context) => pb.MockNewsViewModel()),
+              create: (context) => pb.MockNewsViewModel.create()),
         ], child: const NewsAlertSetupView())));
     // expect(find.text('Loading something'), findsOne);
   });
