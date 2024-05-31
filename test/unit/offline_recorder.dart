@@ -151,4 +151,40 @@ void main() {
             .exists(),
         isFalse);
   });
+
+  News testNews2 = News(
+      title: "Test title",
+      date: "2003-12-11",
+      transcriptId: 1,
+      audio: null,
+      fullTranscript: "Test",
+      paragraphs: [
+        Paragraph(
+          transcript: "0",
+          title:
+              "Local bakery wins national award for innovative cupcake flavors, residents celebrate with free tastings. Mayor commends efforts, hails bakery as symbol of community creativity and entrepreneurship.",
+          date: "2003-12-11",
+          content:
+              "The local bakery's triumph in clinching a prestigious national award for its inventive cupcake flavors has set the town abuzz with excitement. In a jubilant display of community spirit, residents flock to the bakery for complimentary tastings, reveling in the delectable creations that have put their hometown on the culinary map. As the aroma of freshly baked treats fills the air, the mayor takes to the podium, praising the bakery's dedication to pushing culinary boundaries and showcasing the town's entrepreneurial spirit. With a heartfelt commendation, the mayor lauds the bakery as more than just a purveyor of sweets; it's a symbol of the community's ingenuity and innovation. Amidst cheers and applause, the bakery stands as a testament to the power of local businesses in fostering creativity and unity within the neighborhood.",
+          source:
+              "This news comes from \"The Daily Gazette,\" a renowned source for community updates and local achievements, highlighting the innovative cupcake flavors and celebratory atmosphere at a nearby bakery.",
+          url: "Test",
+        ),
+      ]);
+
+  test("Load all news loads correctly if there are only news", () async {
+    PathProviderPlatform.instance = MockPathProviderPlateform();
+    IOOverrides.global = MockIOOverrides(MockFileSys());
+    OfflineRecorder offRec = await OfflineRecorder.create();
+
+    await offRec.downloadNews(testNews);
+    await offRec.downloadNews(testNews2);
+
+    List<News> loadedNews = await offRec.loadAllNews();
+    debugPrint(loadedNews.toString());
+
+    expect(2, equals(loadedNews.length));
+    expect(loadedNews.contains(testNews), true);
+    expect(loadedNews.contains(testNews2), true);
+  });
 }

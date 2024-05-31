@@ -202,9 +202,9 @@ class OfflineRecorder {
     final dir = Directory(_appOfflineNewsPath);
     final Iterable<File> files = (await dir.list().toList()).whereType<File>();
 
-    List<News> news = List.empty();
+    List<News> news = List.empty(growable: true);
     for (var f in files) {
-      _readNewsFile(f).then((n) => {
+      await _readNewsFile(f).then((n) => {
             if (n != null) {news.add(n)}
           });
     }

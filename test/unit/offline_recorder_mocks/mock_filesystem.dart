@@ -134,6 +134,9 @@ class MockFileSys {
   }
 
   String readFile(MockFile file) {
+    debugPrint("1");
+    debugPrint(file.path);
+
     List<String> path = file.path.split("/");
     removeLastIf(path, (p) => p[p.length - 1].isEmpty);
     int i = 0;
@@ -152,5 +155,23 @@ class MockFileSys {
       throw FileSystemException("${file.path} does not exist");
     }
     return content;
+  }
+
+  List<MockFile> listAllFiles() {
+    List<MockFile> listFiles(Dir dir, String path) {
+      List<MockFile> files = List.empty(growable: true);
+
+      for (var entry in dir.keys) {
+        if (dir[entry] is String) {
+          files.add(MockFile("$path/$entry", this));
+        } else if (dir[entry] is Dir) {
+          files = listFiles(dir[entry], path.isEmpty ? entry : "$path/$entry");
+        }
+      }
+
+      return files;
+    }
+
+    return listFiles(FILES, "");
   }
 }
