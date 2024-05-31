@@ -89,6 +89,8 @@ class ValidateVM extends MockNewsSettingsViewModel {
   @override
   Future<bool> pushSettings(NewsSettings? settings) {
     if (expected != null) {
+      debugPrint(
+          "[PUSH] What is happening ns: ${settings!.countries}, ${settings.cities}, ${settings.interests}");
       expect(settings!.cities, equals(expected!.cities));
       expect(settings.countries, equals(expected!.countries));
       expect(settings.interests, equals(expected!.interests));
@@ -189,7 +191,7 @@ void main() {
       (WidgetTester tester) async {
     final vm = ValidateVM(
         NewsSettings(
-            interests: ["Aviation"],
+            interests: ["Acting"],
             cities: ["Abobo (Côte d'Ivoire)"],
             countries: ["Antarctica"],
             wantsCities: false,
@@ -214,7 +216,7 @@ void main() {
 
     await select(const Key("countries-selector"), "Antarctica", "Next");
     await select(const Key("cities-selector"), "Abobo (Côte d'Ivoire)", "Next");
-    await select(const Key("interests-selector"), "Aviation", "Done");
+    await select(const Key("interests-selector"), "Acting", "Done");
 
     expect(vm.wasTriggered, isTrue);
   });
