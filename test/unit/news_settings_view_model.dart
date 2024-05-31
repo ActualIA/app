@@ -58,7 +58,8 @@ void main() {
             wantsCities: false,
             wantsCountries: false,
             wantsInterests: true,
-            locale: 'en')),
+            locale: 'en',
+            userPrompt: "")),
         isFalse);
   });
 }
