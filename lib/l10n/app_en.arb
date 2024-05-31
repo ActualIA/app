@@ -75,6 +75,13 @@
     }
   },
   "search": "Search",
+  "explainingUserPrompt": "You can personalize your news feed with this predefined prompts.\n - Read the news...",
+  "prompt1": "as if you were a radio host",
+  "prompt2": "as if you were 5 years old",
+  "prompt3": "as if you were a robot",
+  "prompt4": "with a lot of enthusiasm",
+  "prompt5": "with a lot of sarcasm",
+  "prompt6": "with a bit of humor",
   "errorTitle": "An error occurred",
   "errorNewsFetch": "Unable to fetch news.",
   "errorNoNews": "There are no news for you on this date.",

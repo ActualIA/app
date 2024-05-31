@@ -24,9 +24,15 @@ class NewsSettingsViewModel extends ChangeNotifier {
   int? get settingsId => _settingsId;
 
   String get locale => settings?.locale ?? "en";
+  String get userPrompt => settings?.userPrompt ?? "";
 
   void setLocale(String? loc) {
     if (_settings != null) _settings!.locale = loc ?? "en";
+    notifyListeners();
+  }
+
+  void setUserPrompt(String? prompt) {
+    if (_settings != null) _settings!.userPrompt = prompt ?? "";
     notifyListeners();
   }
 
@@ -45,7 +51,8 @@ class NewsSettingsViewModel extends ChangeNotifier {
           wantsCities: res['wants_cities'],
           wantsCountries: res['wants_countries'],
           wantsInterests: res['wants_interests'],
-          locale: res['locale']);
+          locale: res['locale'],
+          userPrompt: res['user_prompt']);
       _settingsId = res['id'];
       notifyListeners();
     } catch (e) {
@@ -68,7 +75,8 @@ class NewsSettingsViewModel extends ChangeNotifier {
         'wants_cities': set.wantsCities,
         'wants_countries': set.wantsCountries,
         'wants_interests': set.wantsInterests,
-        'locale': set.locale
+        'locale': set.locale,
+        'user_prompt': set.userPrompt
       }, onConflict: "created_by");
       fetchSettings();
       return true;
