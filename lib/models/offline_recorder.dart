@@ -187,8 +187,8 @@ class OfflineRecorder {
       throw Exception("The date is too far in the past");
     }
 
-    String filePath =
-        _appOfflineNewsPath + "${date.year}-$month-${day}_transcript.json";
+    String filePath = _appOfflineNewsPath +
+        "${date.toIso8601String().substring(0, 10)}_transcript.json";
     if (!await File(filePath).exists()) {
       throw FileSystemException("$filePath doesn't exist");
     }
@@ -209,6 +209,6 @@ class OfflineRecorder {
           });
     }
 
-    return Future.value(news);
+    return news;
   }
 }

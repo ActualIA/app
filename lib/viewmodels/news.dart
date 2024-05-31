@@ -130,7 +130,6 @@ class NewsViewModel extends ChangeNotifier {
         log("Error fetching news: $e", level: Level.WARNING.value);
       }
       log("Error fetching news: $e", level: Level.WARNING.value);
-      _setError(ErrorType.fetch);
     }
   }
 
