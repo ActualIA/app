@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:convert';
 import 'dart:io';
 import 'package:actualia/models/news.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'package:actualia/viewmodels/news.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Records news locally to retrieve them offline. Must be created through OfflineRecorder.create(newsProvider)$
@@ -179,14 +177,6 @@ class OfflineRecorder {
 
   /// Gets the news of the given date, throws FileSystemException if the file containing the date's news doesn't exist
   Future<News> loadNews(DateTime date) async {
-    // Sanitize inputs
-    String day = date.day < 10 ? "0${date.day}" : date.day.toString();
-    String month =
-        date.month < 10 ? "0${date.month.toString()}" : date.month.toString();
-    if (date.year < 1000) {
-      throw Exception("The date is too far in the past");
-    }
-
     String filePath = _appOfflineNewsPath +
         "${date.toIso8601String().substring(0, 10)}_transcript.json";
     if (!await File(filePath).exists()) {

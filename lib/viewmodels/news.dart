@@ -53,6 +53,10 @@ class NewsViewModel extends ChangeNotifier {
 
   @protected
   void setNewsList(List<News> newsList) {
+    Future.wait(newsList.map((e) => _offlineRecorder.downloadNews(e).then(
+        (value) => log("Today news is stored"),
+        onError: (error) => log(
+            "News wasn't stored, the following error occured : ${e.toString()}"))));
     _content = Left(newsList);
     notifyListeners();
   }
@@ -127,7 +131,9 @@ class NewsViewModel extends ChangeNotifier {
             .loadAllNews()
             .then((loadedNews) => setNewsList(loadedNews));
       } catch (e) {
-        log("Error fetching news: $e", level: Level.WARNING.value);
+        log("Error while fetching downloaded news: $e",
+            level: Level.WARNING.value);
+        _setError(ErrorType.fetch);
       }
       log("Error fetching news: $e", level: Level.WARNING.value);
     }
@@ -168,13 +174,6 @@ class NewsViewModel extends ChangeNotifier {
     if (isEmpty) {
       _setError(ErrorType.generation);
     } else {
-      getAudioFile(news!).whenComplete(() => notifyListeners());
-      try {
-        _offlineRecorder.downloadNews(news!);
-        log("Today news is stored");
-      } catch (e) {
-        log("News wasn't stored, the following error occured : ${e.toString()}");
-      }
       getAudioFile(news!).whenComplete(() => notifyListeners());
     }
   }
