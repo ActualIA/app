@@ -151,7 +151,7 @@ class OfflineRecorder {
     if (!(file.path
         .substring(file.path.length - "XXXX-XX-XX_transcript.json".length)
         .startsWith(RegExp(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")))) {
-      return Future(() => null);
+      return null;
     }
 
     String json = await file.readAsString();
