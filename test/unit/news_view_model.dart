@@ -82,6 +82,29 @@ class FakeSupabaseClient extends Fake implements SupabaseClient {
   FunctionsClient get functions => FakeFunctionsClient();
 }
 
+class MockOfflineRecorder extends Fake implements OfflineRecorder {
+  @override
+  Future<void> downloadNews(News news) {
+    return Future(() => null);
+  }
+
+  @override
+  Future<List<News>> loadAllNews() {
+    return Future(() => List.empty());
+  }
+
+  @override
+  Future<News> loadNews(DateTime date) {
+    return Future(() => News(
+        title: "test",
+        date: "test",
+        transcriptId: 2,
+        audio: "test",
+        paragraphs: List.empty(),
+        fullTranscript: ""));
+  }
+}
+
 class AlreadyExistingNewsVM extends NewsViewModel {
   AlreadyExistingNewsVM.create(super.supabase) : super.create();
 
@@ -108,13 +131,6 @@ class AlreadyExistingNewsVM extends NewsViewModel {
   @override
   Future<void> invokeTranscriptFunction() {
     fail("invokeTranscriptFunction should not be called");
-  }
-}
-
-class MockOfflineRecorder extends Fake implements OfflineRecorder {
-  @override
-  Future<void> downloadNews(News news) async {
-    //does not need to do anything
   }
 }
 
@@ -340,6 +356,7 @@ void main() {
 
   test('already existing news are correctly fetched', () async {
     NewsViewModel vm = AlreadyExistingNewsVM.create(FakeSupabaseClient());
+    vm.offlineRecorder = MockOfflineRecorder();
     await vm.getNews(DateTime.now());
     expect(vm.news?.title, equals("News"));
   });
@@ -353,24 +370,28 @@ void main() {
 
   test('getNews with invalid date reports error', () async {
     NewsViewModel vm = NewsViewModel.create(FakeSupabaseClient());
+    vm.offlineRecorder = MockOfflineRecorder();
     await vm.getNews(DateTime.fromMicrosecondsSinceEpoch(0));
     expect(vm.hasError, isTrue);
   });
 
   test('getNews with non working EF reports error', () async {
     NewsViewModel vm = NeverExistingNewsVM.create();
+    vm.offlineRecorder = MockOfflineRecorder();
     await vm.getNews(DateTime.now());
     expect(vm.hasError, isTrue);
   });
 
   test('getNewsList with non working EF reports error', () async {
     NewsViewModel vm = NeverExistingNewsVM.create();
+    vm.offlineRecorder = MockOfflineRecorder();
     await vm.getNewsList();
     expect(vm.hasError, isTrue);
   });
 
   test('getNewsList with working EF returns correct list', () async {
     NewsListVM vm = NewsListVM.create(FakeSupabaseClient());
+    vm.offlineRecorder = MockOfflineRecorder();
     await vm.getNewsList();
     expect(vm.newsList, isNotNull);
     expect(vm.newsList!.length, equals(1));
@@ -382,6 +403,7 @@ void main() {
 
   test('getNewsList with Empty list sets hasNews to false', () async {
     EmptyNewsListVM vm = EmptyNewsListVM.create(FakeSupabaseClient());
+    vm.offlineRecorder = MockOfflineRecorder();
     await vm.getNewsList();
     expect(vm.newsList, isEmpty);
     expect(vm.isEmpty, isTrue);
@@ -389,12 +411,14 @@ void main() {
 
   test('getNewsList with Exception reports error', () async {
     ExceptionNewsListVM vm = ExceptionNewsListVM.create(FakeSupabaseClient());
+    vm.offlineRecorder = MockOfflineRecorder();
     await vm.getNewsList();
     expect(vm.hasError, isTrue);
   });
 
   test('getNewsList with non-today news generates news', () async {
     NotTodayNewsListVM vm = NotTodayNewsListVM.create(FakeSupabaseClient());
+    vm.offlineRecorder = MockOfflineRecorder();
     await vm.getNewsList();
     expect(vm.generateNewsCalled, isTrue);
   });
