@@ -146,15 +146,7 @@ enum ProviderType {
   telegram("/telegram/channel", "Telegram",
       parameters: ["Channel ID"], factory: TelegramProviderFactory()),
   google("gnews", "Google News"),
-  rss("", "RSS", parameters: ["URL"], factory: RSSFeedProviderFactory()),
-  leTemps("https://www.letemps.ch/articles.rss", "Le Temps",
-      factory: RSSFeedProviderFactory()),
-  twentyMinutes("https://partner-feeds.20min.ch/rss/20minutes", "20 Minutes CH",
-      factory: RSSFeedProviderFactory()),
-  epfl("https://actu.epfl.ch/feeds/rss/fr/", "Actu EPFL",
-      factory: RSSFeedProviderFactory()),
-  rts("https://www.rts.ch/info/suisse?format=rss/news", "RTS",
-      factory: RSSFeedProviderFactory());
+  rss("", "RSS", parameters: ["URL"], factory: RSSFeedProviderFactory());
 
   /// Base url of the provider, used for matching
   final String basePath;
