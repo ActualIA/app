@@ -113,7 +113,8 @@ class WizardNavigationBottomBar extends StatelessWidget {
 
     if (showRight) {
       right = Container(
-        padding: const EdgeInsets.all(UNIT_PADDING),
+        padding: const EdgeInsets.symmetric(
+            vertical: UNIT_PADDING * 3 / 4, horizontal: UNIT_PADDING),
         child: FilledButton.tonal(
             onPressed: rOnPressed,
             style: ButtonStyle(
@@ -121,14 +122,15 @@ class WizardNavigationBottomBar extends StatelessWidget {
                     (states) => THEME_LIGHTGRAY)),
             child: Text(
               rText ?? loc.button,
-              style: theme.textTheme.bodyMedium?.copyWith(color: THEME_BUTTON),
+              style: (theme.textTheme.displaySmall)!.apply(color: THEME_BUTTON),
               textScaler: const TextScaler.linear(2),
             )),
       );
     }
     if (showCancel) {
       cancel = Container(
-          padding: const EdgeInsets.all(UNIT_PADDING),
+          padding: const EdgeInsets.symmetric(
+              vertical: UNIT_PADDING * 3 / 4, horizontal: UNIT_PADDING),
           child: FilledButton.tonal(
               onPressed: onCancel,
               style: ButtonStyle(
@@ -137,7 +139,7 @@ class WizardNavigationBottomBar extends StatelessWidget {
               child: Text(
                 cancelText ?? loc.cancel,
                 style:
-                    theme.textTheme.bodyMedium?.copyWith(color: THEME_BUTTON),
+                    (theme.textTheme.displaySmall)!.apply(color: THEME_BUTTON),
                 textScaler: const TextScaler.linear(2),
               )));
     }
@@ -154,6 +156,7 @@ class WizardScaffold extends StatelessWidget {
   final PreferredSizeWidget topBar;
   final Widget body;
   final Widget bottomBar;
+  final EdgeInsetsGeometry? padding;
 
   const WizardScaffold(
       {this.topBar = const TopAppBar(
@@ -161,6 +164,7 @@ class WizardScaffold extends StatelessWidget {
       ),
       required this.body,
       required this.bottomBar,
+      this.padding,
       super.key});
 
   @override
@@ -171,7 +175,7 @@ class WizardScaffold extends StatelessWidget {
       appBar: topBar,
       bottomNavigationBar: bottomBar,
       body: Container(
-        padding: const EdgeInsets.fromLTRB(48.0, 48.0, 48.0, 48.0),
+        padding: padding ?? const EdgeInsets.all(UNIT_PADDING * 3),
         alignment: Alignment.topCenter,
         child: body ?? Text(loc.notImplemented),
       ),
