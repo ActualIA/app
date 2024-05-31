@@ -3,7 +3,7 @@ import SupabaseClient from "https://esm.sh/v135/@supabase/supabase-js@2.42.4/dis
 import { getUserSettings } from "../database.ts";
 
 export async function getUserRawNews(
-  user: string | NewsSettings,
+  userId: string,
   supabaseClient: SupabaseClient,
 ) {
   const user = await getUserSettings(userId, supabaseClient);

@@ -114,7 +114,7 @@ class WizardNavigationBottomBar extends StatelessWidget {
     if (showRight) {
       right = Container(
         padding: const EdgeInsets.symmetric(
-            vertical: UNIT_PADDING * 3 / 4, horizontal: UNIT_PADDING),
+            vertical: UNIT_PADDING, horizontal: UNIT_PADDING),
         child: FilledButton.tonal(
             onPressed: rOnPressed,
             style: ButtonStyle(
@@ -122,7 +122,7 @@ class WizardNavigationBottomBar extends StatelessWidget {
                     (states) => THEME_LIGHTGRAY)),
             child: Text(
               rText ?? loc.button,
-              style: (theme.textTheme.displaySmall)!.apply(color: THEME_BUTTON),
+              style: theme.textTheme.bodyMedium?.copyWith(color: THEME_BUTTON),
               textScaler: const TextScaler.linear(2),
             )),
       );
@@ -130,7 +130,7 @@ class WizardNavigationBottomBar extends StatelessWidget {
     if (showCancel) {
       cancel = Container(
           padding: const EdgeInsets.symmetric(
-              vertical: UNIT_PADDING * 3 / 4, horizontal: UNIT_PADDING),
+              vertical: UNIT_PADDING, horizontal: UNIT_PADDING),
           child: FilledButton.tonal(
               onPressed: onCancel,
               style: ButtonStyle(
@@ -139,7 +139,7 @@ class WizardNavigationBottomBar extends StatelessWidget {
               child: Text(
                 cancelText ?? loc.cancel,
                 style:
-                    (theme.textTheme.displaySmall)!.apply(color: THEME_BUTTON),
+                    theme.textTheme.bodyMedium?.copyWith(color: THEME_BUTTON),
                 textScaler: const TextScaler.linear(2),
               )));
     }
