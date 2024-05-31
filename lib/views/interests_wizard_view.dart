@@ -127,7 +127,8 @@ class _InterestWizardViewState extends State<InterestWizardView> {
               wantsCities: true,
               wantsCountries: true,
               wantsInterests: true,
-              locale: loc.localeName);
+              locale: loc.localeName,
+              userPrompt: "");
           try {
             await nsvm.pushSettings(toSend);
             if (auth.isOnboardingRequired) {
