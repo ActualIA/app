@@ -1,4 +1,6 @@
 import 'package:actualia/models/auth_model.dart';
+import 'package:actualia/models/news.dart';
+import 'package:actualia/models/offline_recorder.dart';
 import 'package:actualia/viewmodels/alarms.dart';
 import 'package:actualia/viewmodels/news.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
@@ -14,6 +16,29 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../unit/auth_model.dart';
 import 'auth.dart';
 import 'utils.dart';
+
+class MockOfflineRecorder extends Fake implements OfflineRecorder {
+  @override
+  Future<void> downloadNews(News news) {
+    return Future(() => null);
+  }
+
+  @override
+  Future<List<News>> loadAllNews() {
+    return Future(() => List.empty());
+  }
+
+  @override
+  Future<News> loadNews(DateTime date) {
+    return Future(() => News(
+        title: "test",
+        date: "test",
+        transcriptId: 17,
+        audio: "test",
+        paragraphs: List.empty(),
+        fullTranscript: ""));
+  }
+}
 
 class MockHttp extends BaseMockedHttpClient {
   @override
@@ -253,6 +278,7 @@ void main() {
           serverClientId:
               '505202936017-bn8uc2veq2hv5h6ksbsvr9pr38g12gde.apps.googleusercontent.com',
         ));
+    nvm.offlineRecorder = MockOfflineRecorder();
     NewsSettingsViewModel nsvm = NewsSettingsViewModel(client);
     AlarmsViewModel avm = AlarmsViewModel(client);
     ProvidersViewModel pvm = ProvidersViewModel(client);

@@ -98,7 +98,7 @@ class MockOfflineRecorder extends Fake implements OfflineRecorder {
     return Future(() => News(
         title: "test",
         date: "test",
-        transcriptId: 2,
+        transcriptId: 17,
         audio: "test",
         paragraphs: List.empty(),
         fullTranscript: ""));
