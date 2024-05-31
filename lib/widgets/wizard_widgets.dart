@@ -113,8 +113,7 @@ class WizardNavigationBottomBar extends StatelessWidget {
 
     if (showRight) {
       right = Container(
-        padding: const EdgeInsets.symmetric(
-            vertical: UNIT_PADDING, horizontal: UNIT_PADDING),
+        padding: const EdgeInsets.all(UNIT_PADDING),
         child: FilledButton.tonal(
             onPressed: rOnPressed,
             style: ButtonStyle(
@@ -129,8 +128,7 @@ class WizardNavigationBottomBar extends StatelessWidget {
     }
     if (showCancel) {
       cancel = Container(
-          padding: const EdgeInsets.symmetric(
-              vertical: UNIT_PADDING, horizontal: UNIT_PADDING),
+          padding: const EdgeInsets.all(UNIT_PADDING),
           child: FilledButton.tonal(
               onPressed: onCancel,
               style: ButtonStyle(
