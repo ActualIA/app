@@ -219,15 +219,13 @@ class WizardScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var loc = AppLocalizations.of(context)!;
-
     return Scaffold(
       appBar: topBar,
       bottomNavigationBar: bottomBar,
       body: Container(
         padding: const EdgeInsets.fromLTRB(48.0, 48.0, 48.0, 48.0),
         alignment: Alignment.topCenter,
-        child: body ?? Text(loc.notImplemented),
+        child: body,
       ),
     );
   }

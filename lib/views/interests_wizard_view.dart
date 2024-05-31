@@ -30,6 +30,11 @@ class _InterestWizardViewState extends State<InterestWizardView> {
   @override
   void initState() {
     super.initState();
+    NewsSettingsViewModel nsvm =
+        Provider.of<NewsSettingsViewModel>(context, listen: false);
+    _selectedCountries = List<String>.from(nsvm.settings!.countries);
+    _selectedCities = List<String>.from(nsvm.settings!.cities);
+    _selectedInterests = List<String>.from(nsvm.settings!.interests);
     _step = WizardStep.COUNTRIES;
   }
 
@@ -51,9 +56,6 @@ class _InterestWizardViewState extends State<InterestWizardView> {
         Provider.of<NewsSettingsViewModel>(context);
     final AuthModel auth = Provider.of<AuthModel>(context);
     final NewsSettings predefined = NewsSettings.defaults();
-    _selectedCountries = nsvm.settings!.countries;
-    _selectedCities = nsvm.settings!.cities;
-    _selectedInterests = nsvm.settings!.interests;
 
     Widget countriesSelector = WizardSelector(
       items: predefined.predefinedCountries.map((e) => (e, e)).toList(),
@@ -92,6 +94,7 @@ class _InterestWizardViewState extends State<InterestWizardView> {
         onCancel: () {
           setState(() {
             _step = WizardStep.COUNTRIES;
+            _selectedCities = List<String>.from(nsvm.settings!.cities);
           });
         },
         rText: loc.next,
@@ -116,6 +119,7 @@ class _InterestWizardViewState extends State<InterestWizardView> {
         onCancel: () {
           setState(() {
             _step = WizardStep.CITIES;
+            _selectedInterests = List<String>.from(nsvm.settings!.interests);
           });
         },
         rText: auth.isOnboardingRequired ? loc.next : loc.done,
