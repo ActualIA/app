@@ -25,6 +25,7 @@ migrate_working_dir/
 **/doc/api/
 **/ios/*
 **/macos/*
+**/windows/*
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
