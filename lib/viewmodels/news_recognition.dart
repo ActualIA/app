@@ -13,9 +13,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// Contains either the OCR result (left) or an error (right).
-typedef _Content = Either<String, _Error>;
+typedef _Content = Either<String, Error>;
 
-enum _Error { recognition, processing, noImage }
+enum Error { recognition, processing, noImage }
 
 class NewsRecognitionViewModel extends ChangeNotifier {
   late final SupabaseClient supabase;
@@ -33,11 +33,11 @@ class NewsRecognitionViewModel extends ChangeNotifier {
   String getErrorMessage(AppLocalizations loc) {
     final error = (_content?.fold((l) => null, (r) => r))!;
     switch (error) {
-      case _Error.recognition:
+      case Error.recognition:
         return loc.ocrErrorRecognition;
-      case _Error.processing:
+      case Error.processing:
         return loc.ocrErrorProcessing;
-      case _Error.noImage:
+      case Error.noImage:
         return loc.ocrErrorNoImage;
     }
   }
@@ -120,7 +120,7 @@ class NewsRecognitionViewModel extends ChangeNotifier {
   Future<void> takePictureAndProcess() async {
     final picture = await takePicture();
     if (picture == null) {
-      setError(_Error.noImage);
+      setError(Error.noImage);
       return;
     }
 

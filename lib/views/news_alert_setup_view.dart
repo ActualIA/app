@@ -61,6 +61,9 @@ class _NewsAlertSetupViewState extends State<NewsAlertSetupView> {
   // Cov: Alarm logic strictly depends on mobile platform
   // coverage:ignore-start
   Future<void> updateAlarm(BuildContext context) async {
+    if (!enabled) {
+      return;
+    }
     AlarmsViewModel model = Provider.of(context, listen: false);
     await model.setAlarm(
         selectedDateTime, assetAudio, loopAudio, vibrate, volume, null);
@@ -121,7 +124,7 @@ class _NewsAlertSetupViewState extends State<NewsAlertSetupView> {
                 Container(
                   margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                   child: Text(
-                    alarmModel.isAlarmSet
+                    enabled
                         ? loc.alarmSetFor(selectedDateTime)
                         : loc.alarmNotSet,
                     style: Theme.of(context)
@@ -158,6 +161,8 @@ class _NewsAlertSetupViewState extends State<NewsAlertSetupView> {
                         value: volume,
                         onChanged: (value) {
                           setState(() => volume = value);
+                        },
+                        onChangeEnd: (value) {
                           updateAlarm(context);
                         },
                       ),
@@ -173,10 +178,12 @@ class _NewsAlertSetupViewState extends State<NewsAlertSetupView> {
                     ),
                     Switch(
                       value: loopAudio,
-                      onChanged: (value) => setState(() {
-                        loopAudio = value;
+                      onChanged: (value) {
+                        setState(() {
+                          loopAudio = value;
+                        });
                         updateAlarm(context);
-                      }),
+                      },
                       key: const Key("switch-loop"),
                     ),
                   ],
@@ -190,10 +197,12 @@ class _NewsAlertSetupViewState extends State<NewsAlertSetupView> {
                     ),
                     Switch(
                       value: vibrate,
-                      onChanged: (value) => setState(() {
-                        vibrate = value;
+                      onChanged: (value) {
+                        setState(() {
+                          vibrate = value;
+                        });
                         updateAlarm(context);
-                      }),
+                      },
                       key: const Key("switch-vibrate"),
                     ),
                   ],

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:actualia/models/auth_model.dart';
+import 'package:actualia/models/news.dart';
 import 'package:actualia/viewmodels/alarms.dart';
 import 'package:actualia/viewmodels/news.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
@@ -70,6 +71,14 @@ class MockNewsViewModel extends NewsViewModel {
     // nvm.offlineRecorder = await OfflineRecorder.create();
     return nvm;
   }
+
+  News? get news => News(
+      title: "test",
+      date: "17-10-2002",
+      transcriptId: 17,
+      audio: "test",
+      paragraphs: List.empty(),
+      fullTranscript: "test");
 }
 
 void main() {

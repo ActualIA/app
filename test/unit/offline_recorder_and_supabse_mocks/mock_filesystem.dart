@@ -69,13 +69,13 @@ class MockFileSys {
 
   void addFile(MockFile file, String content) {
     dynamic createSubDir(List<String> consumer, int depth) {
-      String head = consumer[0];
-      consumer.removeAt(0);
       if (consumer.isEmpty) {
         _depth = depth;
         return content;
       } else {
-        return {head: createSubDir(consumer, depth++)};
+        String head = consumer[0];
+        consumer.removeAt(0);
+        return {head: createSubDir(consumer, ++depth)};
       }
     }
 
@@ -95,7 +95,7 @@ class MockFileSys {
         depth++;
       } else {
         exist = false;
-        subFiles[path[depth]] = createSubDir(path.sublist(depth), depth++);
+        subFiles[path[depth]] = createSubDir(path.sublist(depth + 1), depth);
       }
     }
   }
@@ -134,9 +134,6 @@ class MockFileSys {
   }
 
   String readFile(MockFile file) {
-    debugPrint("1");
-    debugPrint(file.path);
-
     List<String> path = file.path.split("/");
     removeLastIf(path, (p) => p[p.length - 1].isEmpty);
     int i = 0;

@@ -1,18 +1,15 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:flutter/widgets.dart';
-import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
-import 'dart:developer' as dev;
 
 import 'package:actualia/models/news.dart';
 import 'package:actualia/models/offline_recorder.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 
-import 'offline_recorder_mocks/mock_directory.dart';
-import 'offline_recorder_mocks/mock_file.dart';
-import 'offline_recorder_mocks/mock_filesystem.dart';
+import 'offline_recorder_and_supabse_mocks/mock_directory.dart';
+import 'offline_recorder_and_supabse_mocks/mock_file.dart';
+import 'offline_recorder_and_supabse_mocks/mock_filesystem.dart';
 
 News testNews = News(
     title: "Test title",
@@ -59,13 +56,11 @@ class MockIOOverrides extends IOOverrides {
 
   @override
   Directory createDirectory(String path) {
-    // debugPrint("[CREATEDIR] path: $path");
     return MockDir(path, files);
   }
 
   @override
   File createFile(String path) {
-    // debugPrint("[CREATEFILE] path: $path");
     return MockFile(path, files, size: path.length);
   }
 }
@@ -75,10 +70,16 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   test("Correct Serialisation and Deserialization", () {
-    var json = testNews.toJson();
-    var news = News.fromJson(json);
+    var newsJson = testNews.toJson();
+    var news = News.fromJson(newsJson);
 
     expect(news, equals(testNews));
+
+    var p = testNews.paragraphs.first;
+    var paragraphJson = p.toJson();
+    var paragraph = Paragraph.fromJson(paragraphJson);
+
+    expect(paragraph, equals(p));
   });
 
   test(
@@ -181,7 +182,6 @@ void main() {
     await offRec.downloadNews(testNews2);
 
     List<News> loadedNews = await offRec.loadAllNews();
-    debugPrint(loadedNews.toString());
 
     expect(2, equals(loadedNews.length));
     expect(loadedNews.contains(testNews), true);
