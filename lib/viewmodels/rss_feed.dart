@@ -19,21 +19,17 @@ class RSSFeedViewModel extends ChangeNotifier {
   RSSFeedViewModel(this.supabase);
 
   getRawNewsList() async {
-    debugPrint("[ RSSFVM ] getting news !"); 
     hasNews = false;
     final rawNewsList = await fetchRawNewsList();
     final articles = parseIntoArticles(rawNewsList);
     setArticles(articles);
     hasNews = true;
-    debugPrint("[ RSSFVM ] got news !"); 
     notifyListeners();
   }
 
   Future<List<dynamic>> fetchRawNewsList() async {
     try {
-      debugPrint("trying to invoke"); 
       final res = await supabase.functions.invoke('generate-raw-feed');
-      debugPrint("invoked with ${jsonDecode(res.data)}"); 
       return jsonDecode(res.data);
     } catch (e) {
       hasNews = false;
@@ -42,7 +38,6 @@ class RSSFeedViewModel extends ChangeNotifier {
   }
 
   List<Article> parseIntoArticles(List<dynamic> items) {
-    debugPrint("type of item is: ${items[0]['url']}"); 
     List<Article> art = items
         .where((item) => item != null)
         .map((item) => Article(
