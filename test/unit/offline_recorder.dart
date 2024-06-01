@@ -1,18 +1,15 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:flutter/widgets.dart';
-import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
-import 'dart:developer' as dev;
 
 import 'package:actualia/models/news.dart';
 import 'package:actualia/models/offline_recorder.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 
-import 'offline_recorder_mocks/mock_directory.dart';
-import 'offline_recorder_mocks/mock_file.dart';
-import 'offline_recorder_mocks/mock_filesystem.dart';
+import 'offline_recorder_and_supabse_mocks/mock_directory.dart';
+import 'offline_recorder_and_supabse_mocks/mock_file.dart';
+import 'offline_recorder_and_supabse_mocks/mock_filesystem.dart';
 
 News testNews = News(
     title: "Test title",

@@ -13,8 +13,9 @@ import 'package:path_provider_platform_interface/path_provider_platform_interfac
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'offline_recorder.dart';
-import 'offline_recorder_mocks/mock_file.dart';
-import 'offline_recorder_mocks/mock_filesystem.dart';
+import 'offline_recorder_and_supabse_mocks/mock_file.dart';
+import 'offline_recorder_and_supabse_mocks/mock_filesystem.dart';
+import 'offline_recorder_and_supabse_mocks/supabase_mock.dart';
 
 class FakeGoTrueClient extends Fake implements GoTrueClient {
   @override
@@ -526,5 +527,42 @@ void main() {
     vm.setError(ErrorType.generation);
     expect(vm.getErrorMessage(MockAppLoc()),
         "Something went wrong while generating news. Please try again later.");
+  });
+
+  test("fetchNews work as intended with existing news", () async {
+    PathProviderPlatform.instance = MockPathProviderPlateform();
+    MockFileSys files = MockFileSys();
+    IOOverrides.global = MockIOOverrides(files);
+    FakeDB db = FakeDB([], [
+      {
+        "id": 1,
+        "user": "1234",
+        "title": "title",
+        "transcript": {
+          "totalNews": 1,
+          "totalNewsByLLM": "10",
+          "intro": "intro",
+          "outro": "outro",
+          "fullTranscript": "blablabla",
+          "news": [
+            {
+              "transcript": "blablabla",
+              "title": "title",
+              "description": "description",
+              "content": "content",
+              "url": "url",
+              "image": "image.jpg",
+              "publishedAt": "2023-05-02T21:29:00.000Z",
+              "source": {"name": "name", "url": "url"}
+            }
+          ]
+        },
+        "date": DateTime.now().toIso8601String(),
+        "audio": "audio",
+        "is_public": false
+      },
+    ]);
+    NewsViewModel vm = await NewsViewModel.init(db); //NewsViewModel(db);
+    vm.fetchNews(DateTime.now());
   });
 }
