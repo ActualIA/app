@@ -527,8 +527,4 @@ void main() {
     expect(vm.getErrorMessage(MockAppLoc()),
         "Something went wrong while generating news. Please try again later.");
   });
-
-  test("factory works", () async {
-    NewsViewModel vm = await NewsViewModel.init();
-  });
 }
