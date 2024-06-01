@@ -1,25 +1,69 @@
 import 'dart:developer';
 
+import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:logging/logging.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+/// Contains either the OCR result (left) or an error (right).
+typedef _Content = Either<String, _Error>;
+
+enum _Error { recognition, processing, noImage }
 
 class NewsRecognitionViewModel extends ChangeNotifier {
   late final SupabaseClient supabase;
+
+  _Content? _content;
+  bool isProcessing = false;
+
+  bool get hasError => _content?.isRight() ?? false;
+  String? get result => _content?.fold((l) => l, (r) => null);
+
+  String getErrorMessage(AppLocalizations loc) {
+    final error = (_content?.fold((l) => null, (r) => r))!;
+    switch (error) {
+      case _Error.recognition:
+        return loc.ocrErrorRecognition;
+      case _Error.processing:
+        return loc.ocrErrorProcessing;
+      case _Error.noImage:
+        return loc.ocrErrorNoImage;
+    }
+  }
+
+  @protected
+  void setError(_Error error) {
+    _content = Right(error);
+    notifyListeners();
+  }
+
+  @protected
+  void setContent(String content) {
+    _content = Left(content);
+    notifyListeners();
+  }
+
+  @protected
+  void markProcessingAs(bool started) {
+    isProcessing = started;
+    notifyListeners();
+  }
+
   final ImagePicker _picker = ImagePicker();
 
   NewsRecognitionViewModel(SupabaseClient supabaseClient) {
     supabase = supabaseClient;
   }
 
-  Future<String?> ocr(String filePath) async {
+  Future<void> ocr(String filePath) async {
     try {
       final textFromImage = await recognizeText(filePath);
       log("Text from image: $textFromImage", level: Level.INFO.value);
-      return await invokeProcessImage(textFromImage);
+      await invokeProcessImage(textFromImage);
     } catch (e) {
       log("Error processing image: $e", level: Level.WARNING.value);
       throw Exception("Failed to process image");
@@ -35,14 +79,14 @@ class NewsRecognitionViewModel extends ChangeNotifier {
     return recognizedText.text;
   }
 
-  Future<String?> invokeProcessImage(String textFromImage) async {
+  Future<void> invokeProcessImage(String textFromImage) async {
     try {
       final processImageResponse = await supabase.functions
           .invoke('process-image', body: {"textFromImage": textFromImage});
 
       log("Edge function 'process-image' invoked successfully.",
           level: Level.INFO.value);
-      return processImageResponse.data;
+      setContent(processImageResponse.data);
     } catch (e) {
       log("Error invoking process-image edge function: $e",
           level: Level.WARNING.value);
@@ -62,6 +106,19 @@ class NewsRecognitionViewModel extends ChangeNotifier {
       log('Permission denied', level: Level.WARNING.value);
     }
     return null;
+  }
+
+  Future<void> takePictureAndProcess() async {
+    final picture = await takePicture();
+    if (picture == null) {
+      setError(_Error.noImage);
+      return;
+    }
+
+    markProcessingAs(true);
+    final text = await recognizeText(picture.path);
+    await invokeProcessImage(text);
+    markProcessingAs(false);
   }
 
   Future<PermissionStatus> askPermission() async {

@@ -1,6 +1,7 @@
 import "package:actualia/models/news.dart";
 import "package:actualia/viewmodels/news.dart";
 import "package:actualia/views/news_view.dart";
+import "package:dartz/dartz.dart";
 import "package:flutter/material.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:provider/provider.dart";
@@ -10,48 +11,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class FakeSupabaseClient extends Fake implements SupabaseClient {}
 
 class MockNewsViewModel extends NewsViewModel {
-  MockNewsViewModel() : super(FakeSupabaseClient());
+  MockNewsViewModel.create() : super.create(FakeSupabaseClient());
 
   @override
-  News? get news => News(
-      title: "Title",
-      date: "1970-01-01",
-      transcriptId: -1,
-      audio: null,
-      paragraphs: [
-        Paragraph(
-            transcript: "text1",
-            source: "source1",
-            title: "title1",
-            date: "1970-01-01",
-            content: "content1",
-            url: "url1"),
-        Paragraph(
-            transcript: "text2",
-            source: "source2",
-            title: "title2",
-            date: "1970-01-01",
-            content: "content2",
-            url: "url2"),
-        Paragraph(
-            transcript: "text3",
-            source: "source3",
-            title: "title3",
-            date: "1970-01-01",
-            content: "content3",
-            url: "url3"),
-        Paragraph(
-            transcript: "text4",
-            source: "source4",
-            title: "title4",
-            date: "1970-01-01",
-            content: "content4",
-            url: "url4")
-      ],
-      fullTranscript: "full-transcript");
-
-  @override
-  List<News> get newsList => [
+  Content get content => Left([
         News(
             title: "Title1",
             date: "1970-01-01",
@@ -146,7 +109,7 @@ class MockNewsViewModel extends NewsViewModel {
                   url: "url2"),
             ],
             fullTranscript: "full-transcript"),
-      ];
+      ]);
 
   @override
   Future<void> getNews(DateTime date) {
@@ -190,7 +153,8 @@ void main() {
   testWidgets("Has all correct title", (WidgetTester tester) async {
     // Build our app and trigger a frame.
 
-    await tester.pumpWidget(NewsWrapper(const NewsView(), MockNewsViewModel()));
+    await tester
+        .pumpWidget(NewsWrapper(const NewsView(), MockNewsViewModel.create()));
     await tester.pumpAndSettle();
 
     expect(find.text("Title1"), findsOne);

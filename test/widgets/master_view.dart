@@ -1,6 +1,7 @@
 import 'package:actualia/utils/themes.dart';
 import 'package:actualia/viewmodels/news.dart';
 import 'package:actualia/viewmodels/news_recognition.dart';
+import 'package:actualia/views/context_view.dart';
 import 'package:actualia/views/master_view.dart';
 import 'package:actualia/views/news_view.dart';
 import 'package:actualia/widgets/navigation_menu.dart';
@@ -55,10 +56,17 @@ void main() {
     expect(find.byType(TopAppBar), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.camera_alt));
-    await tester.pump();
-    expect(find.byType(NewsView), findsOneWidget);
+    await tester.pumpAndSettle();
+    expect(find.byType(ContextView), findsOneWidget);
     await tester.tap(find.byIcon(Icons.feed));
     await tester.pumpAndSettle();
     expect(find.byType(NewsView), findsNothing);
+  });
+
+  testWidgets("Can take a picture", (tester) async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+
+    await tester.pumpWidget(MasterWrapper(const MasterView(),
+        MockNewsViewModel(), NewsRecognitionViewModel(FakeSupabaseClient())));
   });
 }

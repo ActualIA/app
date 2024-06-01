@@ -1,9 +1,18 @@
 import 'dart:convert';
 
+import 'package:actualia/models/auth_model.dart';
+import 'package:actualia/viewmodels/alarms.dart';
+import 'package:actualia/viewmodels/news_settings.dart';
+import 'package:actualia/viewmodels/providers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../widgets/news_view.dart';
+import 'auth.dart' as mocknvm;
 import 'utils.dart';
 
 class MockHttp extends BaseMockedHttpClient {
@@ -25,11 +34,13 @@ class MockHttp extends BaseMockedHttpClient {
         case "${BaseMockedHttpClient.baseUrl}/rest/v1/news_settings?on_conflict=created_by":
           var body = json.decode(req.body);
 
-          expect(listEquals(List<String>.from(body['cities']), ['Lausanne']),
+          expect(
+              listEquals(List<String>.from(body['cities']),
+                  ['Abobo (Côte d\'Ivoire)']),
               isTrue);
           expect(listEquals(List<String>.from(body['countries']), ['Albania']),
               isTrue);
-          expect(listEquals(List<String>.from(body['interests']), ['Gaming']),
+          expect(listEquals(List<String>.from(body['interests']), ['Aviation']),
               isTrue);
           return http.StreamedResponse(Stream.fromIterable(["".codeUnits]), 201,
               request: req);
@@ -38,11 +49,12 @@ class MockHttp extends BaseMockedHttpClient {
             "id": 345,
             "created_at": "2024-04-30T14:39:28.189469+00:00",
             "created_by": BaseMockedHttpClient.uuid,
-            "interests": onboardingDone ? jsonEncode(["Gaming"]) : "[]",
+            "interests": onboardingDone ? jsonEncode(["Aviation"]) : "[]",
             "wants_interests": true,
             "countries": onboardingDone ? jsonEncode(["Albania"]) : "[]",
             "wants_countries": true,
-            "cities": onboardingDone ? jsonEncode(["Lausanne"]) : "[]",
+            "cities":
+                onboardingDone ? jsonEncode(["Abobo (Côte d'Ivoire)"]) : "[]",
             "wants_cities": true,
             "user_prompt": null,
             "providers_id": null,
@@ -54,7 +66,7 @@ class MockHttp extends BaseMockedHttpClient {
           expect(
               jsonDecode(req.body),
               equals({
-                "providers": ["/google/news/:category"]
+                "providers": ["gnews"]
               }));
           return response([], 200, req);
         default:
@@ -85,7 +97,36 @@ void main() async {
   testWidgets('User can go through onboarding then inspect profile',
       (tester) async {
     // Starts the app
-    await tester.pumpWidget(AppWrapper(httpClient: MockHttp()));
+    SharedPreferences.setMockInitialValues({});
+
+    MockHttp mockHttp = MockHttp();
+    Supabase.initialize(
+        url: 'https://dpxddbjyjdscvuhwutwu.supabase.co',
+        anonKey:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRweGRkYmp5amRzY3Z1aHd1dHd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTA5NTQzNDcsImV4cCI6MjAyNjUzMDM0N30.0vB8huUmdJIYp3M1nMeoixQBSAX_w2keY0JsYj2Gt8c',
+        httpClient: mockHttp,
+        debug: false,
+        authOptions: const FlutterAuthClientOptions(autoRefreshToken: false));
+
+    SupabaseClient client = Supabase.instance.client;
+    mocknvm.MockNewsViewModel nvm =
+        await mocknvm.MockNewsViewModel.init(client);
+    AuthModel auth = AuthModel(
+        client,
+        GoogleSignIn(
+          serverClientId:
+              '505202936017-bn8uc2veq2hv5h6ksbsvr9pr38g12gde.apps.googleusercontent.com',
+        ));
+    NewsSettingsViewModel nsvm = NewsSettingsViewModel(client);
+    AlarmsViewModel avm = AlarmsViewModel(client);
+    ProvidersViewModel pvm = ProvidersViewModel(client);
+    await tester.pumpWidget(AppWrapper(
+      nvm: nvm,
+      auth: auth,
+      avm: avm,
+      nsvm: nsvm,
+      pvm: pvm,
+    ));
 
     // Login as guest
     final loginButton = find.byKey(const Key("signin-guest"));
@@ -110,8 +151,8 @@ void main() async {
 
     // Select a few interests.
     await selectEntry("Albania");
-    await selectEntry("Lausanne");
-    await selectEntry("Gaming");
+    await selectEntry("Abobo (Côte d'Ivoire)");
+    await selectEntry("Aviation");
 
     await tester.tap(find.textContaining("Add"));
     await tester.pumpAndSettle();
@@ -123,6 +164,9 @@ void main() async {
     await tester.pumpAndSettle();
 
     await tester.tap(find.textContaining("Next"));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text("Skip"));
     await tester.pumpAndSettle();
 
     // Open the profile view.

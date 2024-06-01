@@ -11,6 +11,8 @@
   "skip": "Skip",
   "profileGreeting": "Hello!",
   "readMore": "Read more",
+  "interestsWizardUpdating": "Updating",
+  "interestsUpdateError": "An error occurred while updating.",
   "providersWizardLoading": "Loading your sources",
   "@providersWizardLoading": {
     "description": "Description of the loading screen during provider fetching in the wizard"
@@ -23,7 +25,7 @@
   "@providersWizardTitle": {
     "description": "Title of the provider wizard"
   },
-  "providersUpdateError": "An error occurred while updating",
+  "providersUpdateError": "An error occurred while updating.",
   "@providersUpdateError": {
     "description": "Error toast when provider update fails"
   },
@@ -71,5 +73,20 @@
         "format": "EEEE"
       }
     }
-  }
+  },
+  "explainingUserPrompt": "You can personalize your news feed with this predefined prompts.\n - Read the news...",
+  "prompt1": "as if you were a radio host",
+  "prompt2": "as if you were 5 years old",
+  "prompt3": "as if you were a robot",
+  "prompt4": "with a lot of enthusiasm",
+  "prompt5": "with a lot of sarcasm",
+  "prompt6": "with a bit of humor",
+  "errorTitle": "An error occurred",
+  "errorNewsFetch": "Unable to fetch news.",
+  "errorNoNews": "There are no news for you on this date.",
+  "errorNewsGeneration": "Something went wrong while generating news. Please try again later.",
+  "ocrLoadingText": "Image is being processed",
+  "ocrErrorRecognition": "An error occurred while recognizing text in the image.",
+  "ocrErrorProcessing": "An error occurred while processing the text.",
+  "ocrErrorNoImage": "No picture taken. Please try again."
 }

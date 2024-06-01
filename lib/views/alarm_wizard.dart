@@ -1,4 +1,5 @@
 import 'package:actualia/models/auth_model.dart';
+import 'package:actualia/utils/themes.dart';
 import 'package:actualia/viewmodels/alarms.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
 import 'package:actualia/widgets/alarms_widget.dart';
@@ -40,50 +41,52 @@ class _AlarmWizardView extends State<AlarmWizardView> {
     AuthModel auth = Provider.of<AuthModel>(context);
 
     Widget body = Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(loc.setFirstAlarm, style: Theme.of(context).textTheme.titleLarge),
+        const SizedBox(
+          height: UNIT_PADDING * 4,
+        ),
         PickTimeButton(
             initialTime: _selectedTime,
             onTimeSelected: (time) {
               _selectedTime = time;
             }),
-        WizardNavigationBottomBar(
-          showCancel: true,
-          cancelText: loc.skip,
-          onCancel: () async {
-            if (auth.isOnboardingRequired) {
-              await auth.setOnboardingIsDone();
-            }
-            if (context.mounted) {
-              Navigator.popUntil(context, (route) => route.isFirst);
-            }
-          },
-          showRight: true,
-          rText: "Validate",
-          rOnPressed: () async {
-            avm.setAlarm(
-                _selectedTime,
-                assetAudio,
-                loopAudio,
-                vibrate,
-                volume,
-                Provider.of<NewsSettingsViewModel>(context, listen: false)
-                    .settingsId);
-            if (auth.isOnboardingRequired) {
-              await auth.setOnboardingIsDone();
-            }
-
-            if (context.mounted) {
-              Navigator.popUntil(context, (route) => route.isFirst);
-            }
-          },
-        )
       ],
+    );
+
+    Widget bottomBar = WizardNavigationBottomBar(
+      showCancel: true,
+      cancelText: loc.skip,
+      onCancel: () async {
+        if (auth.isOnboardingRequired) {
+          await auth.setOnboardingIsDone();
+        }
+        if (context.mounted) {
+          Navigator.popUntil(context, (route) => !route.hasActiveRouteBelow);
+        }
+      },
+      showRight: true,
+      rText: loc.done,
+      rOnPressed: () async {
+        avm.setAlarm(
+            _selectedTime,
+            assetAudio,
+            loopAudio,
+            vibrate,
+            volume,
+            Provider.of<NewsSettingsViewModel>(context, listen: false)
+                .settingsId);
+        if (auth.isOnboardingRequired) {
+          await auth.setOnboardingIsDone();
+        }
+        Navigator.popUntil(context, (route) => !route.hasActiveRouteBelow);
+      },
     );
 
     return WizardScaffold(
       body: body,
+      bottomBar: bottomBar,
     );
   }
 }
