@@ -56,13 +56,11 @@ class MockIOOverrides extends IOOverrides {
 
   @override
   Directory createDirectory(String path) {
-    // debugPrint("[CREATEDIR] path: $path");
     return MockDir(path, files);
   }
 
   @override
   File createFile(String path) {
-    // debugPrint("[CREATEFILE] path: $path");
     return MockFile(path, files, size: path.length);
   }
 }
@@ -72,10 +70,16 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   test("Correct Serialisation and Deserialization", () {
-    var json = testNews.toJson();
-    var news = News.fromJson(json);
+    var newsJson = testNews.toJson();
+    var news = News.fromJson(newsJson);
 
     expect(news, equals(testNews));
+
+    var p = testNews.paragraphs.first;
+    var paragraphJson = p.toJson();
+    var paragraph = Paragraph.fromJson(paragraphJson);
+
+    expect(paragraph, equals(p));
   });
 
   test(
@@ -178,7 +182,6 @@ void main() {
     await offRec.downloadNews(testNews2);
 
     List<News> loadedNews = await offRec.loadAllNews();
-    debugPrint(loadedNews.toString());
 
     expect(2, equals(loadedNews.length));
     expect(loadedNews.contains(testNews), true);
