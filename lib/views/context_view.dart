@@ -19,12 +19,10 @@ class ContextView extends StatelessWidget {
     if (nrvm.isProcessing) {
       return LoadingView(text: loc.ocrLoadingText);
     } else if (nrvm.hasError) {
-      body = ErrorDisplayWidget(
-          title: loc.errorTitle, description: nrvm.getErrorMessage(loc));
+      body = ErrorDisplayWidget(description: nrvm.getErrorMessage(loc));
     } else if (nrvm.result == null) {
       nrvm.takePictureAndProcess();
-      body = ErrorDisplayWidget(
-          title: loc.errorTitle, description: loc.ocrErrorNoImage);
+      body = ErrorDisplayWidget(description: loc.ocrErrorNoImage);
     } else {
       body = ListView(
         shrinkWrap: true,

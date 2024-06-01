@@ -40,7 +40,7 @@ class _MasterView extends State<MasterView> {
           onPressed: setCurrentViewState),
       Destination(
           view: Views.CONTEXT,
-          icon: Icons.camera_alt,
+          icon: Icons.camera,
           onPressed: setCurrentViewState),
       Destination(
           view: Views.FEED, icon: Icons.feed, onPressed: setCurrentViewState)
@@ -56,36 +56,38 @@ class _MasterView extends State<MasterView> {
     switch (_currentViews) {
       case Views.NEWS:
         body = const NewsView();
-        final firstTranscript = Provider.of<NewsViewModel>(context).news!;
+        final firstTranscript = Provider.of<NewsViewModel>(context).news;
 
-        floatingButton = ExpandableFab(
-          distance: 112,
-          children: [
-            ActionButton(
-              onPressed: () =>
-                  Share.share('${firstTranscript.fullTranscript}\n\n'
-                      '${loc.newsShareText}'),
-              icon: const Icon(Icons.text_fields),
-            ),
-            ActionButton(
-              onPressed: () async => await Share.shareXFiles([
-                XFile(
-                    // ignore: use_build_context_synchronously
-                    '${(await getApplicationDocumentsDirectory()).path}/audios/${firstTranscript.transcriptId}.mp3')
-              ], text: loc.newsShareText),
-              icon: const Icon(Icons.audiotrack),
-            ),
-            ActionButton(
-              onPressed: () {
-                Provider.of<NewsViewModel>(context, listen: false)
-                    .setNewsPublicInDatabase(firstTranscript);
-                Share.share(
-                    'https://actualia.pages.dev/share?transcriptId=${firstTranscript.transcriptId}');
-              },
-              icon: const Icon(Icons.link),
-            ),
-          ],
-        );
+        floatingButton = firstTranscript == null
+            ? null
+            : ExpandableFab(
+                distance: 112,
+                children: [
+                  ActionButton(
+                    onPressed: () =>
+                        Share.share('${firstTranscript.fullTranscript}\n\n'
+                            '${loc.newsShareText}'),
+                    icon: const Icon(Icons.text_fields),
+                  ),
+                  ActionButton(
+                    onPressed: () async => await Share.shareXFiles([
+                      XFile(
+                          // ignore: use_build_context_synchronously
+                          '${(await getApplicationDocumentsDirectory()).path}/audios/${firstTranscript.transcriptId}.mp3')
+                    ], text: loc.newsShareText),
+                    icon: const Icon(Icons.audiotrack),
+                  ),
+                  ActionButton(
+                    onPressed: () {
+                      Provider.of<NewsViewModel>(context, listen: false)
+                          .setNewsPublicInDatabase(firstTranscript);
+                      Share.share(
+                          'https://actualia.pages.dev/share?transcriptId=${firstTranscript.transcriptId}');
+                    },
+                    icon: const Icon(Icons.link),
+                  ),
+                ],
+              );
         break;
       case Views.FEED:
         body = Center(child: Text(loc.notImplemented));
@@ -94,11 +96,12 @@ class _MasterView extends State<MasterView> {
         body = const ContextView();
         floatingButton = IconButton.filledTonal(
           iconSize: 40,
-          onPressed: () => Provider.of<NewsRecognitionViewModel>(context),
+          onPressed: () =>
+              Provider.of<NewsRecognitionViewModel>(context, listen: false)
+                  .takePictureAndProcess(),
           icon: Container(
               padding: const EdgeInsets.all(UNIT_PADDING / 4),
-              child: const Icon(Icons
-                  .sync_outlined)), // Chosen because it represents the act of doing an action again, which here is the case because they have to take a new picture
+              child: const Icon(Icons.camera_alt)),
           color: THEME_BUTTON,
         );
         break;
