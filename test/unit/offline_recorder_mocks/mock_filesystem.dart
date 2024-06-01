@@ -134,9 +134,6 @@ class MockFileSys {
   }
 
   String readFile(MockFile file) {
-    debugPrint("1");
-    debugPrint(file.path);
-
     List<String> path = file.path.split("/");
     removeLastIf(path, (p) => p[p.length - 1].isEmpty);
     int i = 0;
