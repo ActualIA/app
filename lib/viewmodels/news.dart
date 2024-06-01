@@ -71,7 +71,7 @@ class NewsViewModel extends ChangeNotifier {
     return nvm;
   }
 
-  void _setError(ErrorType error) {
+  void setError(ErrorType error) {
     _content = Right(error);
     notifyListeners();
   }
@@ -93,7 +93,7 @@ class NewsViewModel extends ChangeNotifier {
           date.day == today.day) {
         await generateAndGetNews();
       } else {
-        _setError(ErrorType.noNews);
+        setError(ErrorType.noNews);
       }
     }
   }
@@ -133,7 +133,7 @@ class NewsViewModel extends ChangeNotifier {
       } catch (e) {
         log("Error while fetching downloaded news: $e",
             level: Level.WARNING.value);
-        _setError(ErrorType.fetch);
+        setError(ErrorType.fetch);
       }
       log("Error fetching news: $e", level: Level.WARNING.value);
     }
@@ -167,7 +167,7 @@ class NewsViewModel extends ChangeNotifier {
       } catch (e) {
         log("Error while fetching downloaded news: $e",
             level: Level.WARNING.value);
-        _setError(ErrorType.fetch);
+        setError(ErrorType.fetch);
       }
       log("Error fetching news: $e", level: Level.WARNING.value);
     }
@@ -180,7 +180,7 @@ class NewsViewModel extends ChangeNotifier {
     await fetchNews(DateTime.now());
 
     if (isEmpty) {
-      _setError(ErrorType.generation);
+      setError(ErrorType.generation);
     } else {
       getAudioFile(news!).whenComplete(() => notifyListeners());
     }
