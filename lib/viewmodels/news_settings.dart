@@ -52,7 +52,7 @@ class NewsSettingsViewModel extends ChangeNotifier {
           wantsCountries: res['wants_countries'],
           wantsInterests: res['wants_interests'],
           locale: res['locale'],
-          userPrompt: res['user_prompt']);
+          userPrompt: res['user_prompt'] ?? '');
       _settingsId = res['id'];
       notifyListeners();
     } catch (e) {
