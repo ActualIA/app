@@ -44,7 +44,7 @@ class NewsRecognitionViewModel extends ChangeNotifier {
 
   @protected
   // ignore: library_private_types_in_public_api
-  void setError(_Error error) {
+  void setError(Error error) {
     _content = Right(error);
     notifyListeners();
   }
