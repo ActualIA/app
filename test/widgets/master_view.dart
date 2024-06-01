@@ -64,7 +64,7 @@ void main() {
     expect(find.byType(ActualiaBottomNavigationBar), findsOneWidget);
     expect(find.byType(TopAppBar), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.camera_alt));
+    await tester.tap(find.byIcon(Icons.camera));
     await tester.pumpAndSettle();
     expect(find.byType(ContextView), findsOneWidget);
     await tester.tap(find.byIcon(Icons.feed));
