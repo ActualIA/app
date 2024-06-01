@@ -200,6 +200,5 @@ class OfflineRecorder {
     }
 
     return news;
-  
   }
 }
