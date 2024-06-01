@@ -1,8 +1,8 @@
+import { assertHasEnv } from "../_shared/util.ts";
 import {
   isString,
   validate,
 } from "https://deno.land/x/validasaur@v0.15.0/mod.ts";
-import { assertHasEnv } from "../util.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.42.4";
 import OpenAI from "https://deno.land/x/openai@v4.33.0/mod.ts";
 
@@ -23,7 +23,9 @@ Deno.serve(async (request) => {
       return new Response(JSON.stringify({ errors }), { status: 400 });
     }
     textFromImage = body.textFromImage;
-  } catch (_) {}
+  } catch (_) {
+    console.trace('Received body is not a valid JSON')
+  }
 
   // Create a Supabase client with the user's token.
   const authHeader = request.headers.get("Authorization")!;
@@ -39,8 +41,6 @@ Deno.serve(async (request) => {
     console.error(user.error);
     return new Response("Authentication error", { status: 401 });
   }
-
-  const userId = user.data.user.id;
 
   const openai = new OpenAI();
   const completion = await openai.chat.completions.create({
