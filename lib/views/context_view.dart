@@ -48,24 +48,6 @@ class ContextView extends StatelessWidget {
       );
     }
 
-    return Container(
-        padding: const EdgeInsets.all(UNIT_PADDING),
-        child: Stack(
-          children: [
-            body,
-            Align(
-              alignment: Alignment.bottomRight,
-              child: IconButton.filledTonal(
-                iconSize: 40,
-                onPressed: () => nrvm.takePictureAndProcess(),
-                icon: Container(
-                    padding: const EdgeInsets.all(UNIT_PADDING / 4),
-                    child: const Icon(Icons
-                        .sync_outlined)), // Chosen because it represents the act of doing an action again, which here is the case because they have to take a new picture
-                color: THEME_BUTTON,
-              ),
-            )
-          ],
-        ));
+    return Container(padding: const EdgeInsets.all(UNIT_PADDING), child: body);
   }
 }
