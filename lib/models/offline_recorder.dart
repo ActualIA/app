@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:actualia/models/news.dart';
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -68,7 +67,6 @@ class OfflineRecorder {
       appOfflineNewsFolder
           .list(recursive: false, followLinks: false)
           .listen((FileSystemEntity file) {
-        debugPrint("[CLEARSTORAGE] path: ${file.path}");
         if (file.path
             .substring(file.path.length - "XXXX-XX-XX_transcript.json".length)
             .startsWith(RegExp(r"[0-9]{4}-[0-9]{2}-[0-9]{2}"))) {
