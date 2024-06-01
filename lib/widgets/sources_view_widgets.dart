@@ -89,8 +89,6 @@ class ArticleWidget extends StatelessWidget {
                 padding: const EdgeInsets.only(top: UNIT_PADDING * 2),
                 child: FilledButton.tonal(
                   onPressed: () {
-                    debugPrint("source url: ${this.sourceUrl}");
-                    debugPrint("parsed url: ${Uri.parse(this.sourceUrl)}");
                     _launchInBrowser(Uri.parse(sourceUrl));
                   },
                   child: Text(

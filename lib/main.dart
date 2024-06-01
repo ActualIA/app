@@ -50,8 +50,7 @@ Future<void> main() async {
           create: (context) =>
               NewsRecognitionViewModel(Supabase.instance.client)),
       ChangeNotifierProvider(
-          create: (context) =>
-              RSSFeedViewModel(Supabase.instance.client)),
+          create: (context) => RSSFeedViewModel(Supabase.instance.client)),
     ],
     child: const App(),
   ));
@@ -90,7 +89,8 @@ class _AppState extends State<App> {
       if (authModel.isOnboardingRequired) {
         if (newsSettingsModel.settings == null ||
             providersModel.newsProviders == null) {
-          home = const LoadingView(text: 'Fetching your settings...'); // TODO: this is not normal :( ;
+          // TODO: this is not normal :( ;
+          home = const LoadingView(text: 'Fetching your settings...');
         } else {
           home = const PreOnBoardingPage();
         }

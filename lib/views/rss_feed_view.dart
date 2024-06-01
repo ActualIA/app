@@ -21,8 +21,9 @@ class FeedView extends StatelessWidget {
 
     if (!viewModel.hasNews) {
       Future.microtask(() =>
-        Provider.of<RSSFeedViewModel>(context, listen: false).getRawNewsList());
-        return loading;
+          Provider.of<RSSFeedViewModel>(context, listen: false)
+              .getRawNewsList());
+      return loading;
     } else {
       return Container(
           alignment: Alignment.center,
@@ -36,7 +37,7 @@ class FeedView extends StatelessWidget {
                   content: article.content,
                   title: article.title,
                   date: article.date,
-                  origin: article.origin, 
+                  origin: article.origin,
                   sourceUrl: article.url);
             },
           ));
