@@ -49,6 +49,9 @@ Future<void> main() async {
       ChangeNotifierProvider(
           create: (context) =>
               NewsRecognitionViewModel(Supabase.instance.client)),
+      ChangeNotifierProvider(
+          create: (context) =>
+              RSSFeedViewModel(Supabase.instance.client)),
     ],
     child: const App(),
   ));
@@ -87,7 +90,7 @@ class _AppState extends State<App> {
       if (authModel.isOnboardingRequired) {
         if (newsSettingsModel.settings == null ||
             providersModel.newsProviders == null) {
-          home = const LoadingView(text: 'Fetching your settings...');
+          home = const LoadingView(text: 'Fetching your settings...'); // TODO: this is not normal :( ;
         } else {
           home = const PreOnBoardingPage();
         }
@@ -104,7 +107,7 @@ class _AppState extends State<App> {
       title: 'ActualIA',
       theme: ACTUALIA_THEME,
       home: home,
-      locale: Locale(newsSettings.locale),
+      locale: Locale(newsSettingsModel.locale),
       navigatorKey: _navKey,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,

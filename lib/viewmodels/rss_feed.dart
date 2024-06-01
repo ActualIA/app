@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:actualia/models/article.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -16,35 +18,41 @@ class RSSFeedViewModel extends ChangeNotifier {
 
   RSSFeedViewModel(this.supabase);
 
-  geRawNewsList() async {
+  getRawNewsList() async {
+    debugPrint("[ RSSFVM ] getting news !"); 
     hasNews = false;
     final rawNewsList = await fetchRawNewsList();
     final articles = parseIntoArticles(rawNewsList);
     setArticles(articles);
     hasNews = true;
+    debugPrint("[ RSSFVM ] got news !"); 
     notifyListeners();
   }
 
   Future<List<dynamic>> fetchRawNewsList() async {
     try {
+      debugPrint("trying to invoke"); 
       final res = await supabase.functions.invoke('generate-raw-feed');
-      return res.data as List<dynamic>;
+      debugPrint("invoked with ${jsonDecode(res.data)}"); 
+      return jsonDecode(res.data);
     } catch (e) {
       hasNews = false;
-      throw Exception("Failed to invoke generate-raw-feed function");
+      throw Exception("Failed to invoke generate-raw-feed function: $e");
     }
   }
 
   List<Article> parseIntoArticles(List<dynamic> items) {
-    return items
+    debugPrint("type of item is: ${items[0]['url']}"); 
+    List<Article> art = items
+        .where((item) => item != null)
         .map((item) => Article(
-              title: item['title'],
-              description: item['description'],
-              content: item['content'],
-              origin: item['source']['name'],
-              url: item['source']['url'],
-              date: item['publishedAt'],
-            ))
+            description: item['description'],
+            origin: item['source']['name'],
+            url: item['url'],
+            title: item['title'],
+            date: item['publishedAt'],
+            content: item['content']))
         .toList();
+    return art;
   }
 }

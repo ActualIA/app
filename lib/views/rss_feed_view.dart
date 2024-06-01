@@ -9,24 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
-// TODO: Implement ViewModel plugging into existing EF.
-
-class FeedView extends StatefulWidget {
+class FeedView extends StatelessWidget {
   const FeedView({super.key});
 
-  @override
-  State<FeedView> createState() => _FeedViewState();
-}
-
-class _FeedViewState extends State<FeedView> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() =>
-        Provider.of<RSSFeedViewModel>(context, listen: false).geRawNewsList());
-  }
-
-  @override
   Widget build(BuildContext context) {
     Widget loading =
         const LoadingView(text: "Please wait while we fetch the news for you.");
@@ -35,7 +20,9 @@ class _FeedViewState extends State<FeedView> {
     final List<Article> articles = viewModel.articles;
 
     if (!viewModel.hasNews) {
-      return loading;
+      Future.microtask(() =>
+        Provider.of<RSSFeedViewModel>(context, listen: false).getRawNewsList());
+        return loading;
     } else {
       return Container(
           alignment: Alignment.center,
@@ -49,7 +36,8 @@ class _FeedViewState extends State<FeedView> {
                   content: article.content,
                   title: article.title,
                   date: article.date,
-                  origin: article.origin);
+                  origin: article.origin, 
+                  sourceUrl: article.url);
             },
           ));
     }

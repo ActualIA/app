@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:actualia/utils/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ScrollableText extends StatelessWidget {
   final String text;
@@ -62,6 +63,8 @@ class ArticleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var loc = AppLocalizations.of(context)!;
+
     return ListView(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -86,11 +89,13 @@ class ArticleWidget extends StatelessWidget {
                 padding: const EdgeInsets.only(top: UNIT_PADDING * 2),
                 child: FilledButton.tonal(
                   onPressed: () {
+                    debugPrint("source url: ${this.sourceUrl}");
+                    debugPrint("parsed url: ${Uri.parse(this.sourceUrl)}");
                     _launchInBrowser(Uri.parse(sourceUrl));
                   },
                   child: Text(
                       style: Theme.of(context).textTheme.displaySmall,
-                      "View site"),
+                      loc.sourceViewShort),
                 ))
           ],
         )
