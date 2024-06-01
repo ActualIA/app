@@ -1,9 +1,9 @@
 import OpenAI from "https://deno.land/x/openai@v4.33.0/mod.ts";
-import { corsHeaders } from "../_shared/cors.ts";
-import { News } from "../model.ts";
 import SupabaseClient from "https://esm.sh/v135/@supabase/supabase-js@2.42.4/dist/module/SupabaseClient.js";
-import { getUserSettings } from "../database.ts";
+import { News } from "./model.ts";
+import { getUserSettings } from "./database.ts";
 import { getUserRawNews } from "./get-user-raw-news.ts";
+import { corsHeaders } from "./util.ts";
 
 interface Result {
   transcript: string;
@@ -27,6 +27,14 @@ interface Transcript {
   news: (News & Result)[];
 }
 
+/**
+ * Generates a transcript from the latest news and uploads it to the database.
+ * Uses the `news_settings` of the user given as parameter.
+ *
+ * @param userId id of the user to generate the transcript for
+ * @param supabaseClient Supabase client where the transcript will be saved
+ * @returns HTTP Response describing the outcome of the function
+ */
 export async function generateTranscript(
   userId: string,
   supabaseClient: SupabaseClient,
@@ -70,7 +78,7 @@ export async function generateTranscript(
     console.error(error);
   }
 
-  // return transcript
+  // Return the transcript
   return new Response(JSON.stringify(transcriptRow), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
     status: 200,
@@ -88,6 +96,7 @@ async function createTranscript(
     "",
   );
 
+  // Generate the full transcript
   const openai = new OpenAI();
   const completion1 = await openai.chat.completions.create({
     "model": "gpt-3.5-turbo",
@@ -105,6 +114,7 @@ async function createTranscript(
   });
   const fullTranscript = completion1.choices[0].message.content;
 
+  // Splits the transcript into different sections for each news.
   const completion2 = await openai.chat.completions.create({
     "model": "gpt-3.5-turbo",
     "response_format": {
@@ -126,8 +136,6 @@ async function createTranscript(
   const transcriptJSON: NewsJsonLLM = JSON.parse(
     completion2.choices[0].message.content || "",
   );
-
-  console.log("Transcript JSON: ", transcriptJSON);
 
   return {
     totalNews: news.length,
