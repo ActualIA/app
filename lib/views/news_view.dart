@@ -45,41 +45,11 @@ class _NewsViewState extends State<NewsView> {
           NoNewsView(title: loc.newsEmptyTitle, text: loc.newsEmptyDescription);
     } else {
       final newsList = newsViewModel.newsList!;
-      var firstTranscript = newsViewModel.news!;
-      body = Scaffold(
-          body: ListView.builder(
-              itemCount: newsList.length,
-              itemBuilder: (context, index) {
-                return NewsText(news: newsList[index]);
-              }),
-          floatingActionButton: ExpandableFab(
-            distance: 112,
-            children: [
-              ActionButton(
-                onPressed: () =>
-                    Share.share('${firstTranscript.fullTranscript}\n\n'
-                        '${loc.newsShareText}'),
-                icon: const Icon(Icons.text_fields),
-              ),
-              ActionButton(
-                onPressed: () async => await Share.shareXFiles([
-                  XFile(
-                      // ignore: use_build_context_synchronously
-                      '${(await getApplicationDocumentsDirectory()).path}/audios/${firstTranscript.transcriptId}.mp3')
-                ], text: loc.newsShareText),
-                icon: const Icon(Icons.audiotrack),
-              ),
-              ActionButton(
-                onPressed: () {
-                  Provider.of<NewsViewModel>(context, listen: false)
-                      .setNewsPublicInDatabase(firstTranscript);
-                  Share.share(
-                      'https://actualia.pages.dev/share?transcriptId=${firstTranscript.transcriptId}');
-                },
-                icon: const Icon(Icons.link),
-              ),
-            ],
-          ));
+      body = ListView.builder(
+          itemCount: newsList.length,
+          itemBuilder: (context, index) {
+            return NewsText(news: newsList[index]);
+          });
     }
     return body;
   }
