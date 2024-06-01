@@ -57,6 +57,7 @@ class _MasterView extends State<MasterView> {
       case Views.NEWS:
         body = const NewsView();
         final firstTranscript = Provider.of<NewsViewModel>(context).news!;
+
         floatingButton = ExpandableFab(
           distance: 112,
           children: [
