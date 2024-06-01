@@ -1,4 +1,4 @@
-import { News, NewsSettings, Provider } from "../functions/model.ts";
+import { News, NewsSettings, Provider } from "./model.ts";
 import { parseFeed } from "https://deno.land/x/rss@1.0.2/mod.ts";
 import OpenAI from "https://deno.land/x/openai@v4.33.0/mod.ts";
 
