@@ -12,9 +12,9 @@ ActualIA Android app
 Get your own 1 minute daily summary of news that you choose, tailored to your needs. Wake up with the latest in tech, politics, society, or any subject you’d like. You can listen to your customized news feed, read a transcript, and look into the original sources of the headlines that caught your eye.
 
 ## Architecture Diagram
-![image](https://github.com/ActualIA/app/assets/18498650/4f461f82-b52b-4b94-bb81-56c28ab1c6e3)
+![image](https://github.com/ActualIA/app/assets/18498650/0da64a62-e640-48a0-9c65-2d62b11d3696)
 
-
+Download Excalidraw file
 ## Setup Dev environment
 
 
