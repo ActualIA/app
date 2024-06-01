@@ -58,7 +58,8 @@ class ContextView extends StatelessWidget {
                 onPressed: () => nrvm.takePictureAndProcess(),
                 icon: Container(
                     padding: const EdgeInsets.all(UNIT_PADDING / 4),
-                    child: const Icon(Icons.camera_alt)),
+                    child: const Icon(Icons
+                        .sync_outlined)), // Chosen because it represents the act of doing an action again, which here is the case because they have to take a new picture
                 color: THEME_BUTTON,
               ),
             )
