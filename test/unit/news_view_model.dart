@@ -1,9 +1,20 @@
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import 'package:actualia/models/news.dart';
 import 'package:actualia/models/offline_recorder.dart';
 import 'package:actualia/viewmodels/news.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'offline_recorder.dart';
+import 'offline_recorder_mocks/mock_file.dart';
+import 'offline_recorder_mocks/mock_filesystem.dart';
 
 class FakeGoTrueClient extends Fake implements GoTrueClient {
   @override
@@ -332,7 +343,16 @@ class AudioNewsVM extends NewsViewModel {
   }
 }
 
+class MockAppLoc extends Fake implements AppLocalizations {
+  final String errorNewsFetch = "Unable to fetch news.";
+  final String errorNoNews = "There are no news for you on this date.";
+  final String errorNewsGeneration =
+      "Something went wrong while generating news. Please try again later.";
+}
+
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
   test("generate-transcript failure is reported", () async {
     NewsViewModel vm = NewsViewModel.create(FakeFailingSupabaseClient());
     bool hasThrown = false;
@@ -460,5 +480,51 @@ void main() {
         ],
         fullTranscript: "fullTranscript"));
     expect(vm.generateAudioCalled, isTrue);
+  });
+
+  test("getAudioSource work as intended", () async {
+    PathProviderPlatform.instance = MockPathProviderPlateform();
+    MockFileSys files = MockFileSys();
+    IOOverrides.global = MockIOOverrides(files);
+
+    //dummy transcript
+    News news = News(
+        title: "dummy",
+        date: DateTime.now().toIso8601String(),
+        transcriptId: 1,
+        audio: "dummy",
+        paragraphs: [
+          Paragraph(
+              transcript: "text",
+              source: "source",
+              url: "url",
+              title: "title",
+              date: "12-04-2024",
+              content: "content")
+        ],
+        fullTranscript: "fullTranscript");
+
+    //store dummy transcript
+    MockFile audio = MockFile(
+        "${(await getApplicationDocumentsDirectory()).path}/audios/1.mp3",
+        files);
+    files.addFile(audio, news.toString());
+
+    NewsViewModel vm = NewsViewModel(FakeSupabaseClient());
+
+    expect((await vm.getAudioSource(1)).toString(),
+        equals(DeviceFileSource(audio.path).toString()));
+  });
+
+  test("getErrorMessage works as intended", () async {
+    NewsViewModel vm = NewsViewModel(FakeSupabaseClient());
+    vm.setError(ErrorType.fetch);
+    expect(vm.getErrorMessage(MockAppLoc()), "Unable to fetch news.");
+    vm.setError(ErrorType.noNews);
+    expect(vm.getErrorMessage(MockAppLoc()),
+        "There are no news for you on this date.");
+    vm.setError(ErrorType.generation);
+    expect(vm.getErrorMessage(MockAppLoc()),
+        "Something went wrong while generating news. Please try again later.");
   });
 }
