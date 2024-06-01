@@ -94,7 +94,14 @@ class _MasterView extends State<MasterView> {
         break;
       case Views.CONTEXT:
         body = const ContextView();
-        floatingButton = IconButton.filledTonal(
+        floatingButton = FloatingActionButton(
+          onPressed: () =>
+              Provider.of<NewsRecognitionViewModel>(context, listen: false)
+                  .takePictureAndProcess(),
+          child: const Icon(Icons.camera_alt),
+
+          /*
+        IconButton(
           iconSize: 40,
           onPressed: () =>
               Provider.of<NewsRecognitionViewModel>(context, listen: false)
@@ -103,6 +110,7 @@ class _MasterView extends State<MasterView> {
               padding: const EdgeInsets.all(UNIT_PADDING / 4),
               child: const Icon(Icons.camera_alt)),
           color: THEME_BUTTON,
+*/
         );
         break;
       default:
