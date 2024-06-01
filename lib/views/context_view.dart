@@ -47,8 +47,25 @@ class ContextView extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.all(UNIT_PADDING),
-      child: Scaffold(
+        padding: const EdgeInsets.all(UNIT_PADDING),
+        child: Stack(
+          children: [
+            body,
+            Align(
+              alignment: Alignment.bottomRight,
+              child: IconButton.filledTonal(
+                iconSize: 40,
+                onPressed: () => nrvm.takePictureAndProcess(),
+                icon: Container(
+                    padding: const EdgeInsets.all(UNIT_PADDING / 4),
+                    child: const Icon(Icons.camera_alt)),
+                color: THEME_BUTTON,
+              ),
+            )
+          ],
+        )
+        /*
+      Scaffold(
           floatingActionButton: IconButton.filledTonal(
             iconSize: 40,
             onPressed: () => nrvm.takePictureAndProcess(),
@@ -58,6 +75,7 @@ class ContextView extends StatelessWidget {
             color: THEME_BUTTON,
           ),
           body: body),
-    );
+      */
+        );
   }
 }
