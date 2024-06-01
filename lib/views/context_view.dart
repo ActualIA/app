@@ -19,10 +19,12 @@ class ContextView extends StatelessWidget {
     if (nrvm.isProcessing) {
       return LoadingView(text: loc.ocrLoadingText);
     } else if (nrvm.hasError) {
-      body = ErrorDisplayWidget(description: nrvm.getErrorMessage(loc));
+      body = ErrorDisplayWidget(
+          title: loc.errorTitle, description: nrvm.getErrorMessage(loc));
     } else if (nrvm.result == null) {
       nrvm.takePictureAndProcess();
-      body = ErrorDisplayWidget(description: loc.ocrErrorNoImage);
+      body = ErrorDisplayWidget(
+          title: loc.errorTitle, description: loc.ocrErrorNoImage);
     } else {
       body = ListView(
         shrinkWrap: true,
@@ -64,19 +66,6 @@ class ContextView extends StatelessWidget {
               ),
             )
           ],
-        )
-        /*
-      Scaffold(
-          floatingActionButton: IconButton.filledTonal(
-            iconSize: 40,
-            onPressed: () => nrvm.takePictureAndProcess(),
-            icon: Container(
-                padding: const EdgeInsets.all(UNIT_PADDING / 4),
-                child: const Icon(Icons.camera_alt)),
-            color: THEME_BUTTON,
-          ),
-          body: body),
-      */
-        );
+        ));
   }
 }
