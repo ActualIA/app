@@ -42,6 +42,15 @@ class ContextView extends StatelessWidget {
               child: Text(nrvm.result!,
                   style: Theme.of(context).textTheme.displaySmall,
                   textAlign: TextAlign.center)),
+          ListView.builder(
+            shrinkWrap: true,
+            itemCount: nrvm.contexts.length - 1,
+            itemBuilder: (context, index) {
+              return Text(nrvm.contexts[index + 1],
+                  style: Theme.of(context).textTheme.displaySmall,
+                  textAlign: TextAlign.center);
+            },
+          )
         ],
       );
     }
