@@ -95,22 +95,11 @@ class _MasterView extends State<MasterView> {
       case Views.CONTEXT:
         body = const ContextView();
         floatingButton = FloatingActionButton(
+          backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
           onPressed: () =>
               Provider.of<NewsRecognitionViewModel>(context, listen: false)
                   .takePictureAndProcess(),
           child: const Icon(Icons.camera_alt),
-
-          /*
-        IconButton(
-          iconSize: 40,
-          onPressed: () =>
-              Provider.of<NewsRecognitionViewModel>(context, listen: false)
-                  .takePictureAndProcess(),
-          icon: Container(
-              padding: const EdgeInsets.all(UNIT_PADDING / 4),
-              child: const Icon(Icons.camera_alt)),
-          color: THEME_BUTTON,
-*/
         );
         break;
       default:

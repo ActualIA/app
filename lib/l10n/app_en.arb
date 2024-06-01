@@ -41,6 +41,7 @@
   "logout": "Log out",
   "setFirstAlarm": "Choose your first alarm!",
   "newsContextHeading": "Here is some context regarding the text you just photographed:",
+  "newsOldContextsHeading": "And here are the previous contexts you asked for:",
   "newsContextNoText": "No text found",
   "wizardCountriesTitle": "Select countries",
   "wizardCitiesTitle": "Select cities",

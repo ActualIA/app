@@ -24,6 +24,41 @@ class ContextView extends StatelessWidget {
       nrvm.takePictureAndProcess();
       body = ErrorDisplayWidget(description: loc.ocrErrorNoImage);
     } else {
+      Widget oldContextsHeader = nrvm.contexts.length <= 1
+          ? const SizedBox()
+          : Container(
+              padding: const EdgeInsets.fromLTRB(
+                  UNIT_PADDING * 2, UNIT_PADDING * 2, UNIT_PADDING * 2, 0),
+              child: Text(
+                loc.newsOldContextsHeading,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium!
+                    .copyWith(height: 1.2),
+              ));
+      Widget oldContexts = Container(
+          padding: const EdgeInsets.all(UNIT_PADDING * 2),
+          child: ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            // We display a divider after each context, so we need to double the amount of items, and subtract one to not display a divider after the last context
+            itemCount: (nrvm.contexts.length - 1) * 2 - 1,
+            itemBuilder: (context, index) {
+              // After each context, we display a divider to show the separation
+              return index.isOdd
+                  ? const Divider(
+                      height: UNIT_PADDING * 4,
+                      thickness: 0.5,
+                      indent: UNIT_PADDING * 3,
+                      endIndent: UNIT_PADDING * 3,
+                      color: THEME_GREY,
+                    )
+                  // We do +1 because we don't want to display the last context, since it is already in the result
+                  : Text(nrvm.contexts[(index / 2).floor() + 1],
+                      style: Theme.of(context).textTheme.displaySmall,
+                      textAlign: TextAlign.center);
+            },
+          ));
       body = ListView(
         shrinkWrap: true,
         children: <Widget>[
@@ -42,15 +77,8 @@ class ContextView extends StatelessWidget {
               child: Text(nrvm.result!,
                   style: Theme.of(context).textTheme.displaySmall,
                   textAlign: TextAlign.center)),
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: nrvm.contexts.length - 1,
-            itemBuilder: (context, index) {
-              return Text(nrvm.contexts[index + 1],
-                  style: Theme.of(context).textTheme.displaySmall,
-                  textAlign: TextAlign.center);
-            },
-          )
+          oldContextsHeader,
+          oldContexts,
         ],
       );
     }
