@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:actualia/utils/common.dart';
 import 'package:actualia/utils/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -26,12 +27,13 @@ class SourceOrigin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String formattedDate = parseDateTimeShort(this.date);
     return Text(
         style: Theme.of(context)
             .textTheme
             .displaySmall
             ?.copyWith(color: THEME_GREY),
-        "$origin, $date");
+        "$origin, $formattedDate");
   }
 }
 

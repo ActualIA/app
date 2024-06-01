@@ -9,7 +9,6 @@ class RSSFeedViewModel extends ChangeNotifier {
   late final SupabaseClient supabase;
   bool hasNews = false;
 
-  @protected
   void setArticles(List<Article> articles) {
     _articles = articles;
   }

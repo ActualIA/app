@@ -1,4 +1,5 @@
 import 'package:actualia/models/article.dart';
+import 'package:actualia/utils/common.dart';
 import 'package:actualia/views/source_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -48,10 +49,7 @@ void main() {
     expect(find.text("ActualIA"), findsOne);
 
     //check article origin
-    expect(find.text("$article.origin, $article.date"), findsOne);
-
-    //check title
-    expect(find.text(article.date), findsOne);
+    expect(find.text("${article.origin}, ${parseDateTimeShort(article.date)}"), findsOne);
 
     //check article is present and scrollable
     await tester.dragUntilVisible(find.text(article.content),
