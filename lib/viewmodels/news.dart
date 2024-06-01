@@ -125,7 +125,6 @@ class NewsViewModel extends ChangeNotifier {
       }
 
       setNewsList([parseNews(response), ...newsList ?? []]);
-      debugPrint("[SUCCESS]");
     } catch (e) {
       try {
         _offlineRecorder

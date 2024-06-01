@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -16,14 +15,12 @@ class FakeDeletePostgrestFilterBuilder<T> extends Fake
     try {
       return func(selection as T);
     } catch (e) {
-      debugPrint("[ERROR] in then: $e");
       return Future.value(null);
     }
   }
 
   @override
   FakePostgrestFilterBuilder<T> eq(String field, Object val) {
-    debugPrint("[DEBUG] call to equal");
     T newSelection = (selection == null
         ? db.getRows(column: field, equal: val) ?? []
         : db.getRowsFromTable(
@@ -31,10 +28,6 @@ class FakeDeletePostgrestFilterBuilder<T> extends Fake
                 col: field,
                 cond: (obj) => obj == val) ??
             []) as T;
-    if (newSelection == []) {
-      debugPrint(
-          "No row matching the parameter $field and $val has been found, or parameter are invalid");
-    }
     db.setProvidersTable(
         table: db
                 .getRows()
@@ -59,7 +52,6 @@ class FakePostgrestFilterBuilder<T> extends Fake
     try {
       return func(selection as T);
     } catch (e) {
-      debugPrint("[ERROR] in then: $e");
       return Future.value(null);
     }
   }
@@ -73,10 +65,6 @@ class FakePostgrestFilterBuilder<T> extends Fake
                 col: field,
                 cond: (obj) => obj == val) ??
             []) as T;
-    if (newSelection == []) {
-      debugPrint(
-          "No row matching the parameter $field and $val has been found, or parameter are invalid");
-    }
     return FakePostgrestFilterBuilder<T>(
         providerDB: providerDB, selection: newSelection);
   }
@@ -99,10 +87,6 @@ class FakePostgrestFilterBuilder<T> extends Fake
                   }
                 }) ??
             []) as T;
-    if (newSelection == []) {
-      debugPrint(
-          "No row matching the parameter $column and $value has been found, or parameter are invalid");
-    }
     return FakePostgrestFilterBuilder(
         providerDB: providerDB, selection: newSelection);
   }
@@ -125,10 +109,6 @@ class FakePostgrestFilterBuilder<T> extends Fake
                   }
                 }) ??
             []) as T;
-    if (newSelection == []) {
-      debugPrint(
-          "No row matching the parameter $column and $value has been found, or parameter are invalid");
-    }
     return FakePostgrestFilterBuilder(
         providerDB: providerDB, selection: newSelection);
   }
@@ -147,10 +127,8 @@ class FakePostgrestFilterBuilder<T> extends Fake
   @override
   PostgrestTransformBuilder<Map<String, dynamic>> single() {
     if (selection == null) {
-      debugPrint("Nothing to select from");
       return FakePostgrestFilterBuilder(providerDB: providerDB);
     } else if ((selection! as Table).length > 1) {
-      debugPrint("More than one element in selection");
       return FakePostgrestFilterBuilder(providerDB: providerDB);
     } else {
       return FakePostgrestFilterBuilder(providerDB: providerDB);
@@ -169,7 +147,6 @@ class FakeQueryBuilder extends Fake implements SupabaseQueryBuilder {
       {String? onConflict,
       bool ignoreDuplicates = false,
       bool defaultToNull = true}) {
-    debugPrint("[DEBUG] call to upsert");
     Table newTable = table.toList();
     Table val;
     try {
@@ -189,7 +166,6 @@ class FakeQueryBuilder extends Fake implements SupabaseQueryBuilder {
 
   @override
   PostgrestFilterBuilder<Table> delete() {
-    debugPrint("[DEBUG] call to delete");
     return FakeDeletePostgrestFilterBuilder(db: db, selection: table);
   }
 }
@@ -222,14 +198,11 @@ class FakeDB extends Fake implements SupabaseClient {
 
   Table? getRowsFromTable(
       {required Table table, String? col, bool Function(Object val)? cond}) {
-    debugPrint("[DEBUG] get from table: $table");
     if (col == null) {
-      debugPrint("[DEBUG] get row column null, return: $table");
       return table;
     } else if (cond != null) {
       bool columnExist = table.isEmpty ? false : table[0].containsKey(col);
       if (!columnExist) {
-        debugPrint("$col does not exist in table");
         return null;
       }
       Table res = [];
@@ -238,25 +211,21 @@ class FakeDB extends Fake implements SupabaseClient {
           res.add(row);
         }
       }
-      debugPrint("[DEBUG] get row res: $res");
+
       return res;
     } else {
-      debugPrint(
-          "If column not null, then equal should not be null, cond is: $cond");
       return null;
     }
   }
 
   Table? getRows({String? column, Object? equal}) {
     if (column == null) {
-      debugPrint("[DEBUG] get row column null, return: $_providersTables");
       return _providersTables;
     } else if (equal != null) {
       bool columnExist = providersTable.isEmpty
           ? false
           : providersTable[0].containsKey(column);
       if (!columnExist) {
-        debugPrint("$column does not exist in table");
         return null;
       }
       Table res = [];
@@ -265,11 +234,9 @@ class FakeDB extends Fake implements SupabaseClient {
           res.add(row);
         }
       }
-      debugPrint("[DEBUG] get row res: $res");
+
       return res;
     } else {
-      debugPrint(
-          "If column not null, then equal should not be null, equal is: $equal");
       return null;
     }
   }
