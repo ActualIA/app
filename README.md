@@ -14,7 +14,7 @@ Get your own 1 minute daily summary of news that you choose, tailored to your ne
 ## Architecture Diagram
 ![image](https://github.com/ActualIA/app/assets/18498650/0da64a62-e640-48a0-9c65-2d62b11d3696)
 
-[Download Excalidraw file](https://github.com/ActualIA/app/ad.excalidraw)
+[Download Excalidraw file](https://github.com/ActualIA/app/raw/ad.excalidraw)
 ## Setup Dev environment
 
 
