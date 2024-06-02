@@ -95,6 +95,7 @@ class _MasterView extends State<MasterView> {
       case Views.CONTEXT:
         body = const ContextView();
         floatingButton = FloatingActionButton(
+          backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
           onPressed: () =>
               Provider.of<NewsRecognitionViewModel>(context, listen: false)
                   .takePictureAndProcess(),

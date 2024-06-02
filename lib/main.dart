@@ -9,7 +9,7 @@ import 'package:actualia/viewmodels/alarms.dart';
 import 'package:actualia/viewmodels/rss_feed.dart';
 import 'package:actualia/views/loading_view.dart';
 import 'package:actualia/views/master_view.dart';
-import 'package:actualia/views/narrator_settings_view.dart';
+import 'package:actualia/views/news_alert_setup_view.dart';
 import 'package:actualia/views/news_alert_view.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
 import 'package:actualia/views/login_view.dart';
