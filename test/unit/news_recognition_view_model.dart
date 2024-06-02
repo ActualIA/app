@@ -55,6 +55,16 @@ class FakeNewsRecognitionVM extends NewsRecognitionViewModel {
   Future<XFile?> takePicture() async {
     return XFile.fromData(Uint8List(256));
   }
+
+  @override
+  Future<void> writeContext() async {
+    return;
+  }
+
+  @override
+  Future<void> retrieveContexts() async {
+    return;
+  }
 }
 
 class NoPermissionNewsRecognitionVM extends NewsRecognitionViewModel {
@@ -63,6 +73,16 @@ class NoPermissionNewsRecognitionVM extends NewsRecognitionViewModel {
   @override
   Future<PermissionStatus> askPermission() async {
     return PermissionStatus.denied;
+  }
+
+  @override
+  Future<void> writeContext() async {
+    return;
+  }
+
+  @override
+  Future<void> retrieveContexts() async {
+    return;
   }
 }
 
@@ -73,6 +93,16 @@ class FailingNewsRecognitionVM extends NewsRecognitionViewModel {
   Future<String> recognizeText(String filePath) async {
     return "Hello, world!";
   }
+
+  @override
+  Future<void> writeContext() async {
+    return;
+  }
+
+  @override
+  Future<void> retrieveContexts() async {
+    return;
+  }
 }
 
 class ErrorNewsRecognitionVM extends NewsRecognitionViewModel {
@@ -81,6 +111,16 @@ class ErrorNewsRecognitionVM extends NewsRecognitionViewModel {
   @override
   void setError(error) {
     super.setError(error);
+  }
+
+  @override
+  Future<void> writeContext() async {
+    return;
+  }
+
+  @override
+  Future<void> retrieveContexts() async {
+    return;
   }
 }
 
@@ -121,6 +161,16 @@ class MockFullNewsRecognitionViewModel extends NewsRecognitionViewModel {
   Future<void> invokeProcessImage(String textFromImage) async {
     hasProcessed = true;
   }
+
+  @override
+  Future<void> writeContext() async {
+    return;
+  }
+
+  @override
+  Future<void> retrieveContexts() async {
+    return;
+  }
 }
 
 class FailingCameraNewsRecognitionViewModel extends NewsRecognitionViewModel {
@@ -129,6 +179,16 @@ class FailingCameraNewsRecognitionViewModel extends NewsRecognitionViewModel {
   @override
   Future<XFile?> takePicture() async {
     return null;
+  }
+
+  @override
+  Future<void> writeContext() async {
+    return;
+  }
+
+  @override
+  Future<void> retrieveContexts() async {
+    return;
   }
 }
 
