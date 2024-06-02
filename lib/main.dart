@@ -1,6 +1,7 @@
 //coverage:ignore-file
 
 import 'package:actualia/models/auth_model.dart';
+import 'package:actualia/viewmodels/narrator.dart';
 import 'package:actualia/viewmodels/news_recognition.dart';
 import 'package:actualia/viewmodels/providers.dart';
 import 'package:actualia/utils/themes.dart';
@@ -8,6 +9,7 @@ import 'package:actualia/viewmodels/alarms.dart';
 import 'package:actualia/viewmodels/rss_feed.dart';
 import 'package:actualia/views/loading_view.dart';
 import 'package:actualia/views/master_view.dart';
+import 'package:actualia/views/narrator_settings_view.dart';
 import 'package:actualia/views/news_alert_view.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
 import 'package:actualia/views/login_view.dart';
@@ -50,6 +52,7 @@ Future<void> main() async {
               NewsRecognitionViewModel(Supabase.instance.client)),
       ChangeNotifierProvider(
           create: (context) => RSSFeedViewModel(Supabase.instance.client)),
+          create: (context) => NarratorViewModel(Supabase.instance.client)),
     ],
     child: const App(),
   ));
