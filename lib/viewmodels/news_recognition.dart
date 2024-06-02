@@ -128,18 +128,23 @@ class NewsRecognitionViewModel extends ChangeNotifier {
     final text = await recognizeText(picture.path);
     await invokeProcessImage(text);
     // Write the context to a file
-    final file =
-        File('${_contextDirectory.path}/${_oldContexts.length + 1}.txt');
-    await file.writeAsString(result!);
-    _oldContexts = [result!, ..._oldContexts];
-    for (String texte in _oldContexts) {
-      debugPrint(texte);
-    }
+    await writeContext(result);
     markProcessingAs(false);
   }
 
   Future<PermissionStatus> askPermission() async {
     return await Permission.camera.request();
+  }
+
+  Future<void> writeContext(String? context) async {
+    if (context == null) {
+      log('Context is null', level: Level.WARNING.value);
+      return;
+    }
+    final file =
+        File('${_contextDirectory.path}/${_oldContexts.length + 1}.txt');
+    await file.writeAsString(context);
+    _oldContexts = [context, ..._oldContexts];
   }
 
   Future<void> retrieveContexts() async {

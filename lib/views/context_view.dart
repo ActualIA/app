@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:actualia/utils/themes.dart';
 import 'package:actualia/viewmodels/news_recognition.dart';
 import 'package:actualia/views/loading_view.dart';
@@ -42,7 +44,7 @@ class ContextView extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             // We display a divider after each context, so we need to double the amount of items, and subtract one to not display a divider after the last context
-            itemCount: (nrvm.contexts.length - 1) * 2 - 1,
+            itemCount: max((nrvm.contexts.length - 1) * 2 - 1, 0),
             itemBuilder: (context, index) {
               // After each context, we display a divider to show the separation
               return index.isOdd
