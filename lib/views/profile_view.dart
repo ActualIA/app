@@ -3,6 +3,7 @@
 import 'package:actualia/utils/themes.dart';
 import 'package:actualia/viewmodels/providers.dart';
 import 'package:actualia/views/accessibility.dart';
+import 'package:actualia/views/narrator_settings_view.dart';
 import 'package:actualia/views/news_alert_setup_view.dart';
 import 'package:actualia/views/interests_wizard_view.dart';
 import 'package:actualia/views/providers_wizard_view.dart';
@@ -81,6 +82,11 @@ class _ProfilePageState extends State<ProfilePageView> {
             context,
             MaterialPageRoute(
                 builder: (context) => const NewsAlertSetupView()));
+      case SettingsRows.NARRATOR:
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const NarratorSettingsView()));
       case SettingsRows.ACCESSIBILITY:
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => const AccessibilityView()));

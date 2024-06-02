@@ -60,6 +60,8 @@
   "onboardingDescription2": "Wake up with the latest in tech, politics, society, or any subject you'd like.",
   "onboardingTitle3": "Stay informed, always",
   "onboardingDescription3": "You can listen to your customized news feed, read a transcript, and always look into the original sources of the headlines that caught your eye.",
+  "narratorTitle": "Choose a voice for your audio",
+  "voice": "Voice",
   "accessibilityLanguage": "Language",
   "accessibilityUpdateError": "Error during update",
   "alarmDismiss": "Dismiss alarm",
@@ -74,6 +76,7 @@
       }
     }
   },
+  "search": "Search",
   "explainingUserPrompt": "You can personalize your news feed with this predefined prompts.\n - Read the news...",
   "prompt1": "as if you were a radio host",
   "prompt2": "as if you were 5 years old",

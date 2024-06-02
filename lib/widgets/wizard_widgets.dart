@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class WizardSelector extends StatelessWidget {
+class WizardSelector extends StatefulWidget {
   final String title;
   final List<(Object, String)> items;
   final List<(Object, String)> selectedItems;
@@ -21,8 +21,57 @@ class WizardSelector extends StatelessWidget {
       super.key});
 
   @override
+  State<WizardSelector> createState() => _WizardSelector();
+}
+
+class _WizardSelector extends State<WizardSelector> {
+  late List<(Object, String)> _items;
+  final TextEditingController _filterController = TextEditingController();
+  late String _filter = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _items = widget.items;
+    _filterController.addListener(() {
+      setState(() {
+        _filter = _filterController.text;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _filterController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Widget title = WizardSelectorTitle(title: this.title);
+    var loc = AppLocalizations.of(context)!;
+
+    Widget filter = Container(
+        padding: const EdgeInsets.fromLTRB(
+            UNIT_PADDING / 4, UNIT_PADDING, UNIT_PADDING / 4, 0),
+        child: Container(
+            decoration: BoxDecoration(
+                border: Border.all(width: BORDER_WIDTH),
+                borderRadius: BorderRadius.circular(BOX_BORDER_RADIUS)),
+            child: TextField(
+              controller: _filterController,
+              style: Theme.of(context).textTheme.bodyMedium,
+              decoration: InputDecoration(
+                icon: Container(
+                    padding:
+                        const EdgeInsets.fromLTRB(UNIT_PADDING / 2, 0, 0, 0),
+                    child: const Icon(Icons.search)),
+                iconColor: THEME_BUTTON,
+                hintText: loc.search,
+                border: InputBorder.none,
+              ),
+            )));
+
+    Widget title = WizardSelectorTitle(title: widget.title);
 
     Widget body = Expanded(
         child: Container(
@@ -35,16 +84,21 @@ class WizardSelector extends StatelessWidget {
                         spacing: UNIT_PADDING / 2,
                         runSpacing: UNIT_PADDING / 2.5,
                         alignment: WrapAlignment.center,
-                        children: items
+                        children: _items
+                            .where((item) => item.$2
+                                .toLowerCase()
+                                .contains(_filter.toLowerCase()))
                             .map((e) => FilterChip(
                                 label: Text(e.$2),
                                 onSelected: (v) {
-                                  onSelected(e);
+                                  widget.onSelected(e);
                                 },
-                                selected: selectedItems.contains(e)))
+                                selected: widget.selectedItems.contains(e)))
                             .toList())))));
 
-    return Column(children: [title, body]);
+    return Column(
+      children: [title, filter, body],
+    );
   }
 }
 
@@ -154,6 +208,7 @@ class WizardScaffold extends StatelessWidget {
   final PreferredSizeWidget topBar;
   final Widget body;
   final Widget bottomBar;
+  final EdgeInsetsGeometry? padding;
 
   const WizardScaffold(
       {this.topBar = const TopAppBar(
@@ -161,19 +216,18 @@ class WizardScaffold extends StatelessWidget {
       ),
       required this.body,
       required this.bottomBar,
+      this.padding,
       super.key});
 
   @override
   Widget build(BuildContext context) {
-    var loc = AppLocalizations.of(context)!;
-
     return Scaffold(
       appBar: topBar,
       bottomNavigationBar: bottomBar,
       body: Container(
-        padding: const EdgeInsets.fromLTRB(48.0, 48.0, 48.0, 48.0),
+        padding: padding ?? const EdgeInsets.all(UNIT_PADDING * 3),
         alignment: Alignment.topCenter,
-        child: body ?? Text(loc.notImplemented),
+        child: body,
       ),
     );
   }
