@@ -94,7 +94,7 @@ class _NewsAlertSetupViewState extends State<NewsAlertSetupView> {
           children: <Widget>[
             Container(
                 padding: const EdgeInsets.only(
-                    top: UNIT_PADDING * 8, bottom: UNIT_PADDING * 2),
+                    top: UNIT_PADDING * 3, bottom: UNIT_PADDING * 2),
                 alignment: AlignmentDirectional.bottomStart,
                 child: Text(
                     style: Theme.of(context).textTheme.titleLarge,
