@@ -157,7 +157,11 @@ class NewsRecognitionViewModel extends ChangeNotifier {
     }
 
     // Get all files in the context directory
-    final files = await _contextDirectory.list().toList() as List<File>;
+    final files = await _contextDirectory
+        .list()
+        .where((entity) => entity is File)
+        .cast<File>()
+        .toList();
     // Sort the files by descending name (the name should be 1.txt, 2.txt, 3.txt, etc.)
     files.sort((a, b) => b.path.compareTo(a.path));
 
