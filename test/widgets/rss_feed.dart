@@ -15,6 +15,17 @@ class MockRSSFeedViewModel extends RSSFeedViewModel {
   MockRSSFeedViewModel() : super(FakeSupabaseClient());
 }
 
+class Mock2RSSFeedViewModel extends RSSFeedViewModel {
+  @override
+  bool hasNews = false;
+  bool hasFetched = false;
+  Mock2RSSFeedViewModel() : super(FakeSupabaseClient());
+  @override
+  getRawNewsList() {
+    hasFetched = true;
+  }
+}
+
 void main() {
   testWidgets("Check every element of source view is present and working",
       (tester) async {
@@ -98,5 +109,29 @@ void main() {
         find.text(
             "${articles[0].origin}, ${parseDateTimeShort(articles[0].date)}"),
         findsOne);
+  });
+
+  testWidgets("Gets news when not already done", (WidgetTester tester) async {
+    var rssfvm = Mock2RSSFeedViewModel();
+    // init SourceView
+    await tester.pumpWidget(MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        title: 'ActualIA',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+          scaffoldBackgroundColor: Colors.white,
+        ),
+        home: MultiProvider(
+          providers: [
+            ChangeNotifierProvider<RSSFeedViewModel>(
+                create: (context) => rssfvm)
+          ],
+          child: const FeedView(),
+        )));
+    await tester.pump(Durations.short1);
+
+    expect(rssfvm.hasFetched, isTrue);
   });
 }
