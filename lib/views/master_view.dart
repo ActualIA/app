@@ -1,14 +1,10 @@
-import 'dart:developer';
-
 import 'package:actualia/views/rss_feed_view.dart';
-import 'package:actualia/viewmodels/news_recognition.dart';
 import 'package:actualia/views/context_view.dart';
 import 'package:actualia/views/news_view.dart';
 import 'package:actualia/widgets/top_app_bar.dart';
 import 'package:flutter/material.dart';
 import '../models/navigation_menu.dart';
 import '../widgets/navigation_menu.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MasterView extends StatefulWidget {
   const MasterView({super.key});
@@ -46,8 +42,6 @@ class _MasterView extends State<MasterView> {
 
   @override
   Widget build(BuildContext context) {
-    var loc = AppLocalizations.of(context)!;
-
     Widget body;
     switch (_currentViews) {
       case Views.NEWS:
@@ -58,9 +52,6 @@ class _MasterView extends State<MasterView> {
         break;
       case Views.CONTEXT:
         body = const ContextView();
-        break;
-      default:
-        body = Center(child: Text(loc.notImplemented));
         break;
     }
 
