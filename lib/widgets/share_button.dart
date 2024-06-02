@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:actualia/utils/themes.dart';
 import 'package:flutter/material.dart';
 
 @immutable
@@ -132,6 +133,7 @@ class _ExpandableFabState extends State<ExpandableFab>
           curve: const Interval(0.25, 1.0, curve: Curves.easeInOut),
           duration: const Duration(milliseconds: 250),
           child: FloatingActionButton(
+            backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
             onPressed: _toggle,
             child: const Icon(Icons.share),
           ),

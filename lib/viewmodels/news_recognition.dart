@@ -1,9 +1,12 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:dartz/dartz.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:logging/logging.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -20,8 +23,12 @@ class NewsRecognitionViewModel extends ChangeNotifier {
   _Content? _content;
   bool isProcessing = false;
 
+  List<String> _oldContexts = [];
+  late Directory _contextDirectory;
+
   bool get hasError => _content?.isRight() ?? false;
   String? get result => _content?.fold((l) => l, (r) => null);
+  List<String> get contexts => _oldContexts;
 
   String getErrorMessage(AppLocalizations loc) {
     final error = (_content?.fold((l) => null, (r) => r))!;
@@ -57,6 +64,7 @@ class NewsRecognitionViewModel extends ChangeNotifier {
 
   NewsRecognitionViewModel(SupabaseClient supabaseClient) {
     supabase = supabaseClient;
+    Future.microtask(() => retrieveContexts());
   }
 
   Future<void> ocr(String filePath) async {
@@ -118,10 +126,52 @@ class NewsRecognitionViewModel extends ChangeNotifier {
     markProcessingAs(true);
     final text = await recognizeText(picture.path);
     await invokeProcessImage(text);
+    if (result != null) {
+      _oldContexts = [result!, ..._oldContexts];
+    }
+    // Write the context to a file
+    Future.microtask(writeContext);
     markProcessingAs(false);
   }
 
   Future<PermissionStatus> askPermission() async {
     return await Permission.camera.request();
+  }
+
+  Future<void> writeContext() async {
+    if (result == null) {
+      log('Context is null', level: Level.WARNING.value);
+      return;
+    }
+    final file =
+        File('${_contextDirectory.path}/${_oldContexts.length + 1}.txt');
+    await file.writeAsString(result!);
+  }
+
+  Future<void> retrieveContexts() async {
+    final dir = await getApplicationDocumentsDirectory();
+    _contextDirectory = Directory('${dir.path}/contexts');
+
+    if (!await _contextDirectory.exists()) {
+      await _contextDirectory.create(recursive: true);
+    }
+
+    // Get all files in the context directory
+    final files = await _contextDirectory
+        .list()
+        .where((entity) => entity is File)
+        .cast<File>()
+        .toList();
+    // Sort the files by descending name (the name should be 1.txt, 2.txt, 3.txt, etc.)
+    files.sort((a, b) => b.path.compareTo(a.path));
+
+    List<String> contexts = [];
+    // For each file, get its content and add it to the list
+    for (var file in files) {
+      final content = await file.readAsString();
+      contexts.add(content);
+    }
+
+    _oldContexts = contexts;
   }
 }

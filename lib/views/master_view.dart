@@ -1,3 +1,4 @@
+import 'package:actualia/views/rss_feed_view.dart';
 import 'package:actualia/utils/themes.dart';
 import 'package:actualia/viewmodels/news.dart';
 import 'package:actualia/viewmodels/news_recognition.dart';
@@ -49,10 +50,9 @@ class _MasterView extends State<MasterView> {
 
   @override
   Widget build(BuildContext context) {
-    var loc = AppLocalizations.of(context)!;
-
     Widget body;
     Widget? floatingButton;
+    final loc = AppLocalizations.of(context)!;
     switch (_currentViews) {
       case Views.NEWS:
         body = const NewsView();
@@ -90,31 +90,17 @@ class _MasterView extends State<MasterView> {
               );
         break;
       case Views.FEED:
-        body = Center(child: Text(loc.notImplemented));
+        body = const FeedView();
         break;
       case Views.CONTEXT:
         body = const ContextView();
         floatingButton = FloatingActionButton(
+          backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
           onPressed: () =>
               Provider.of<NewsRecognitionViewModel>(context, listen: false)
                   .takePictureAndProcess(),
           child: const Icon(Icons.camera_alt),
-
-          /*
-        IconButton(
-          iconSize: 40,
-          onPressed: () =>
-              Provider.of<NewsRecognitionViewModel>(context, listen: false)
-                  .takePictureAndProcess(),
-          icon: Container(
-              padding: const EdgeInsets.all(UNIT_PADDING / 4),
-              child: const Icon(Icons.camera_alt)),
-          color: THEME_BUTTON,
-*/
         );
-        break;
-      default:
-        body = Center(child: Text(loc.notImplemented));
         break;
     }
 

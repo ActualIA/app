@@ -1,3 +1,5 @@
+import 'package:actualia/models/article.dart';
+import 'package:actualia/utils/common.dart';
 import 'package:actualia/utils/themes.dart';
 import 'package:actualia/views/source_view.dart';
 import 'package:flutter/material.dart';
@@ -30,11 +32,12 @@ class NewsText extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                             builder: (builder) => SourceView(
-                                article: paragraph.content,
-                                title: paragraph.title,
-                                date: paragraph.date.substring(0, 10),
-                                newsPaper: paragraph.source,
-                                url: paragraph.url)));
+                                article: Article(
+                                    content: paragraph.content,
+                                    title: paragraph.title,
+                                    date: paragraph.date.substring(0, 10),
+                                    origin: paragraph.source,
+                                    url: paragraph.url))));
                   },
                   child: Column(
                     children: [
@@ -77,36 +80,6 @@ class NewsDateTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String parseDateTime(String dateString) {
-      DateTime dateTime = DateTime.parse(dateString);
-      List<String> weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-      List<String> months = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December"
-      ];
-      String suffix;
-      if (dateTime.day == 1 || dateTime.day == 21 || dateTime.day == 31) {
-        suffix = "st";
-      } else if (dateTime.day == 2 || dateTime.day == 22) {
-        suffix = "nd";
-      } else if (dateTime.day == 3 || dateTime.day == 23) {
-        suffix = "rd";
-      } else {
-        suffix = "th";
-      }
-      return "${weekDays[dateTime.weekday - 1]}, ${months[dateTime.month - 1]} ${dateTime.day}$suffix, ${dateTime.year}";
-    }
-
     Widget playButton = news.transcriptId == -1
         ? const SizedBox(width: 40, height: 40)
         : PlayButton(transcriptId: news.transcriptId);

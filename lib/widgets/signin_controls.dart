@@ -49,7 +49,7 @@ class _SignInControls extends State<SignInControls> {
               padding: const EdgeInsets.symmetric(vertical: UNIT_PADDING / 2),
               child: TextButton(
                 onPressed: () async {
-                  await authModel.signInWithFakeAccount();
+                  await authModel.signInAnonymously();
                 },
                 key: const Key("signin-guest"),
                 child: Text(
