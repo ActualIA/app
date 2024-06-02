@@ -4,12 +4,8 @@ import 'package:actualia/widgets/error.dart';
 import 'package:flutter/material.dart';
 import 'package:actualia/widgets/news_text.dart';
 import 'package:actualia/viewmodels/news.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-import '../widgets/share_button.dart';
 
 class NewsView extends StatefulWidget {
   const NewsView({super.key});
