@@ -6,6 +6,7 @@ import 'package:actualia/viewmodels/news_recognition.dart';
 import 'package:actualia/viewmodels/providers.dart';
 import 'package:actualia/utils/themes.dart';
 import 'package:actualia/viewmodels/alarms.dart';
+import 'package:actualia/viewmodels/rss_feed.dart';
 import 'package:actualia/views/loading_view.dart';
 import 'package:actualia/views/master_view.dart';
 import 'package:actualia/views/news_alert_setup_view.dart';
@@ -50,6 +51,8 @@ Future<void> main() async {
           create: (context) =>
               NewsRecognitionViewModel(Supabase.instance.client)),
       ChangeNotifierProvider(
+          create: (context) => RSSFeedViewModel(Supabase.instance.client)),
+      ChangeNotifierProvider(
           create: (context) => NarratorViewModel(Supabase.instance.client)),
     ],
     child: const App(),
@@ -75,8 +78,9 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     AuthModel authModel = Provider.of(context);
     AlarmsViewModel alarmsModel = Provider.of(context);
-    ProvidersViewModel pvm = Provider.of(context);
-    NewsSettingsViewModel newsSettings = Provider.of(context);
+    ProvidersViewModel providersModel = Provider.of(context);
+    NewsSettingsViewModel newsSettingsModel = Provider.of(context);
+    // RSSFeedViewModel RSSModel = Provider.of(context);
 
     Widget home;
     if (alarmsModel.isAlarmActive) {
@@ -84,9 +88,10 @@ class _AppState extends State<App> {
       Future.microtask(
           () => {_navKey.currentState?.popUntil((r) => r.isFirst)});
     } else if (authModel.isSignedIn) {
-      newsSettings = Provider.of(context);
+      newsSettingsModel = Provider.of(context);
       if (authModel.isOnboardingRequired) {
-        if (newsSettings.settings == null || pvm.newsProviders == null) {
+        if (newsSettingsModel.settings == null ||
+            providersModel.newsProviders == null) {
           home = LoadingView(text: AppLocalizations.of(context)!.loading);
         } else {
           home = const PreOnBoardingPage();
@@ -104,7 +109,7 @@ class _AppState extends State<App> {
       title: 'ActualIA',
       theme: ACTUALIA_THEME,
       home: home,
-      locale: Locale(newsSettings.locale),
+      locale: Locale(newsSettingsModel.locale),
       navigatorKey: _navKey,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
