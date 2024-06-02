@@ -52,7 +52,7 @@ class _MasterView extends State<MasterView> {
   Widget build(BuildContext context) {
     Widget body;
     Widget? floatingButton;
-    final loc = AppLocalizations.of(context)!; 
+    final loc = AppLocalizations.of(context)!;
     switch (_currentViews) {
       case Views.NEWS:
         body = const NewsView();
