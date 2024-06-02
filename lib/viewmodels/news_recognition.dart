@@ -126,8 +126,11 @@ class NewsRecognitionViewModel extends ChangeNotifier {
     markProcessingAs(true);
     final text = await recognizeText(picture.path);
     await invokeProcessImage(text);
+    if (result != null) {
+      _oldContexts = [result!, ..._oldContexts];
+    }
     // Write the context to a file
-    await writeContext(result);
+    Future.microtask(writeContext);
     markProcessingAs(false);
   }
 
@@ -135,15 +138,14 @@ class NewsRecognitionViewModel extends ChangeNotifier {
     return await Permission.camera.request();
   }
 
-  Future<void> writeContext(String? context) async {
-    if (context == null) {
+  Future<void> writeContext() async {
+    if (result == null) {
       log('Context is null', level: Level.WARNING.value);
       return;
     }
     final file =
         File('${_contextDirectory.path}/${_oldContexts.length + 1}.txt');
-    await file.writeAsString(context);
-    _oldContexts = [context, ..._oldContexts];
+    await file.writeAsString(result!);
   }
 
   Future<void> retrieveContexts() async {
