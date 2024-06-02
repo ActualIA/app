@@ -1,3 +1,4 @@
+import 'package:actualia/utils/themes.dart';
 import 'package:actualia/viewmodels/alarms.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
 import 'package:actualia/widgets/alarms_widget.dart';
@@ -86,141 +87,132 @@ class _NewsAlertSetupViewState extends State<NewsAlertSetupView> {
     var loc = AppLocalizations.of(context)!;
     AlarmsViewModel alarmModel = Provider.of(context);
 
-    Widget body = Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Container(
-              margin: const EdgeInsets.symmetric(vertical: 20.0),
-              child: Column(children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    PickTimeButton(
-                        initialTime: selectedDateTime,
-                        onTimeSelected: (t) => selectedDateTime = t),
-                    Column(
-                      children: [
-                        Icon(
-                          enabled ? Icons.alarm_on : Icons.alarm_off,
-                          size: 30.0,
-                        ),
-                        Switch(
+    Widget body = Container(
+        padding: const EdgeInsets.symmetric(horizontal: UNIT_PADDING * 3),
+        child: ListView(
+          shrinkWrap: true,
+          children: <Widget>[
+            Container(
+                padding: const EdgeInsets.only(
+                    top: UNIT_PADDING * 8, bottom: UNIT_PADDING * 2),
+                alignment: AlignmentDirectional.bottomStart,
+                child: Text(
+                    style: Theme.of(context).textTheme.titleLarge,
+                    "Alarm settings")),
+            Container(
+                padding: const EdgeInsets.symmetric(vertical: UNIT_PADDING / 2),
+                key: const Key("switch-on-off"),
+                child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                          style: Theme.of(context).textTheme.displayMedium,
+                          "Enable alarm"),
+                      Switch(
                           value: enabled,
                           onChanged: (value) => {
-                            setState(() => enabled = value),
-                            if (value)
-                              {saveAlarm(context)}
-                            else
-                              {deleteAlarm(context)}
+                                setState(() => enabled = value),
+                                if (value)
+                                  saveAlarm(context)
+                                else
+                                  deleteAlarm(context)
+                              }),
+                    ])),
+            Container(
+                padding: const EdgeInsets.symmetric(vertical: UNIT_PADDING / 2),
+                child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                          style: Theme.of(context).textTheme.displayMedium,
+                          "Time"),
+                      PickTimeButton(
+                          initialTime: selectedDateTime,
+                          onTimeSelected: (t) => selectedDateTime = t),
+                    ])),
+            Container(
+                padding: const EdgeInsets.symmetric(vertical: UNIT_PADDING / 2),
+                child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                          style: Theme.of(context).textTheme.displayMedium,
+                          "Vibrate"),
+                      Switch(
+                          value: vibrate,
+                          onChanged: (value) {
+                            setState(() {
+                              vibrate = value;
+                            });
+                            updateAlarm(context);
                           },
-                          key: const Key("switch-on-off"),
-                        ),
-                      ],
-                    )
-                  ],
+                          key: const Key("switch-vibrate")),
+                    ])),
+            Container(
+                padding: const EdgeInsets.symmetric(vertical: UNIT_PADDING / 2),
+                child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                          style: Theme.of(context).textTheme.displayMedium,
+                          "Loop audio"),
+                      Switch(
+                          value: loopAudio,
+                          onChanged: (value) {
+                            setState(() {
+                              loopAudio = value;
+                            });
+                            updateAlarm(context);
+                          },
+                          key: const Key("switch-loop")),
+                    ])),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  volume > 0.7
+                      ? Icons.volume_up_rounded
+                      : volume > 0.1
+                          ? Icons.volume_down_rounded
+                          : Icons.volume_mute_rounded,
                 ),
                 Container(
-                  margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                  child: Text(
-                    enabled
-                        ? loc.alarmSetFor(selectedDateTime)
-                        : loc.alarmNotSet,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium!
-                        .copyWith(color: Colors.blueAccent.withOpacity(0.8)),
+                    padding: const EdgeInsets.only(left: UNIT_PADDING / 4),
+                    child: Text(
+                      "${(volume * 100).round()}%",
+                      style: Theme.of(context).textTheme.displayMedium,
+                    )),
+                Expanded(
+                  child: Slider(
+                    value: volume,
+                    onChanged: (value) {
+                      setState(() => volume = value);
+                    },
+                    onChangeEnd: (value) {
+                      updateAlarm(context);
+                    },
+                    key: const Key("slider"),
                   ),
                 ),
-              ])),
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 20.0),
-            padding: const EdgeInsets.all(5),
-            decoration: BoxDecoration(
-                border: Border.all(width: 3, color: Colors.lightBlueAccent),
-                borderRadius: const BorderRadius.all(Radius.circular(10))),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      volume > 0.7
-                          ? Icons.volume_up_rounded
-                          : volume > 0.1
-                              ? Icons.volume_down_rounded
-                              : Icons.volume_mute_rounded,
-                    ),
-                    Text(
-                      "${(volume * 100).round()}%",
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    Expanded(
-                      child: Slider(
-                        value: volume,
-                        onChanged: (value) {
-                          setState(() => volume = value);
-                        },
-                        onChangeEnd: (value) {
-                          updateAlarm(context);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      loc.alarmLoop,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    Switch(
-                      value: loopAudio,
-                      onChanged: (value) {
-                        setState(() {
-                          loopAudio = value;
-                        });
-                        updateAlarm(context);
-                      },
-                      key: const Key("switch-loop"),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Vibrate',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    Switch(
-                      value: vibrate,
-                      onChanged: (value) {
-                        setState(() {
-                          vibrate = value;
-                        });
-                        updateAlarm(context);
-                      },
-                      key: const Key("switch-vibrate"),
-                    ),
-                  ],
-                ),
-                FilledButton.tonal(
-                    onPressed: () => testAlarm(context), child: Text(loc.test)),
               ],
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ));
 
     Widget bottomBar = Container(
-      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(UNIT_PADDING * 2),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          FilledButton.tonal(
+              onPressed: () {
+                testAlarm(context);
+              },
+              child: Text(loc.test)),
           FilledButton.tonal(
               onPressed: () {
                 Navigator.pop(context);

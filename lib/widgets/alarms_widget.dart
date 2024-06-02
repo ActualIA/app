@@ -53,14 +53,14 @@ class _PickTimeButton extends State<PickTimeButton> {
   Widget build(BuildContext context) {
     return RawMaterialButton(
       onPressed: pickTime,
-      fillColor: THEME_BUTTON,
+      fillColor: Theme.of(context).colorScheme.secondaryContainer,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10))),
+          borderRadius: BorderRadius.all(Radius.circular(BOX_BORDER_RADIUS))),
       child: Container(
         margin: const EdgeInsets.all(UNIT_PADDING),
         child: Text(
           TimeOfDay.fromDateTime(_selectedTime).format(context),
-          style: Theme.of(context).textTheme.displayLarge!,
+          style: Theme.of(context).textTheme.displayMedium!,
         ),
       ),
     );
