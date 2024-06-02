@@ -73,7 +73,6 @@ class FakeAccountSignin extends FakeGoTrueClient {
             aud: "",
             createdAt: "")));
   }
-}
 
 @override
 Future<AuthResponse> signInAnonymously(
@@ -95,6 +94,7 @@ Future<AuthResponse> signInAnonymously(
           aud: "",
           createdAt: "")));
   }
+}
 
 class Signout extends FakeGoTrueClient {
   bool hasSignedOut = false;
