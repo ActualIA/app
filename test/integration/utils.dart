@@ -67,13 +67,19 @@ class BaseMockedHttpClient extends Fake implements Client {
         "id": uuid,
         "aud": "authenticated",
         "role": "authenticated",
-        "email": null,
-        "email_confirmed_at": null,
+        "email": "actualia@example.com",
+        "email_confirmed_at": "2024-04-30T12:19:05.934212069Z",
         "phone": "",
         "last_sign_in_at": "2024-04-30T12:19:05.937201913Z",
-        "app_metadata": { },
+        "app_metadata": {
+          "provider": "email",
+          "providers": ["email"]
+        },
         "user_metadata": {
-          "onboardingDone": true,
+          "email": "actualia@example.com",
+          "email_verified": false,
+          "phone_verified": false,
+          "sub": uuid,
           ...extraUserMetadata
         },
         "identities": [
@@ -82,7 +88,7 @@ class BaseMockedHttpClient extends Fake implements Client {
             "id": uuid,
             "user_id": uuid,
             "identity_data": {
-              "email": null,
+              "email": "actualia@example.com",
               "email_verified": false,
               "phone_verified": false,
               "sub": uuid
@@ -91,7 +97,7 @@ class BaseMockedHttpClient extends Fake implements Client {
             "last_sign_in_at": "2024-04-30T12:19:05.92670308Z",
             "created_at": "2024-04-30T12:19:05.926754Z",
             "updated_at": "2024-04-30T12:19:05.926754Z",
-            "email": null
+            "email": "actualia@example.com"
           }
         ],
         "created_at": "2024-04-30T12:19:05.922289Z",
@@ -112,15 +118,6 @@ class BaseMockedHttpClient extends Fake implements Client {
       var b = json.decode(body as String);
 
       switch (url.toString()) {
-        case "$baseUrl/auth/v1/signup?":
-          return Response(jsonEncode({
-            "access_token": accessToken,
-            "token_type": "bearer",
-            "expires_in": 3600,
-            "expires_at": 2000000000,
-            "refresh_token": "2IgxVlIyikNSCD_V20IMVQ",
-            "user": userData
-          }), 200);
         case "$baseUrl/auth/v1/token?grant_type=password":
           expect(b['email'], equals("actualia@example.com"));
           expect(b['password'], equals("actualia"));
