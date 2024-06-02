@@ -25,7 +25,7 @@ class _NoNewsViewState extends State<NoNewsView> {
         ? const SizedBox.shrink()
         : Text(
             widget.text!,
-            style: Theme.of(context).textTheme.displayMedium,
+            style: Theme.of(context).textTheme.displayLarge,
             textAlign: TextAlign.center,
           );
 
