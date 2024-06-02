@@ -56,6 +56,7 @@
     "alarmLoop": "Répétez l'audio",
     "alarmNotSet": "Alarme désactivée",
     "alarmSetFor": "Alarme activée pour {date} prochain",
+    "search": "Filtrer",
     "explainingUserPrompt": "Vous pouvez personnaliser votre fil d'actualité grâce à ces prompts prédéfinis.\n - Lire les actualités...",
     "prompt1": "comme si tu étais un robot",
     "prompt2": "comme si tu avais 5ans",

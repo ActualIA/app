@@ -46,18 +46,6 @@ class ContextView extends StatelessWidget {
       );
     }
 
-    return Container(
-      padding: const EdgeInsets.all(UNIT_PADDING),
-      child: Scaffold(
-          floatingActionButton: IconButton.filledTonal(
-            iconSize: 40,
-            onPressed: () => nrvm.takePictureAndProcess(),
-            icon: Container(
-                padding: const EdgeInsets.all(UNIT_PADDING / 4),
-                child: const Icon(Icons.camera_alt)),
-            color: THEME_BUTTON,
-          ),
-          body: body),
-    );
+    return Container(padding: const EdgeInsets.all(UNIT_PADDING), child: body);
   }
 }

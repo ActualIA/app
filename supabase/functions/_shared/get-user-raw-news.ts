@@ -1,7 +1,14 @@
-import { fetchNews } from "../providers.ts";
+import { fetchNews } from "./providers.ts";
 import SupabaseClient from "https://esm.sh/v135/@supabase/supabase-js@2.42.4/dist/module/SupabaseClient.js";
-import { getUserSettings } from "../database.ts";
+import { getUserSettings } from "./database.ts";
 
+/**
+ * Get all the news from the last 24h for a given user.
+ *
+ * @param userId id of the user whose providers will be used
+ * @param supabaseClient client where the `news_settings` will be fetched
+ * @returns
+ */
 export async function getUserRawNews(
   userId: string,
   supabaseClient: SupabaseClient,

@@ -1,3 +1,4 @@
+import 'package:actualia/models/news.dart';
 import 'package:actualia/utils/themes.dart';
 import 'package:actualia/viewmodels/news.dart';
 import 'package:actualia/viewmodels/news_recognition.dart';
@@ -16,6 +17,14 @@ class FakeSupabaseClient extends Fake implements SupabaseClient {}
 
 class MockNewsViewModel extends NewsViewModel {
   MockNewsViewModel() : super(FakeSupabaseClient());
+  @override
+  News? get news => News(
+      title: "test",
+      date: "17-10-2002",
+      transcriptId: 17,
+      audio: "test",
+      paragraphs: List.empty(),
+      fullTranscript: "test");
 }
 
 class MockNewsRecognitionViewModel extends NewsRecognitionViewModel {
@@ -55,7 +64,7 @@ void main() {
     expect(find.byType(ActualiaBottomNavigationBar), findsOneWidget);
     expect(find.byType(TopAppBar), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.camera_alt));
+    await tester.tap(find.byIcon(Icons.camera));
     await tester.pumpAndSettle();
     expect(find.byType(ContextView), findsOneWidget);
     await tester.tap(find.byIcon(Icons.feed));
