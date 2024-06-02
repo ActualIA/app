@@ -327,7 +327,7 @@ void main() {
   test("Correctly signs in with fake account", () async {
     AuthModel vm =
         AuthModel(FakeSupabaseClient(FakeAccountSignin()), FakeGoogleSignin());
-    expect(await vm.signInWithFakeAccount(), isTrue);
+    expect(await vm.signInAnonymously(), isTrue);
   });
 
   test("Correctly signs out", () async {
