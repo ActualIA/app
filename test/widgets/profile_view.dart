@@ -2,6 +2,7 @@ import 'package:actualia/models/auth_model.dart';
 import 'package:actualia/models/news_settings.dart';
 import 'package:actualia/models/providers.dart';
 import 'package:actualia/viewmodels/alarms.dart';
+import 'package:actualia/viewmodels/narrator.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
 import 'package:actualia/viewmodels/providers.dart';
 import 'package:actualia/views/profile_view.dart';
@@ -106,15 +107,20 @@ class MockAlarmsViewModel extends AlarmsViewModel {
   bool get isAlarmSet => false;
 }
 
+class MockNarratorViewModel extends NarratorViewModel {
+  MockNarratorViewModel() : super(FakeSupabaseClient());
+}
+
 class ProfilePageWrapper extends StatelessWidget {
   late final Widget _child;
   late final NewsSettingsViewModel _newsSettingsModel;
   final ProvidersViewModel pvm;
   late final AuthModel _authModel;
   late final AlarmsViewModel _alarmsModel;
+  late final NarratorViewModel _narratorModel;
 
   ProfilePageWrapper(this._child, this._newsSettingsModel, this.pvm,
-      this._authModel, this._alarmsModel,
+      this._authModel, this._alarmsModel, this._narratorModel,
       {super.key});
 
   @override
@@ -126,7 +132,9 @@ class ProfilePageWrapper extends StatelessWidget {
           ChangeNotifierProvider<AuthModel>(create: (context) => _authModel),
           ChangeNotifierProvider<ProvidersViewModel>(create: (context) => pvm),
           ChangeNotifierProvider<AlarmsViewModel>(
-              create: (context) => _alarmsModel)
+              create: (context) => _alarmsModel),
+          ChangeNotifierProvider<NarratorViewModel>(
+              create: (context) => _narratorModel),
         ],
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -150,7 +158,8 @@ void main() {
         MockNewsSettingsViewModel(),
         MockProvidersViewModel(),
         MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin()),
-        MockAlarmsViewModel(FakeSupabaseClient())));
+        MockAlarmsViewModel(FakeSupabaseClient()),
+        MockNarratorViewModel()));
 
     expect(find.text('Log out'), findsOne);
 
@@ -165,7 +174,7 @@ void main() {
     expect(find.text("Sources"), findsOne);
     expect(find.text("Alarm"), findsOne);
     await testButton('Storage');
-    await testButton('Narrator');
+    expect(find.text("Narrator"), findsOne);
     await testButton('Accessibility');
     // await testButton('Done');
   });
@@ -176,7 +185,8 @@ void main() {
         MockNewsSettingsViewModel(),
         MockProvidersViewModel(),
         MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin()),
-        MockAlarmsViewModel(FakeSupabaseClient())));
+        MockAlarmsViewModel(FakeSupabaseClient()),
+        MockNarratorViewModel()));
 
     expect(find.text("test.test@epfl.ch"), findsOne);
   });
@@ -187,7 +197,8 @@ void main() {
         MockNewsSettingsViewModel(),
         MockProvidersViewModel(),
         MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin()),
-        MockAlarmsViewModel(FakeSupabaseClient())));
+        MockAlarmsViewModel(FakeSupabaseClient()),
+        MockNarratorViewModel()));
 
     expect(find.text("Interests"), findsOne);
     await tester.tap(find.text("Interests"));
@@ -214,7 +225,8 @@ void main() {
         MockNewsSettingsViewModel(),
         MockProvidersViewModel(),
         MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin()),
-        MockAlarmsViewModel(FakeSupabaseClient())));
+        MockAlarmsViewModel(FakeSupabaseClient()),
+        MockNarratorViewModel()));
 
     await tester.tap(find.text("Alarm"));
     await tester.pumpAndSettle();
