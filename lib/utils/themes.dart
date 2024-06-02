@@ -28,28 +28,38 @@ ThemeData ACTUALIA_THEME = ThemeData(
           fontFamily: "EB Garamond",
           fontSize: 32.0,
           height: 0.9,
+          letterSpacing: -.5,
           leadingDistribution: TextLeadingDistribution.even,
           fontWeight: FontWeight.w400),
       titleMedium: TextStyle(
           fontFamily: "EB Garamond",
           fontSize: 24.0,
           height: 0.9,
+          letterSpacing: -.5,
           leadingDistribution: TextLeadingDistribution.even,
           fontWeight: FontWeight.w400),
       titleSmall: TextStyle(
           fontFamily: "EB Garamond",
           fontSize: 14.0,
           height: 1.4,
+          letterSpacing: -.5,
           fontWeight: FontWeight.w300),
       // MONOSPACED BODIES
       displayLarge: TextStyle(
-          fontFamily: "Fira Code", fontSize: 24.0, fontWeight: FontWeight.w500),
+          fontFamily: "Fira Code",
+          fontSize: 24.0,
+          letterSpacing: -.5,
+          fontWeight: FontWeight.w500),
       displayMedium: TextStyle(
-          fontFamily: "Fira Code", fontSize: 20.0, fontWeight: FontWeight.w400),
+          fontFamily: "Fira Code",
+          fontSize: 20.0,
+          letterSpacing: -.5,
+          fontWeight: FontWeight.w400),
       displaySmall: TextStyle(
           fontFamily: "Fira Code",
           fontSize: 14.0,
           height: 1.4,
+          letterSpacing: -.5,
           fontWeight: FontWeight.w300),
     ),
     colorScheme: ColorScheme.fromSeed(
