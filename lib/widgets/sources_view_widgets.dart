@@ -56,8 +56,8 @@ class ArticleWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var loc = AppLocalizations.of(context)!;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return ListView(
+      shrinkWrap: true,
       children: <Widget>[
         Container(
             padding: const EdgeInsets.symmetric(
