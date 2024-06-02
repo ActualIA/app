@@ -90,14 +90,8 @@ class AuthModel extends ChangeNotifier {
     return res.user != null;
   }
 
-  // use the anonymous sign in API from Supabase !
-  // More info can be found at the documentation webpage.
   Future<bool> signInWithFakeAccount() async {
-    final res = await _supabase.auth.signInAnonymously();
-
-    log("signed in anonymously ! user : $res.user", level: Level.WARNING.value);
-
-    return res.user != null;
+    return signInWithEmail("actualia@example.com", "actualia");
   }
 
   /// Sets a flag in user metadata to remember that the onboarding is done
