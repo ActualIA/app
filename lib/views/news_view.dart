@@ -45,11 +45,14 @@ class _NewsViewState extends State<NewsView> {
           NoNewsView(title: loc.newsEmptyTitle, text: loc.newsEmptyDescription);
     } else {
       final newsList = newsViewModel.newsList!;
-      body = ListView.builder(
-          itemCount: newsList.length,
-          itemBuilder: (context, index) {
-            return NewsText(news: newsList[index]);
-          });
+      body = RefreshIndicator(
+          onRefresh: Provider.of<NewsViewModel>(context, listen: false)
+              .generateAndGetNews,
+          child: ListView.builder(
+              itemCount: newsList.length,
+              itemBuilder: (context, index) {
+                return NewsText(news: newsList[index]);
+              }));
     }
     return body;
   }

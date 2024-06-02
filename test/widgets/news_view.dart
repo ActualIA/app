@@ -11,6 +11,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class FakeSupabaseClient extends Fake implements SupabaseClient {}
 
 class MockNewsViewModel extends NewsViewModel {
+  bool generateAndGetNewsCalled = false;
   MockNewsViewModel.create() : super.create(FakeSupabaseClient());
 
   @override
@@ -120,6 +121,12 @@ class MockNewsViewModel extends NewsViewModel {
   Future<void> getNewsList() {
     return Future.value();
   }
+
+  @override
+  Future<void> generateAndGetNews() {
+    generateAndGetNewsCalled = true;
+    return Future.value();
+  }
 }
 
 class NewsWrapper extends StatelessWidget {
@@ -158,5 +165,17 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text("Title1"), findsOne);
+  });
+
+  testWidgets("Swiping down calls generateAndGetNews",
+      (WidgetTester tester) async {
+    final model = MockNewsViewModel.create();
+    await tester.pumpWidget(NewsWrapper(const NewsView(), model));
+    await tester.pumpAndSettle();
+
+    await tester.fling(find.byType(NewsView), const Offset(0, 300), 1000);
+    await tester.pumpAndSettle();
+
+    expect(model.generateAndGetNewsCalled, true);
   });
 }
