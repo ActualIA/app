@@ -73,6 +73,27 @@ class FakeAccountSignin extends FakeGoTrueClient {
             aud: "",
             createdAt: "")));
   }
+
+  @override
+  Future<AuthResponse> signInAnonymously(
+      {String? captchaToken, Map<String, dynamic>? data}) {
+    return Future.value(AuthResponse(
+        session: Session(
+            accessToken: "",
+            tokenType: "",
+            user: const User(
+                id: "1234",
+                appMetadata: {},
+                userMetadata: {},
+                aud: "",
+                createdAt: "")),
+        user: const User(
+            id: "1234",
+            appMetadata: {},
+            userMetadata: {},
+            aud: "",
+            createdAt: "")));
+  }
 }
 
 class Signout extends FakeGoTrueClient {
