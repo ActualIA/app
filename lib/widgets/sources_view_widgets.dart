@@ -1,5 +1,4 @@
-import 'dart:developer';
-
+import 'package:actualia/models/article.dart';
 import 'package:actualia/utils/common.dart';
 import 'package:actualia/utils/themes.dart';
 import 'package:flutter/material.dart';
@@ -49,41 +48,28 @@ class SourceTitle extends StatelessWidget {
 }
 
 class ArticleWidget extends StatelessWidget {
-  final String title;
-  final String date;
-  final String origin;
-  final String content;
-  final String sourceUrl;
+  final Article article;
 
-  const ArticleWidget(
-      {this.title = "",
-      this.origin = "",
-      this.date = "",
-      this.content = "",
-      this.sourceUrl = "",
-      super.key});
+  const ArticleWidget({required this.article, super.key});
 
   @override
   Widget build(BuildContext context) {
     var loc = AppLocalizations.of(context)!;
 
-    return ListView(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        ListView(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+        Container(
             padding: const EdgeInsets.symmetric(
                 horizontal: UNIT_PADDING, vertical: UNIT_PADDING * 2),
-            children: <Widget>[
-              SourceOrigin(origin: origin, date: date),
+            child: Column(children: <Widget>[
+              SourceOrigin(origin: article.origin, date: article.date),
               Container(
                   padding:
                       const EdgeInsets.symmetric(vertical: UNIT_PADDING / 2),
-                  child: SourceTitle(title: title)),
-            ]),
-        ScrollableText(text: content),
+                  child: SourceTitle(title: article.title)),
+            ])),
+        ScrollableText(text: article.content),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -91,7 +77,7 @@ class ArticleWidget extends StatelessWidget {
                 padding: const EdgeInsets.only(top: UNIT_PADDING * 2),
                 child: FilledButton.tonal(
                   onPressed: () {
-                    _launchInBrowser(Uri.parse(sourceUrl));
+                    _launchInBrowser(Uri.parse(article.url));
                   },
                   child: Text(
                       style: Theme.of(context).textTheme.displaySmall,

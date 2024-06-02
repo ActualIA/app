@@ -88,8 +88,7 @@ class _AppState extends State<App> {
       if (authModel.isOnboardingRequired) {
         if (newsSettingsModel.settings == null ||
             providersModel.newsProviders == null) {
-          // TODO: this is not normal :( ;
-          home = const LoadingView(text: 'Fetching your settings...');
+          home = LoadingView(text: AppLocalizations.of(context)!.loading);
         } else {
           home = const PreOnBoardingPage();
         }
