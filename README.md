@@ -61,6 +61,6 @@ All the commits must follow the [Conventional Commits](https://www.conventionalc
 
 ## Figma
 
-To direct the design process, a [Figma Board](https://www.figma.com/team_invite/redeem/LbT1WUk9GvAooNPRXd5Kwp) has been setup for team members. It houses the main design elements.
+To direct the design process, a [Figma Board](https://www.figma.com/) has been setup for team members. It houses the main design elements.
 
-For milestone 1, [see the Figma here](https://www.figma.com/file/vxgSg8jGsV4710Gm9mAyDL/Submissions?type=design&node-id=0-1&mode=design&t=cyFxwt0EOjpTBYSd-0).
+You can find the board [here](https://www.figma.com/design/8GfgXznK0gmJuPWhfBwGBs/ActualIA%3A%3Amockup?version-id=5901485944&node-id=0-1&t=sIX4uiqU0DQVb2eI-0)
