@@ -49,8 +49,9 @@ class SourceTitle extends StatelessWidget {
 
 class ArticleWidget extends StatelessWidget {
   final Article article;
+  final ScrollPhysics? physics;
 
-  const ArticleWidget({required this.article, super.key});
+  const ArticleWidget({required this.article, super.key, this.physics});
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +59,7 @@ class ArticleWidget extends StatelessWidget {
 
     return ListView(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: physics ?? const NeverScrollableScrollPhysics(),
       children: <Widget>[
         Container(
             padding: const EdgeInsets.symmetric(
@@ -70,7 +71,7 @@ class ArticleWidget extends StatelessWidget {
                       const EdgeInsets.symmetric(vertical: UNIT_PADDING / 2),
                   child: SourceTitle(title: article.title)),
             ])),
-        ScrollableText(text: article.content),
+        Text(style: Theme.of(context).textTheme.displaySmall, article.content),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

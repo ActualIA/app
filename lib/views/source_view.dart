@@ -33,6 +33,7 @@ class _SourceViewState extends State<SourceView> {
       body: Container(
           padding: const EdgeInsets.all(UNIT_PADDING * 3),
           child: ArticleWidget(
+            physics: const AlwaysScrollableScrollPhysics(),
             article: _article,
           )),
     );
