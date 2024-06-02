@@ -58,6 +58,7 @@ class ArticleWidget extends StatelessWidget {
 
     return ListView(
       shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
       children: <Widget>[
         Container(
             padding: const EdgeInsets.symmetric(
