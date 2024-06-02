@@ -238,7 +238,13 @@ void main() {
     await tester.tap(find.text("OK"));
 
     await tester.tap(find.byKey(const Key("switch-on-off")));
-    await tester.drag(find.byType(Slider), Offset.fromDirection(30));
+    await tester.scrollUntilVisible(find.byKey(const Key("slider")), 100,
+        scrollable: find.descendant(
+            of: find.byType(ListView),
+            matching:
+                find.byWidgetPredicate((widget) => widget is Scrollable)));
+    await tester.drag(
+        find.byKey(const Key("slider")), Offset.fromDirection(30));
     await tester.tap(find.byKey(const Key("switch-loop")));
     await tester.tap(find.byKey(const Key("switch-vibrate")));
 
