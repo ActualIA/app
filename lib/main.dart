@@ -51,7 +51,8 @@ Future<void> main() async {
           create: (context) =>
               NewsRecognitionViewModel(Supabase.instance.client)),
       ChangeNotifierProvider(
-          create: (context) => RSSFeedViewModel(Supabase.instance.client)),
+          create: (context) => RSSFeedViewModel(Supabase.instance.client)), 
+      ChangeNotifierProvider(
           create: (context) => NarratorViewModel(Supabase.instance.client)),
     ],
     child: const App(),

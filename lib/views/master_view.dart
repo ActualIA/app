@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/navigation_menu.dart';
 import '../widgets/navigation_menu.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MasterView extends StatefulWidget {
   const MasterView({super.key});
@@ -51,6 +52,7 @@ class _MasterView extends State<MasterView> {
   Widget build(BuildContext context) {
     Widget body;
     Widget? floatingButton;
+    final loc = AppLocalizations.of(context)!; 
     switch (_currentViews) {
       case Views.NEWS:
         body = const NewsView();
