@@ -9,12 +9,14 @@ import 'package:provider/provider.dart';
 class PlayButton extends StatefulWidget {
   final int transcriptId;
   final double size;
+  final Source? source;
   final Future<void> Function()? onPressed;
 
   const PlayButton(
       {super.key,
       required this.transcriptId,
       this.size = 40.0,
+      this.source,
       this.onPressed});
 
   @override
@@ -82,7 +84,7 @@ class PlayButtonState extends State<PlayButton> {
             case PlayerState.completed:
             case PlayerState.stopped:
             case PlayerState.disposed:
-              Source? source =
+              Source? source = widget.source ??
                   await newsViewModel.getAudioSource(widget.transcriptId);
               if (source != null) {
                 await playAudio(audioPlayer, source);

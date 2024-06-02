@@ -208,6 +208,7 @@ class WizardScaffold extends StatelessWidget {
   final PreferredSizeWidget topBar;
   final Widget body;
   final Widget bottomBar;
+  final EdgeInsetsGeometry? padding;
 
   const WizardScaffold(
       {this.topBar = const TopAppBar(
@@ -215,6 +216,7 @@ class WizardScaffold extends StatelessWidget {
       ),
       required this.body,
       required this.bottomBar,
+      this.padding,
       super.key});
 
   @override
@@ -223,7 +225,7 @@ class WizardScaffold extends StatelessWidget {
       appBar: topBar,
       bottomNavigationBar: bottomBar,
       body: Container(
-        padding: const EdgeInsets.fromLTRB(48.0, 48.0, 48.0, 48.0),
+        padding: padding ?? const EdgeInsets.all(UNIT_PADDING * 3),
         alignment: Alignment.topCenter,
         child: body,
       ),
