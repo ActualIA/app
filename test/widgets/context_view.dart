@@ -19,8 +19,10 @@ class FakeNewsRecognitionVM extends NewsRecognitionViewModel {
   @override
   bool get hasError => false;
   @override
-  List<String> get contexts =>
-      ["This is a context that is displayed when the text is recognized."];
+  List<String> get contexts => [
+        "This is a context that is displayed when the text is recognized.",
+        "This is an old context that should also be displayed."
+      ];
 }
 
 void main() {
@@ -47,6 +49,9 @@ void main() {
     expect(
         find.text(
             "This is a context that is displayed when the text is recognized."),
+        findsWidgets);
+
+    expect(find.text("This is an old context that should also be displayed."),
         findsWidgets);
   });
 }
