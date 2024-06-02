@@ -49,7 +49,8 @@ void main() {
     expect(find.text("ActualIA"), findsOne);
 
     //check article origin
-    expect(find.text("${article.origin}, ${parseDateTimeShort(article.date)}"), findsOne);
+    expect(find.text("${article.origin}, ${parseDateTimeShort(article.date)}"),
+        findsOne);
 
     //check article is present and scrollable
     await tester.dragUntilVisible(find.text(article.content),
