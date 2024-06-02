@@ -74,6 +74,7 @@
       }
     }
   },
+  "search": "Search",
   "explainingUserPrompt": "You can personalize your news feed with this predefined prompts.\n - Read the news...",
   "prompt1": "as if you were a radio host",
   "prompt2": "as if you were 5 years old",
