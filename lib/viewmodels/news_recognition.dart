@@ -169,8 +169,4 @@ class NewsRecognitionViewModel extends ChangeNotifier {
 
     _oldContexts = contexts;
   }
-
-  Future<XFile?> pickImage() async {
-    return await _picker.pickImage(source: ImageSource.camera);
-  }
 }
