@@ -57,7 +57,7 @@ class FakeNewsRecognitionVM extends NewsRecognitionViewModel {
   }
 
   @override
-  Future<void> writeContext(String? context) async {
+  Future<void> writeContext() async {
     return;
   }
 
@@ -76,7 +76,7 @@ class NoPermissionNewsRecognitionVM extends NewsRecognitionViewModel {
   }
 
   @override
-  Future<void> writeContext(String? context) async {
+  Future<void> writeContext() async {
     return;
   }
 
@@ -95,7 +95,7 @@ class FailingNewsRecognitionVM extends NewsRecognitionViewModel {
   }
 
   @override
-  Future<void> writeContext(String? context) async {
+  Future<void> writeContext() async {
     return;
   }
 
@@ -114,7 +114,7 @@ class ErrorNewsRecognitionVM extends NewsRecognitionViewModel {
   }
 
   @override
-  Future<void> writeContext(String? context) async {
+  Future<void> writeContext() async {
     return;
   }
 
@@ -163,7 +163,7 @@ class MockFullNewsRecognitionViewModel extends NewsRecognitionViewModel {
   }
 
   @override
-  Future<void> writeContext(String? context) async {
+  Future<void> writeContext() async {
     return;
   }
 
@@ -182,7 +182,7 @@ class FailingCameraNewsRecognitionViewModel extends NewsRecognitionViewModel {
   }
 
   @override
-  Future<void> writeContext(String? context) async {
+  Future<void> writeContext() async {
     return;
   }
 
