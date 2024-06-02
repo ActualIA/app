@@ -6,6 +6,7 @@ import "package:flutter_test/flutter_test.dart";
 import "package:image_picker/image_picker.dart";
 import "package:permission_handler/permission_handler.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FakeFunctionsClient extends Fake implements FunctionsClient {
   @override
@@ -74,6 +75,63 @@ class FailingNewsRecognitionVM extends NewsRecognitionViewModel {
   }
 }
 
+class ErrorNewsRecognitionVM extends NewsRecognitionViewModel {
+  ErrorNewsRecognitionVM() : super(FakeSupabaseClient());
+
+  @override
+  void setError(error) {
+    super.setError(error);
+  }
+}
+
+class FakeL10n extends Fake implements AppLocalizations {
+  @override
+  String get ocrErrorNoImage => "no_image";
+  @override
+  String get ocrErrorProcessing => "processing";
+  @override
+  String get ocrErrorRecognition => "recognition";
+}
+
+class FakeXFile extends Fake implements XFile {
+  @override
+  String get path => "";
+}
+
+class MockFullNewsRecognitionViewModel extends NewsRecognitionViewModel {
+  MockFullNewsRecognitionViewModel() : super(FakeSupabaseClient());
+
+  bool tookPicture = false;
+  bool hasRecognized = false;
+  bool hasProcessed = false;
+
+  @override
+  Future<XFile?> takePicture() async {
+    tookPicture = true;
+    return FakeXFile();
+  }
+
+  @override
+  Future<String> recognizeText(String filePath) async {
+    hasRecognized = true;
+    return "text";
+  }
+
+  @override
+  Future<void> invokeProcessImage(String textFromImage) async {
+    hasProcessed = true;
+  }
+}
+
+class FailingCameraNewsRecognitionViewModel extends NewsRecognitionViewModel {
+  FailingCameraNewsRecognitionViewModel() : super(FakeSupabaseClient());
+
+  @override
+  Future<XFile?> takePicture() async {
+    return null;
+  }
+}
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -91,8 +149,8 @@ void main() {
 
   test("InvokeProcessImage returns data from the response", () async {
     FakeNewsRecognitionVM vm = FakeNewsRecognitionVM();
-    String? data = await vm.invokeProcessImage("Test");
-    expect(data, equals("Hello, world!"));
+    await vm.invokeProcessImage("Test");
+    expect(vm.result, equals("Hello, world!"));
   });
 
   test("InvokeProcessImage throws an exception on failure", () async {
@@ -103,5 +161,35 @@ void main() {
   test("Ocr with failing supabase function throws exception", () async {
     FailingNewsRecognitionVM vm = FailingNewsRecognitionVM();
     expect(() async => await vm.ocr("path"), throwsException);
+  });
+
+  test("Returns correct error messages", () {
+    ErrorNewsRecognitionVM vm = ErrorNewsRecognitionVM();
+
+    vm.setError(Error.noImage);
+    expect(vm.getErrorMessage(FakeL10n()), equals("no_image"));
+
+    vm.setError(Error.processing);
+    expect(vm.getErrorMessage(FakeL10n()), equals("processing"));
+
+    vm.setError(Error.recognition);
+    expect(vm.getErrorMessage(FakeL10n()), equals("recognition"));
+  });
+
+  test("Full workflow", () async {
+    MockFullNewsRecognitionViewModel vm = MockFullNewsRecognitionViewModel();
+    await vm.takePictureAndProcess();
+
+    expect(vm.tookPicture, isTrue);
+    expect(vm.hasRecognized, isTrue);
+    expect(vm.hasProcessed, isTrue);
+  });
+
+  test("Failing camera is reported", () async {
+    FailingCameraNewsRecognitionViewModel vm =
+        FailingCameraNewsRecognitionViewModel();
+    await vm.takePictureAndProcess();
+
+    expect(vm.hasError, isTrue);
   });
 }

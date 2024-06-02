@@ -1,12 +1,14 @@
 //coverage:ignore-file
 
 import 'package:actualia/models/auth_model.dart';
+import 'package:actualia/viewmodels/narrator.dart';
 import 'package:actualia/viewmodels/news_recognition.dart';
 import 'package:actualia/viewmodels/providers.dart';
 import 'package:actualia/utils/themes.dart';
 import 'package:actualia/viewmodels/alarms.dart';
 import 'package:actualia/views/loading_view.dart';
 import 'package:actualia/views/master_view.dart';
+import 'package:actualia/views/narrator_settings_view.dart';
 import 'package:actualia/views/news_alert_view.dart';
 import 'package:actualia/viewmodels/news_settings.dart';
 import 'package:actualia/views/login_view.dart';
@@ -28,6 +30,7 @@ Future<void> main() async {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRweGRkYmp5amRzY3Z1aHd1dHd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTA5NTQzNDcsImV4cCI6MjAyNjUzMDM0N30.0vB8huUmdJIYp3M1nMeoixQBSAX_w2keY0JsYj2Gt8c',
   );
   await Alarm.init();
+  NewsViewModel nvm = await NewsViewModel.init(Supabase.instance.client);
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
@@ -37,8 +40,7 @@ Future<void> main() async {
                 serverClientId:
                     '505202936017-bn8uc2veq2hv5h6ksbsvr9pr38g12gde.apps.googleusercontent.com',
               ))),
-      ChangeNotifierProvider(
-          create: (context) => NewsViewModel(Supabase.instance.client)),
+      ChangeNotifierProvider(create: (context) => nvm),
       ChangeNotifierProvider(
           create: (context) => NewsSettingsViewModel(Supabase.instance.client)),
       ChangeNotifierProvider(
@@ -48,6 +50,8 @@ Future<void> main() async {
       ChangeNotifierProvider(
           create: (context) =>
               NewsRecognitionViewModel(Supabase.instance.client)),
+      ChangeNotifierProvider(
+          create: (context) => NarratorViewModel(Supabase.instance.client)),
     ],
     child: const App(),
   ));

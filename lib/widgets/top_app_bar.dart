@@ -35,6 +35,7 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
     }
 
     return AppBar(
+      automaticallyImplyLeading: enableReturnButton,
       centerTitle: true,
       title: Container(
         padding: const EdgeInsets.symmetric(vertical: UNIT_PADDING),
@@ -42,8 +43,8 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
           onPressed: () {
             // Action for the title button
           },
-          child: Text('ActualIA',
-              style: Theme.of(context).textTheme.displayMedium),
+          child:
+              Text('ActualIA', style: Theme.of(context).textTheme.displayLarge),
         ),
       ),
       actions: actions,

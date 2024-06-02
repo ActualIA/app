@@ -89,6 +89,8 @@ class ValidateVM extends MockNewsSettingsViewModel {
   @override
   Future<bool> pushSettings(NewsSettings? settings) {
     if (expected != null) {
+      debugPrint(
+          "[PUSH] What is happening ns: ${settings!.countries}, ${settings.cities}, ${settings.interests}");
       expect(settings!.cities, equals(expected!.cities));
       expect(settings.countries, equals(expected!.countries));
       expect(settings.interests, equals(expected!.interests));
@@ -178,7 +180,8 @@ void main() {
 
     await testSelector(const Key("countries-selector"), "Chad", "Next");
     await tester.pumpAndSettle();
-    await testSelector(const Key("cities-selector"), "Basel", "Next");
+    await testSelector(
+        const Key("cities-selector"), "Abobo (Côte d'Ivoire)", "Next");
     await tester.pumpAndSettle();
     await testSelector(const Key("interests-selector"), "Gaming", "Next");
   });
@@ -188,13 +191,14 @@ void main() {
       (WidgetTester tester) async {
     final vm = ValidateVM(
         NewsSettings(
-            interests: ["Biology"],
-            cities: ["Basel"],
+            interests: ["Acting"],
+            cities: ["Abobo (Côte d'Ivoire)"],
             countries: ["Antarctica"],
             wantsCities: false,
             wantsCountries: false,
             wantsInterests: false,
-            locale: "en"),
+            locale: "en",
+            userPrompt: ""),
         null);
     await tester.pumpWidget(WizardWrapper(
         wizard: const InterestWizardView(),
@@ -211,22 +215,37 @@ void main() {
     }
 
     await select(const Key("countries-selector"), "Antarctica", "Next");
-    await select(const Key("cities-selector"), "Basel", "Next");
-    await select(const Key("interests-selector"), "Biology", "Done");
+    await select(const Key("cities-selector"), "Abobo (Côte d'Ivoire)", "Next");
+    await select(const Key("interests-selector"), "Acting", "Done");
 
     expect(vm.wasTriggered, isTrue);
+  });
+
+  testWidgets("interests wizard: filter work as intended", (tester) async {
+    await tester.pumpWidget(WizardWrapper(
+        wizard: const InterestWizardView(),
+        nsvm: MockNewsSettingsViewModel(),
+        auth: MockAuthModel(FakeSupabaseClient(), FakeGoogleSignin()),
+        pvm: MockProvidersViewModel()));
+
+    expect(find.byIcon(Icons.search), findsOneWidget);
+    await tester.enterText(find.byType(TextField), "switzerland");
+    await tester.pumpAndSettle();
+
+    expect(find.byType(FilterChip), findsOneWidget);
   });
 
   testWidgets("Interests wizard: Keep initial values",
       (WidgetTester tester) async {
     NewsSettings ns = NewsSettings(
         interests: ["Gaming"],
-        cities: ["Basel"],
+        cities: ["Abobo (Côte d'Ivoire)"],
         countries: ["Antarctica"],
         wantsCities: false,
         wantsCountries: false,
         wantsInterests: false,
-        locale: "en");
+        locale: "en",
+        userPrompt: "");
     final vm = ValidateVM(ns, ns);
 
     await tester.pumpWidget(WizardWrapper(
@@ -261,7 +280,7 @@ void main() {
     expect(find.text("Cancel"), findsOne);
     await tester.tap(find.text("Next"));
     await tester.pumpAndSettle();
-    await tester.tap(find.text("Basel"));
+    await tester.tap(find.text("Abobo (Côte d'Ivoire)"));
     expect(find.text("Cancel"), findsOne);
     await tester.tap(find.text("Cancel"));
     await tester.pumpAndSettle();
@@ -281,7 +300,7 @@ void main() {
 
     expect(find.byType(PickTimeButton), findsOneWidget);
     expect(find.byType(WizardNavigationBottomBar), findsOneWidget);
-    await tester.tap(find.text("Validate"));
+    await tester.tap(find.text("Done"));
     expect(avm.isAlarmSet, isTrue);
   });
 }

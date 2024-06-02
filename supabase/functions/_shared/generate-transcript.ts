@@ -1,9 +1,9 @@
 import OpenAI from "https://deno.land/x/openai@v4.33.0/mod.ts";
-import { corsHeaders } from "../_shared/cors.ts";
-import { News } from "../model.ts";
 import SupabaseClient from "https://esm.sh/v135/@supabase/supabase-js@2.42.4/dist/module/SupabaseClient.js";
-import { getUserSettings } from "../database.ts";
+import { News } from "./model.ts";
+import { getUserSettings } from "./database.ts";
 import { getUserRawNews } from "./get-user-raw-news.ts";
+import { corsHeaders } from "./util.ts";
 
 interface Result {
   transcript: string;
@@ -27,6 +27,14 @@ interface Transcript {
   news: (News & Result)[];
 }
 
+/**
+ * Generates a transcript from the latest news and uploads it to the database.
+ * Uses the `news_settings` of the user given as parameter.
+ *
+ * @param userId id of the user to generate the transcript for
+ * @param supabaseClient Supabase client where the transcript will be saved
+ * @returns HTTP Response describing the outcome of the function
+ */
 export async function generateTranscript(
   userId: string,
   supabaseClient: SupabaseClient,
@@ -44,14 +52,16 @@ export async function generateTranscript(
 
   // Generate a transcript from the news.
   console.log("Generating transcript from news");
-  const transcript = news.length > 0 ? await createTranscript(news, interests.locale) : {
-    totalNews: 0,
-    totalNewsByLLM: 0,
-    intro: "",
-    outro: "",
-    title: "",
-    news: [],
-  };
+  const transcript = news.length > 0
+    ? await createTranscript(news, interests.locale, interests.user_prompt)
+    : {
+      totalNews: 0,
+      totalNewsByLLM: 0,
+      intro: "",
+      outro: "",
+      title: "",
+      news: [],
+    };
 
   // Insert the transcript into the database.
   console.log(
@@ -68,7 +78,7 @@ export async function generateTranscript(
     console.error(error);
   }
 
-  // return transcript
+  // Return the transcript
   return new Response(JSON.stringify(transcriptRow), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
     status: 200,
@@ -79,12 +89,14 @@ export async function generateTranscript(
 async function createTranscript(
   news: News[],
   lang: string,
+  userPrompt: string,
 ): Promise<Transcript> {
   const newsToGenerate = news.reduce(
     (s, n) => `${s}${n.title}\n${n.description}\n\n`,
     "",
   );
 
+  // Generate the full transcript
   const openai = new OpenAI();
   const completion1 = await openai.chat.completions.create({
     "model": "gpt-3.5-turbo",
@@ -92,7 +104,7 @@ async function createTranscript(
       {
         "role": "system",
         "content":
-          `You're a radio journalist writing a script to announce the day's news. The user gives you the news to announce. Your radio broadcast should only last 2-3 minutes, so try to find interesting transitions between the news items. You are targeting an audience able to understand the locale '${lang}', choose the language accordingly. Write the script.`,
+          `You're a journalist writing a script to announce the day's news. The user gives you the news to announce. Your should only last 2-3 minutes, so try to find interesting transitions between the news items. You are targeting an audience able to understand the locale '${lang}', choose the language accordingly. The user wants you to write the script ${userPrompt}`,
       },
       {
         "role": "user",
@@ -102,6 +114,7 @@ async function createTranscript(
   });
   const fullTranscript = completion1.choices[0].message.content;
 
+  // Splits the transcript into different sections for each news.
   const completion2 = await openai.chat.completions.create({
     "model": "gpt-3.5-turbo",
     "response_format": {
@@ -123,8 +136,6 @@ async function createTranscript(
   const transcriptJSON: NewsJsonLLM = JSON.parse(
     completion2.choices[0].message.content || "",
   );
-
-  console.log("Transcript JSON: ", transcriptJSON);
 
   return {
     totalNews: news.length,

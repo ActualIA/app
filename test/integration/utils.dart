@@ -18,40 +18,30 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AppWrapper extends StatelessWidget {
-  final Client? httpClient;
+  final AuthModel? auth;
+  final NewsViewModel? nvm;
+  final NewsSettingsViewModel? nsvm;
+  final ProvidersViewModel? pvm;
+  final AlarmsViewModel? avm;
 
-  const AppWrapper({super.key, this.httpClient});
+  const AppWrapper({
+    required this.auth,
+    required this.nvm,
+    required this.nsvm,
+    required this.pvm,
+    required this.avm,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    SharedPreferences.setMockInitialValues({});
-
-    Supabase.initialize(
-        url: 'https://dpxddbjyjdscvuhwutwu.supabase.co',
-        anonKey:
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRweGRkYmp5amRzY3Z1aHd1dHd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTA5NTQzNDcsImV4cCI6MjAyNjUzMDM0N30.0vB8huUmdJIYp3M1nMeoixQBSAX_w2keY0JsYj2Gt8c',
-        httpClient: httpClient,
-        debug: false,
-        authOptions: const FlutterAuthClientOptions(autoRefreshToken: false));
-
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-            create: (context) => AuthModel(
-                Supabase.instance.client,
-                GoogleSignIn(
-                  serverClientId:
-                      '505202936017-bn8uc2veq2hv5h6ksbsvr9pr38g12gde.apps.googleusercontent.com',
-                ))),
-        ChangeNotifierProvider(
-            create: (context) => NewsViewModel(Supabase.instance.client)),
-        ChangeNotifierProvider(
-            create: (context) =>
-                NewsSettingsViewModel(Supabase.instance.client)),
-        ChangeNotifierProvider(
-            create: (context) => ProvidersViewModel(Supabase.instance.client)),
-        ChangeNotifierProvider(
-            create: (context) => AlarmsViewModel(Supabase.instance.client)),
+        ChangeNotifierProvider(create: (context) => auth),
+        ChangeNotifierProvider(create: (context) => nvm),
+        ChangeNotifierProvider(create: (context) => nsvm),
+        ChangeNotifierProvider(create: (context) => pvm),
+        ChangeNotifierProvider(create: (context) => avm),
       ],
       child: const App(),
     );

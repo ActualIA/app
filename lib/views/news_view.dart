@@ -1,5 +1,6 @@
 import 'package:actualia/views/loading_view.dart';
 import 'package:actualia/views/no_news_view.dart';
+import 'package:actualia/widgets/error.dart';
 import 'package:flutter/material.dart';
 import 'package:actualia/widgets/news_text.dart';
 import 'package:actualia/viewmodels/news.dart';
@@ -32,53 +33,26 @@ class _NewsViewState extends State<NewsView> {
     Widget loading = LoadingView(text: loc.newsLoading);
 
     final newsViewModel = Provider.of<NewsViewModel>(context);
-    final newsList = newsViewModel.newsList;
-    final hasNews = newsViewModel.hasNews;
     Widget body;
 
-    if (newsList.isEmpty) {
-      if (hasNews) {
-        body = loading;
-      } else {
-        body = NoNewsView(
-            title: loc.newsEmptyTitle, text: loc.newsEmptyDescription);
-      }
+    if (newsViewModel.isLoading) {
+      body = loading;
+    } else if (newsViewModel.hasError) {
+      body =
+          ErrorDisplayWidget(description: newsViewModel.getErrorMessage(loc));
+    } else if (newsViewModel.isEmpty) {
+      body =
+          NoNewsView(title: loc.newsEmptyTitle, text: loc.newsEmptyDescription);
     } else {
-      var firstTranscript = newsList.first;
-      body = Scaffold(
-          body: ListView.builder(
+      final newsList = newsViewModel.newsList!;
+      body = RefreshIndicator(
+          onRefresh: Provider.of<NewsViewModel>(context, listen: false)
+              .generateAndGetNews,
+          child: ListView.builder(
               itemCount: newsList.length,
               itemBuilder: (context, index) {
                 return NewsText(news: newsList[index]);
-              }),
-          floatingActionButton: ExpandableFab(
-            distance: 112,
-            children: [
-              ActionButton(
-                onPressed: () =>
-                    Share.share('${firstTranscript.fullTranscript}\n\n'
-                        '${loc.newsShareText}'),
-                icon: const Icon(Icons.text_fields),
-              ),
-              ActionButton(
-                onPressed: () async => await Share.shareXFiles([
-                  XFile(
-                      // ignore: use_build_context_synchronously
-                      '${(await getApplicationDocumentsDirectory()).path}/audios/${firstTranscript.transcriptId}.mp3')
-                ], text: loc.newsShareText),
-                icon: const Icon(Icons.audiotrack),
-              ),
-              ActionButton(
-                onPressed: () {
-                  Provider.of<NewsViewModel>(context, listen: false)
-                      .setNewsPublicInDatabase(firstTranscript);
-                  Share.share(
-                      'https://actualia.pages.dev/share?transcriptId=${firstTranscript.transcriptId}');
-                },
-                icon: const Icon(Icons.link),
-              ),
-            ],
-          ));
+              }));
     }
     return body;
   }

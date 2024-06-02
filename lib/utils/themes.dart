@@ -8,6 +8,8 @@
 import 'package:flutter/material.dart';
 
 const double UNIT_PADDING = 16.0;
+const double BOX_BORDER_RADIUS = 8.0;
+const double BORDER_WIDTH = 1.0;
 const double ICON_NAV_SIZE = 40;
 const Color THEME_PRIMARY = Color(0xFF5EDCE4);
 const Color THEME_GREY = Color(0xFFCDCDDC);
@@ -41,9 +43,9 @@ ThemeData ACTUALIA_THEME = ThemeData(
           fontWeight: FontWeight.w300),
       // MONOSPACED BODIES
       displayLarge: TextStyle(
-          fontFamily: "Fira Code", fontSize: 32.0, fontWeight: FontWeight.w700),
-      displayMedium: TextStyle(
           fontFamily: "Fira Code", fontSize: 24.0, fontWeight: FontWeight.w500),
+      displayMedium: TextStyle(
+          fontFamily: "Fira Code", fontSize: 20.0, fontWeight: FontWeight.w400),
       displaySmall: TextStyle(
           fontFamily: "Fira Code",
           fontSize: 14.0,

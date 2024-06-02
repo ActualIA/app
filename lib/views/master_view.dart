@@ -1,12 +1,12 @@
-import 'dart:developer';
-
+import 'package:actualia/utils/themes.dart';
+import 'package:actualia/viewmodels/news.dart';
 import 'package:actualia/viewmodels/news_recognition.dart';
 import 'package:actualia/views/context_view.dart';
 import 'package:actualia/views/news_view.dart';
+import 'package:actualia/widgets/share_button.dart';
 import 'package:actualia/widgets/top_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:logging/logging.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/navigation_menu.dart';
@@ -23,28 +23,11 @@ class MasterView extends StatefulWidget {
 class _MasterView extends State<MasterView> {
   Views _currentViews = Views.NEWS;
   late List<Destination> _destinations;
-  late String? _ocrText;
 
   void setCurrentViewState(Views view) {
-    if (view != Views.CAMERA) {
-      setState(() {
-        _currentViews = view;
-      });
-    }
-  }
-
-  Future<void> cameraButtonPressed(Views view) async {
-    log("Camera button pressed on navigation bar", level: Level.INFO.value);
-    NewsRecognitionViewModel newsRecognitionVM =
-        Provider.of<NewsRecognitionViewModel>(context, listen: false);
-    XFile? image = await newsRecognitionVM.takePicture();
-
-    if (image != null) {
-      _ocrText = await newsRecognitionVM.ocr(image.path);
-      setState(() {
-        _currentViews = Views.CONTEXT;
-      });
-    }
+    setState(() {
+      _currentViews = view;
+    });
   }
 
   @override
@@ -56,9 +39,9 @@ class _MasterView extends State<MasterView> {
           icon: Icons.newspaper,
           onPressed: setCurrentViewState),
       Destination(
-          view: Views.CAMERA,
-          icon: Icons.camera_alt,
-          onPressed: cameraButtonPressed),
+          view: Views.CONTEXT,
+          icon: Icons.camera,
+          onPressed: setCurrentViewState),
       Destination(
           view: Views.FEED, icon: Icons.feed, onPressed: setCurrentViewState)
     ];
@@ -69,18 +52,66 @@ class _MasterView extends State<MasterView> {
     var loc = AppLocalizations.of(context)!;
 
     Widget body;
+    Widget? floatingButton;
     switch (_currentViews) {
       case Views.NEWS:
         body = const NewsView();
-        break;
-      case Views.CAMERA:
-        body = Center(child: Text(loc.notImplemented));
+        final firstTranscript = Provider.of<NewsViewModel>(context).news;
+
+        floatingButton = firstTranscript == null
+            ? null
+            : ExpandableFab(
+                distance: 112,
+                children: [
+                  ActionButton(
+                    onPressed: () =>
+                        Share.share('${firstTranscript.fullTranscript}\n\n'
+                            '${loc.newsShareText}'),
+                    icon: const Icon(Icons.text_fields),
+                  ),
+                  ActionButton(
+                    onPressed: () async => await Share.shareXFiles([
+                      XFile(
+                          // ignore: use_build_context_synchronously
+                          '${(await getApplicationDocumentsDirectory()).path}/audios/${firstTranscript.transcriptId}.mp3')
+                    ], text: loc.newsShareText),
+                    icon: const Icon(Icons.audiotrack),
+                  ),
+                  ActionButton(
+                    onPressed: () {
+                      Provider.of<NewsViewModel>(context, listen: false)
+                          .setNewsPublicInDatabase(firstTranscript);
+                      Share.share(
+                          'https://actualia.pages.dev/share?transcriptId=${firstTranscript.transcriptId}');
+                    },
+                    icon: const Icon(Icons.link),
+                  ),
+                ],
+              );
         break;
       case Views.FEED:
         body = Center(child: Text(loc.notImplemented));
         break;
       case Views.CONTEXT:
-        body = ContextView(text: _ocrText ?? loc.newsContextNoText);
+        body = const ContextView();
+        floatingButton = FloatingActionButton(
+          onPressed: () =>
+              Provider.of<NewsRecognitionViewModel>(context, listen: false)
+                  .takePictureAndProcess(),
+          child: const Icon(Icons.camera_alt),
+
+          /*
+        IconButton(
+          iconSize: 40,
+          onPressed: () =>
+              Provider.of<NewsRecognitionViewModel>(context, listen: false)
+                  .takePictureAndProcess(),
+          icon: Container(
+              padding: const EdgeInsets.all(UNIT_PADDING / 4),
+              child: const Icon(Icons.camera_alt)),
+          color: THEME_BUTTON,
+*/
+        );
         break;
       default:
         body = Center(child: Text(loc.notImplemented));
@@ -89,6 +120,7 @@ class _MasterView extends State<MasterView> {
 
     Widget screen = Scaffold(
       appBar: const TopAppBar(),
+      floatingActionButton: floatingButton,
       bottomNavigationBar: ActualiaBottomNavigationBar(
         destinations: _destinations,
       ),

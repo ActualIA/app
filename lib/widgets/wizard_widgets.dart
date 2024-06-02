@@ -2,27 +2,22 @@ import 'package:actualia/models/providers.dart';
 import 'package:actualia/viewmodels/providers.dart';
 import 'package:actualia/widgets/top_app_bar.dart';
 import 'package:actualia/utils/themes.dart';
+import 'package:fading_edge_scrollview/fading_edge_scrollview.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class WizardSelector extends StatefulWidget {
   final String title;
-  final String? buttonText;
   final List<(Object, String)> items;
   final List<(Object, String)> selectedItems;
-  final void Function(List<(Object, String)>) onPressed;
-  final bool isInitialOnboarding;
-  final void Function()? onCancel;
+  final void Function((Object, String)) onSelected;
 
   const WizardSelector(
       {required this.items,
-      required this.onPressed,
+      required this.onSelected,
       this.selectedItems = const [],
       this.title = "",
-      this.buttonText,
-      this.isInitialOnboarding = false,
-      this.onCancel,
       super.key});
 
   @override
@@ -31,54 +26,78 @@ class WizardSelector extends StatefulWidget {
 
 class _WizardSelector extends State<WizardSelector> {
   late List<(Object, String)> _items;
-  List<(Object, String)> _selectedItems = [];
+  final TextEditingController _filterController = TextEditingController();
+  late String _filter = "";
 
   @override
   void initState() {
     super.initState();
     _items = widget.items;
-    _selectedItems = widget.selectedItems.toList();
+    _filterController.addListener(() {
+      setState(() {
+        _filter = _filterController.text;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _filterController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     var loc = AppLocalizations.of(context)!;
 
+    Widget filter = Container(
+        padding: const EdgeInsets.fromLTRB(
+            UNIT_PADDING / 4, UNIT_PADDING, UNIT_PADDING / 4, 0),
+        child: Container(
+            decoration: BoxDecoration(
+                border: Border.all(width: BORDER_WIDTH),
+                borderRadius: BorderRadius.circular(BOX_BORDER_RADIUS)),
+            child: TextField(
+              controller: _filterController,
+              style: Theme.of(context).textTheme.bodyMedium,
+              decoration: InputDecoration(
+                icon: Container(
+                    padding:
+                        const EdgeInsets.fromLTRB(UNIT_PADDING / 2, 0, 0, 0),
+                    child: const Icon(Icons.search)),
+                iconColor: THEME_BUTTON,
+                hintText: loc.search,
+                border: InputBorder.none,
+              ),
+            )));
+
     Widget title = WizardSelectorTitle(title: widget.title);
 
     Widget body = Expanded(
         child: Container(
-            padding: const EdgeInsets.fromLTRB(0.0, 24.0, 0.0, 24.0),
-            child: SingleChildScrollView(
-                child: Wrap(
-                    spacing: UNIT_PADDING / 2,
-                    runSpacing: UNIT_PADDING / 2.5,
-                    alignment: WrapAlignment.center,
-                    children: _items
-                        .map((e) => FilterChip(
-                            label: Text(e.$2),
-                            onSelected: (v) {
-                              setState(() {
-                                _selectedItems.contains(e)
-                                    ? _selectedItems.remove(e)
-                                    : _selectedItems.add(e);
-                              });
-                            },
-                            selected: _selectedItems.contains(e)))
-                        .toList()))));
-
-    Widget bottomBar = WizardNavigationBottomBar(
-      showCancel: !widget.isInitialOnboarding,
-      onCancel: widget.onCancel,
-      showRight: true,
-      rText: widget.buttonText ?? loc.next,
-      rOnPressed: () {
-        widget.onPressed(_selectedItems);
-      },
-    );
+            padding:
+                const EdgeInsets.fromLTRB(0.0, UNIT_PADDING * 1.5, 0.0, 0.0),
+            child: FadingEdgeScrollView.fromSingleChildScrollView(
+                child: SingleChildScrollView(
+                    controller: ScrollController(),
+                    child: Wrap(
+                        spacing: UNIT_PADDING / 2,
+                        runSpacing: UNIT_PADDING / 2.5,
+                        alignment: WrapAlignment.center,
+                        children: _items
+                            .where((item) => item.$2
+                                .toLowerCase()
+                                .contains(_filter.toLowerCase()))
+                            .map((e) => FilterChip(
+                                label: Text(e.$2),
+                                onSelected: (v) {
+                                  widget.onSelected(e);
+                                },
+                                selected: widget.selectedItems.contains(e)))
+                            .toList())))));
 
     return Column(
-      children: [title, body, bottomBar],
+      children: [title, filter, body],
     );
   }
 }
@@ -144,51 +163,71 @@ class WizardNavigationBottomBar extends StatelessWidget {
     var loc = AppLocalizations.of(context)!;
     Widget right = const SizedBox();
     Widget cancel = const SizedBox();
+    ThemeData theme = Theme.of(context);
+
     if (showRight) {
-      right = FilledButton.tonal(
-          onPressed: rOnPressed,
-          style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateColor.resolveWith((states) => THEME_BUTTON)),
-          child: Text(
-            rText ?? loc.button,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ));
+      right = Container(
+        padding: const EdgeInsets.all(UNIT_PADDING),
+        child: FilledButton.tonal(
+            onPressed: rOnPressed,
+            style: ButtonStyle(
+                backgroundColor: MaterialStateColor.resolveWith(
+                    (states) => THEME_LIGHTGRAY)),
+            child: Text(
+              rText ?? loc.button,
+              style: theme.textTheme.bodyMedium?.copyWith(color: THEME_BUTTON),
+              textScaler: const TextScaler.linear(2),
+            )),
+      );
     }
     if (showCancel) {
-      cancel = FilledButton.tonal(
-          onPressed: onCancel,
-          style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateColor.resolveWith((states) => THEME_BUTTON)),
-          child: Text(
-            cancelText ?? loc.cancel,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ));
+      cancel = Container(
+          padding: const EdgeInsets.all(UNIT_PADDING),
+          child: FilledButton.tonal(
+              onPressed: onCancel,
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateColor.resolveWith(
+                      (states) => THEME_LIGHTGRAY)),
+              child: Text(
+                cancelText ?? loc.cancel,
+                style:
+                    theme.textTheme.bodyMedium?.copyWith(color: THEME_BUTTON),
+                textScaler: const TextScaler.linear(2),
+              )));
     }
 
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [cancel, right]);
+    return Container(
+        color: THEME_LIGHTGRAY,
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [cancel, right]));
   }
 }
 
 class WizardScaffold extends StatelessWidget {
   final PreferredSizeWidget topBar;
-  final Widget? body;
+  final Widget body;
+  final Widget bottomBar;
+  final EdgeInsetsGeometry? padding;
 
-  const WizardScaffold({this.topBar = const TopAppBar(), this.body, super.key});
+  const WizardScaffold(
+      {this.topBar = const TopAppBar(
+        enableProfileButton: false,
+      ),
+      required this.body,
+      required this.bottomBar,
+      this.padding,
+      super.key});
 
   @override
   Widget build(BuildContext context) {
-    var loc = AppLocalizations.of(context)!;
-
     return Scaffold(
       appBar: topBar,
+      bottomNavigationBar: bottomBar,
       body: Container(
-        padding: const EdgeInsets.fromLTRB(48.0, 48.0, 48.0, 48.0),
+        padding: padding ?? const EdgeInsets.all(UNIT_PADDING * 3),
         alignment: Alignment.topCenter,
-        child: body ?? Text(loc.notImplemented),
+        child: body,
       ),
     );
   }
